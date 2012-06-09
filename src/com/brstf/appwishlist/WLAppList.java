@@ -77,8 +77,8 @@ public class WLAppList extends ListFragment {
 					// Set the paintflags to allow for strikethru for the sale
 					priceView.setPaintFlags(priceView.getPaintFlags()
 							| Paint.STRIKE_THRU_TEXT_FLAG);
-					
-					//Finally, set the text for the currentprice
+
+					// Finally, set the text for the currentprice
 					((TextView) row.findViewById(R.id.sale_price))
 							.setText(getPriceText(curPrice));
 				} else {
@@ -238,6 +238,9 @@ public class WLAppList extends ListFragment {
 		mDbHelper.close();
 	}
 
+	/**
+	 * Function to add all entries from the database to the list
+	 */
 	private void fillData() {
 		// Get all entries from the database and create the item list
 		Cursor c = mDbHelper.fetchAllEntries();
