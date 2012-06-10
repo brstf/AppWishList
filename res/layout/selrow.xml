@@ -11,17 +11,42 @@
         android:src="@drawable/ic_launcher"/>
     
     <ImageButton
+        android:id="@+id/btntag"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/btndelDesc"
+        android:src="@android:drawable/ic_menu_edit" />
+    
+    <ImageButton
+        android:id="@+id/btnshr"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/btndelDesc"
+        android:src="@android:drawable/ic_menu_share" />
+    
+    <ImageButton
         android:id="@+id/btndel"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="fill_parent"
         android:contentDescription="@string/btndelDesc"
         android:src="@android:drawable/ic_menu_delete" />
 
     <ImageButton
         android:id="@+id/btnrev"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="fill_parent"
         android:contentDescription="@string/btnrevDesc"
         android:src="@android:drawable/ic_menu_revert" />
 
+    <ImageView android:id="@+id/shiftpos"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/iconViewDesc"
+        android:src="@android:drawable/ic_menu_sort_by_size"/>
+    
 </LinearLayout>
