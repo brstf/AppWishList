@@ -11,6 +11,7 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.brstf.appwishlist.entries.WLAppEntry;
+import com.brstf.appwishlist.entries.WLEntryType;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,6 +34,10 @@ public class ShareActivity extends Activity {
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		String url = intent.getExtras().getString("android.intent.extra.TEXT");
+
+		Toast.makeText(getBaseContext(),
+				WLEntryType.getTypeString(WLEntryType.getTypeFromURL(url)),
+				Toast.LENGTH_LONG).show();
 
 		// Open up the SQLite database
 		mDbHelper = new WLDbAdapter(this.getApplicationContext());
@@ -109,7 +114,7 @@ public class ShareActivity extends Activity {
 								.getContent());
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 				fos.close();
-				
+
 				ent.setIconPath(ent.getTitle() + ".png");
 
 				// Successful exit

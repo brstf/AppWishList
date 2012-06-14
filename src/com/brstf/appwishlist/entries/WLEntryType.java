@@ -19,10 +19,13 @@ public enum WLEntryType {
 		case APP:
 			return new WLAppEntry(id);
 		case BOOK:
+			return new WLBookEntry(id);
 		case MOVIE:
+			return new WLMovieEntry(id);
 		case MUSIC_ARTIST:
 			return new WLArtistEntry(id);
 		case MUSIC_ALBUM:
+			return new WLAlbumEntry(id);
 		default:
 			return null;
 		}
@@ -70,6 +73,28 @@ public enum WLEntryType {
 		} else if (type.equals("ARTIST")) {
 			return MUSIC_ARTIST;
 		} else if (type.equals("ALBUM")) {
+			return MUSIC_ALBUM;
+		} else {
+			return NONE;
+		}
+	}
+	
+	/**
+	 * Function to retrieve the type of entry based on a give Google Play store URL
+	 * 
+	 * @param url The Google Play URL to retrieve type from
+	 * @return The entry type of the given Google Play URL
+	 */
+	public static WLEntryType getTypeFromURL(String url) {
+		if( url.contains("/store/apps/")) {
+			return APP;
+		} else if( url.contains("/store/movies/")) {
+			return MOVIE;
+		} else if( url.contains("/store/books/")) {
+			return BOOK;
+		} else if( url.contains("/store/music/artist")) {
+			return MUSIC_ARTIST;
+		} else if( url.contains("/store/music/album")) {
 			return MUSIC_ALBUM;
 		} else {
 			return NONE;
