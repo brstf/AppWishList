@@ -1,5 +1,7 @@
 package com.brstf.appwishlist;
 
+import com.brstf.appwishlist.entries.WLAppEntry;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -109,11 +111,11 @@ public class WLDbAdapter {
 	 */
 	public long createEntry(WLAppEntry ent) {
 		ContentValues values = new ContentValues();
-		values.put(KEY_NAME, ent.getName());
+		values.put(KEY_NAME, ent.getTitle());
 		values.put(KEY_URL, ent.getURL());
 		values.put(KEY_ICON, ent.getIconPath());
 		values.put(KEY_CPRICE, ent.getCurrentPrice());
-		values.put(KEY_OPRICE, ent.getOriginalPrice());
+		values.put(KEY_OPRICE, ent.getRegularPrice());
 
 		return mDb.insert(DATABASE_TABLE, null, values);
 	}
@@ -171,11 +173,11 @@ public class WLDbAdapter {
 	 */
 	public boolean updateEntry(long rowId, WLAppEntry ent) {
 		ContentValues values = new ContentValues();
-		values.put(KEY_NAME, ent.getName());
+		values.put(KEY_NAME, ent.getTitle());
 		values.put(KEY_URL, ent.getURL());
 		values.put(KEY_ICON, ent.getIconPath());
 		values.put(KEY_CPRICE, ent.getCurrentPrice());
-		values.put(KEY_OPRICE, ent.getOriginalPrice());
+		values.put(KEY_OPRICE, ent.getRegularPrice());
 
 		return mDb
 				.update(DATABASE_TABLE, values, KEY_ROWID + "=" + rowId, null) > 0;

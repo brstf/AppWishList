@@ -4,14 +4,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.brstf.appwishlist.entries.WLAppEntry;
 
 import android.app.Activity;
 import android.content.Context;
@@ -98,43 +97,20 @@ public class ShareActivity extends Activity {
 				// Grab the text from the url
 				url = params[0];
 				String result = downloadURL(url);
-				ent.setURL(url);
 
-				// Set up the patterns and corresponding matchers
-				Pattern p_name = Pattern
-						.compile("About This App</h4><dl class=\"doc-metadata-list\" itemscope itemtype=\"http://schema.org/MobileSoftwareApplication\"><meta itemprop=\"name\" content=\"(.*?)\"");
-				Pattern p_icon = Pattern
-						.compile("<meta itemprop=\"image\" content=\"(.*?)\"");
-				Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
-				Matcher m_name = p_name.matcher(result);
-				Matcher m_icon = p_icon.matcher(result);
-				Matcher m_price = p_price.matcher(result);
-
-				// Find the patterns
-				m_name.find();
-				m_icon.find();
-				m_price.find();
-
-				// Set our variables with the retrieved information
-				ent.setName(m_name.group(1));
-				if (m_price.group(1).equals("Free")) {
-					ent.setOriginalPrice(0.0f);
-				} else {
-					ent.setOriginalPrice(Float.valueOf(m_price.group(1)
-							.substring(1)));
-				}
+				// TODO: LOADSA MONEY!
+				ent.setFromURLText(url, result);
 
 				// Create a FileOutputStream and write the image to file
 				FileOutputStream fos = getApplicationContext().openFileOutput(
-						ent.getName() + ".png", Context.MODE_PRIVATE);
+						ent.getTitle() + ".png", Context.MODE_PRIVATE);
 				Bitmap bitmap = BitmapFactory
-						.decodeStream((InputStream) new URL(m_icon.group(1))
+						.decodeStream((InputStream) new URL(ent.getIconPath())
 								.getContent());
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 				fos.close();
-
-				// TODO: Make this a default icon on download failure
-				ent.setIconPath(ent.getName() + ".png");
+				
+				ent.setIconPath(ent.getTitle() + ".png");
 
 				// Successful exit
 				return "Success";
@@ -159,7 +135,7 @@ public class ShareActivity extends Activity {
 
 				// Show that the app was successfully added to the wishlist
 				Toast.makeText(getBaseContext(),
-						"Added " + ent.getName() + " to wishlist!",
+						"Added " + ent.getTitle() + " to wishlist!",
 						Toast.LENGTH_SHORT).show();
 			}
 

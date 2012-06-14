@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import com.brstf.appwishlist.entries.WLAppEntry;
+
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -44,47 +47,7 @@ public class WLAppList extends ListFragment {
 
 			// If this is not the selected index, the view is as normal
 			if (position != mSelId) {
-				// Get the view associated with this row
-
-				if (getItem(position).getCurrentPrice() != getItem(position)
-						.getOriginalPrice()) {
-					// If there's a sale, use the row_sale layout
-					row = getActivity().getLayoutInflater().inflate(
-							R.layout.row_sale, parent, false);
-				} else {
-					// Otherwise use the base row layout
-					row = getActivity().getLayoutInflater().inflate(
-							R.layout.row, parent, false);
-				}
-
-				// Set the text of the appname to be the name of the app
-				((TextView) row.findViewById(R.id.appname)).setText(getItem(
-						position).getName());
-
-				// Set the text of the price to be the price of the app
-				float curPrice = getItem(position).getCurrentPrice();
-				float oriPrice = getItem(position).getOriginalPrice();
-
-				// Display the price information based on presence of a sale
-				if (curPrice != oriPrice) {
-					// The original price TextView
-					TextView priceView = ((TextView) row
-							.findViewById(R.id.price));
-
-					// Set the text
-					priceView.setText(getPriceText(oriPrice));
-
-					// Set the paintflags to allow for strikethru for the sale
-					priceView.setPaintFlags(priceView.getPaintFlags()
-							| Paint.STRIKE_THRU_TEXT_FLAG);
-
-					// Finally, set the text for the currentprice
-					((TextView) row.findViewById(R.id.sale_price))
-							.setText(getPriceText(curPrice));
-				} else {
-					((TextView) row.findViewById(R.id.price))
-							.setText(getPriceText(curPrice));
-				}
+				row = getNormalRow(position, parent);
 			} else {
 				// Otherwise the view is the context menu
 				row = getActivity().getLayoutInflater().inflate(
@@ -152,6 +115,52 @@ public class WLAppList extends ListFragment {
 			}
 
 			// Finally, return the row
+			return row;
+		}
+
+		/**
+		 * Gets the View of a row that is not selected
+		 * @param position The position of the row in the list
+		 * @param parent The parent ViewGroup of the listFragment
+		 * @return The row view
+		 */
+		private View getNormalRow(int position, ViewGroup parent) {
+			// Get the view associated with this row
+			View row = null;
+			WLAppEntry ent = getItem(position);
+
+			// Default to the normal row layout
+			int rowLayout = R.layout.row;
+
+			if (ent.isOnSale()) {
+				// If there's a sale, use the row_sale layout
+				rowLayout = R.layout.row_sale;
+			}
+
+			// Inflate the row View
+			row = getActivity().getLayoutInflater().inflate(rowLayout, parent,
+					false);
+
+			// Set the text of the appname to be the name of the app
+			((TextView) row.findViewById(R.id.appname)).setText(ent.getTitle());
+
+			// Display the price information based on presence of a sale
+			if (ent.isOnSale()) {
+				// Set the text of the original price textview
+				TextView priceView = ((TextView) row.findViewById(R.id.price));
+				priceView.setText(getPriceText(ent.getRegularPrice()));
+
+				// Set the paintflags to allow for strikethru for the sale
+				priceView.setPaintFlags(priceView.getPaintFlags()
+						| Paint.STRIKE_THRU_TEXT_FLAG);
+
+				// Finally, set the text for the currentprice
+				((TextView) row.findViewById(R.id.sale_price))
+						.setText(getPriceText(ent.getCurrentPrice()));
+			} else {
+				((TextView) row.findViewById(R.id.price))
+						.setText(getPriceText(ent.getCurrentPrice()));
+			}
 			return row;
 		}
 
@@ -250,11 +259,11 @@ public class WLAppList extends ListFragment {
 		while (!c.isAfterLast()) {
 			Log.d("DBG", String.valueOf(c.getColumnCount()));
 			WLAppEntry ent = new WLAppEntry(c.getInt(0));
-			ent.setName(c.getString(1));
+			ent.setTitle(c.getString(1));
 			ent.setURL(c.getString(2));
 			ent.setIconPath(c.getString(3));
 			ent.setCurrentPrice(c.getFloat(4));
-			ent.setOriginalPrice(c.getFloat(5));
+			ent.setRegularPrice(c.getFloat(5));
 
 			mListAdapter.add(ent);
 			c.moveToNext();

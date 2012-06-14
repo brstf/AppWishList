@@ -89,8 +89,8 @@ public class WLPriceChecker {
 				// Check if these values are different than the existing values
 				if (price != mAdapter.getItem(i).getCurrentPrice()) {
 					mAdapter.getItem(i).setCurrentPrice(price);
-					if (price > mAdapter.getItem(i).getOriginalPrice()) {
-						mAdapter.getItem(i).setOriginalPrice(price);
+					if (price > mAdapter.getItem(i).getRegularPrice()) {
+						mAdapter.getItem(i).setRegularPrice(price);
 					}
 					onProgressUpdate(i);
 					items_changed = true;

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Space
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical" 
+                android:clickable="true">
+
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:contentDescription="@string/empty"
+                    android:src="@drawable/ic_launcher" />
+
+                <Button
+                    android:id="@+id/btnall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dip"
+                    android:layout_marginRight="4dip"
+                    android:background="#FF8800"
+                    android:clickable="true"
+                    android:text="@string/btnalltext"
+                    android:typeface="sans" />
+
+                <LinearLayout 
+                    android:id="@+id/grid_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:baselineAligned="false">
+                    <LinearLayout
+                        android:id="@+id/column1"
+                        android:layout_width="0dip"
+                        android:layout_weight="1"
+	                    android:layout_height="wrap_content"
+						android:orientation="vertical"/>
+                    <LinearLayout
+                        android:id="@+id/column2"
+                        android:layout_width="0dip"
+                        android:layout_weight="1"
+	                    android:layout_height="wrap_content"
+						android:orientation="vertical"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:id="@+id/btnadd"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill"
+                        android:layout_margin="0dip"
+                        android:layout_weight="1"
+                        android:padding="0dip"
+                        android:text="@string/btnaddtext"
+                        android:typeface="sans" />
+
+                    <Button
+                        android:id="@+id/btnpur"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill"
+                        android:layout_margin="0dip"
+                        android:layout_weight="1"
+                        android:padding="0dip"
+                        android:text="@string/btnpurtext"
+                        android:typeface="sans" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+</ScrollView>

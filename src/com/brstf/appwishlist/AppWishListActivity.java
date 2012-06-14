@@ -9,7 +9,7 @@ public class AppWishListActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
 		if (findViewById(R.id.fragment_container) != null) {
 
 			// However, if we're being restored from a previous state,
@@ -31,4 +31,5 @@ public class AppWishListActivity extends Activity {
 					.add(R.id.fragment_container, firstFragment).commit();
 		}
 	}
+	
 }
