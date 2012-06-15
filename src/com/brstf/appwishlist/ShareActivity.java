@@ -10,7 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.appwishlist.entries.WLAppEntry;
+import com.brstf.appwishlist.entries.WLEntry;
 import com.brstf.appwishlist.entries.WLEntryType;
 
 import android.app.Activity;
@@ -34,10 +34,6 @@ public class ShareActivity extends Activity {
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		String url = intent.getExtras().getString("android.intent.extra.TEXT");
-
-		Toast.makeText(getBaseContext(),
-				WLEntryType.getTypeString(WLEntryType.getTypeFromURL(url)),
-				Toast.LENGTH_LONG).show();
 
 		// Open up the SQLite database
 		mDbHelper = new WLDbAdapter(this.getApplicationContext());
@@ -87,21 +83,19 @@ public class ShareActivity extends Activity {
 	private class WLAddApp extends AsyncTask<String, String, String> {
 		// The URL and app entry
 		private String url;
-		private WLAppEntry ent = null;
+		private WLEntry ent = null;
 
 		@Override
 		protected String doInBackground(String... params) {
-			// Create the new App Entry
-			ent = new WLAppEntry(-1);
-			// Here ID is set to -1. We're just writing this to the database so
-			// we'll never see the id
-
 			// Try to download the Play Store text and scrape all relevant
 			// information
 			try {
 				// Grab the text from the url
 				url = params[0];
 				String result = downloadURL(url);
+
+				ent = WLEntryType.getTypeEntry(WLEntryType.getTypeFromURL(url),
+						-1);
 
 				// TODO: LOADSA MONEY!
 				ent.setFromURLText(url, result);

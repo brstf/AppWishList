@@ -49,8 +49,8 @@ public class WLDbAdapter {
 	private static final String DATABASE_CREATE = "create table wlentries (_id integer "
 			+ "primary key autoincrement, type text not null, name text not null, url "
 			+ "text not null, icon text not null, cprice float, rprice float, rating "
-			+ "float, crating text not null, movlength int, creator text not null, "
-			+ "alblength text not null, numtracks int, date text not null, pcount int);";
+			+ "float, crating text, movlength int, creator text, "
+			+ "alblength text, numtracks int, date text, pcount int);";
 
 	private static final String DATABASE_NAME = "wldata";
 	private static final String DATABASE_TABLE = "wlentries";
