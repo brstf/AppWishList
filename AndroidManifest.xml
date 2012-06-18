@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.brstf.appwishlist"
+    package="com.brstf.wishlist"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -23,7 +23,7 @@
         </activity>
         
         <!-- Start the share activity to add a Play listing (Activity is transparent) -->
-        <activity android:name=".ShareActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        <activity android:name="com.brstf.wishlist.ShareActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
