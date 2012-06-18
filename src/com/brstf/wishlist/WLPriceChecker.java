@@ -75,26 +75,15 @@ public class WLPriceChecker {
 				String url = mAdapter.getItem(i).getURL();
 				String result = downloadURL(url);
 
-				// Set up the patterns and corresponding matchers
-				Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
-				Matcher m_price = p_price.matcher(result);
-				m_price.find();
-
-				// Set our variables with the retrieved information
-				float price = 0.0f;
-				if (!m_price.group(1).equals("Free")) {
-					price = Float.valueOf(m_price.group(1).substring(1));
-				}
-
 				// Check if these values are different than the existing values
-				if (price != mAdapter.getItem(i).getCurrentPrice()) {
+				/*if (price != mAdapter.getItem(i).getCurrentPrice()) {
 					mAdapter.getItem(i).setCurrentPrice(price);
 					if (price > mAdapter.getItem(i).getRegularPrice()) {
 						mAdapter.getItem(i).setRegularPrice(price);
 					}
 					onProgressUpdate(i);
 					items_changed = true;
-				}
+				}*/
 			}
 
 			// Successful exit
