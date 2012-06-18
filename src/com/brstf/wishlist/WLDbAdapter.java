@@ -7,6 +7,7 @@ import com.brstf.wishlist.entries.WLBookEntry;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.entries.WLMovieEntry;
+import com.brstf.wishlist.entries.WLPricedEntry;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -226,6 +227,23 @@ public class WLDbAdapter {
 	}
 
 	/**
+	 * Creates a contentValues object for the given PricedEntry
+	 * 
+	 * @param ent
+	 *            The priced entry to get the price values from
+	 * @param values
+	 *            The content values to add the values to
+	 * @return The content values object with price/rating information added
+	 */
+	private ContentValues createPricedValues(WLPricedEntry ent,
+			ContentValues values) {
+		values.put(KEY_CPRICE, ent.getCurrentPrice());
+		values.put(KEY_RPRICE, ent.getRegularPrice());
+		
+		return values;
+	}
+
+	/**
 	 * Creates a ContentValues object for the given APP entry
 	 * 
 	 * @param ent
@@ -235,8 +253,7 @@ public class WLDbAdapter {
 	 * @return The final ContentValues object
 	 */
 	private ContentValues createAppValues(WLAppEntry ent, ContentValues values) {
-		values.put(KEY_CPRICE, ent.getCurrentPrice());
-		values.put(KEY_RPRICE, ent.getRegularPrice());
+		values = createPricedValues(ent, values);
 
 		return values;
 	}
@@ -251,6 +268,7 @@ public class WLDbAdapter {
 	 * @return The final ContentValues object
 	 */
 	private ContentValues createBookValues(WLBookEntry ent, ContentValues values) {
+		values = createPricedValues(ent, values);
 		values.put(KEY_CREATOR, ent.getAuthor());
 		values.put(KEY_PCOUNT, ent.getPageCount());
 		values.put(KEY_DATE, ent.getPublishDate());
@@ -269,6 +287,7 @@ public class WLDbAdapter {
 	 */
 	private ContentValues createMovieValues(WLMovieEntry ent,
 			ContentValues values) {
+		values = createPricedValues(ent, values);
 		values.put(KEY_CRATING, ent.getContentRating());
 		values.put(KEY_CREATOR, ent.getDirector());
 		values.put(KEY_MOVLENGTH, ent.getMovieLength());
@@ -301,6 +320,7 @@ public class WLDbAdapter {
 	 */
 	private ContentValues createAlbumValues(WLAlbumEntry ent,
 			ContentValues values) {
+		values = createPricedValues(ent, values);
 		values.put(KEY_CREATOR, ent.getArtist());
 		values.put(KEY_ALBLENGTH, ent.getLength());
 		values.put(KEY_NUMTRACKS, ent.getTrackCount());

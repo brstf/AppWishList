@@ -6,8 +6,8 @@ import com.brstf.wishlist.WLDbAdapter;
 import com.brstf.wishlist.entries.WLEntry;
 
 public abstract class WLPricedEntry extends WLEntry {
-	private float cPrice = 0.0f;
-	private float rPrice = 0.0f;
+	private float cPrice = -1.0f;
+	private float rPrice = -1.0f;
 	private float rating = 0.0f;
 
 	public WLPricedEntry(int id) {
@@ -93,6 +93,10 @@ public abstract class WLPricedEntry extends WLEntry {
 		}
 
 		rPrice = price;
+		
+		if( cPrice == -1.0f ) {
+			setCurrentPrice(price);
+		}
 	}
 	
 	/**

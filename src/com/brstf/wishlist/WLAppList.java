@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.brstf.appwishlist.R;
+import com.brstf.wishlist.R;
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
@@ -22,7 +22,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -169,7 +168,7 @@ public class WLAppList extends ListFragment {
 				// Finally, set the text for the currentprice
 				((TextView) row.findViewById(R.id.sale_price))
 						.setText(getPriceText(((WLPricedEntry) ent).getCurrentPrice()));
-			} else {
+			} else if(ent.getType() != WLEntryType.MUSIC_ARTIST){
 				((TextView) row.findViewById(R.id.price))
 						.setText(getPriceText(((WLPricedEntry) ent).getCurrentPrice()));
 			}
@@ -242,7 +241,7 @@ public class WLAppList extends ListFragment {
 			}
 		});
 
-		// Refresh all potential info for an app listing
+		// Refresh all potential info for a listing
 		// new WLPriceChecker(mListAdapter).priceCheck();
 	}
 
@@ -283,10 +282,11 @@ public class WLAppList extends ListFragment {
 		int typeCol = c.getColumnIndex(WLDbAdapter.KEY_TYPE);
 		int idCol = c.getColumnIndex(WLDbAdapter.KEY_ROWID);
 		while (!c.isAfterLast()) {
-			Log.d("DBG", String.valueOf(c.getColumnCount()));
 			WLEntry ent = WLEntryType.getTypeEntry(
 					WLEntryType.getTypeFromString(c.getString(typeCol)),
 					c.getInt(idCol));
+			
+			ent.setFromDb(c);
 
 			mListAdapter.add(ent);
 			c.moveToNext();

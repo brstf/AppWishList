@@ -2,10 +2,10 @@
 <resources>
 
     <string name="app_name">Add to Wishlist</string>
-    <string name="actionbar_name">App Wishlist</string>
-    <string name="iconViewDesc">App Icon</string>
-    <string name="btndelDesc">Remove App from List</string>
-    <string name="btnrevDesc">De-select App</string>
+    <string name="actionbar_name">Wishlist</string>
+    <string name="iconViewDesc">Icon</string>
+    <string name="btndelDesc">Remove from List</string>
+    <string name="btnrevDesc">De-select</string>
     <string name="chooser_diag">Open URL with</string>
     <string name="empty"></string>
     <string name="btnalltext">"a l l"</string>

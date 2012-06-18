@@ -2,7 +2,7 @@ package com.brstf.wishlist;
 
 import java.util.ArrayList;
 
-import com.brstf.appwishlist.R;
+import com.brstf.wishlist.R;
 import com.brstf.wishlist.widgets.SquareButton;
 
 import android.app.Fragment;

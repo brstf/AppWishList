@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
     
-    <com.brstf.appwishlist.widgets.SquareImageView android:id="@+id/icon"
+    <com.brstf.wishlist.widgets.SquareImageView android:id="@+id/icon"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="fill_parent"

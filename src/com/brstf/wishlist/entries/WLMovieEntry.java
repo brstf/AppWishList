@@ -74,6 +74,7 @@ public class WLMovieEntry extends WLPricedEntry {
 	
 	@Override
 	public void setFromDb(Cursor c) {
+		super.setFromDb(c);
 		setContentRating(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CRATING)));
 		setDirector(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
 		setMovieLength(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_MOVLENGTH)));

@@ -1,6 +1,6 @@
 package com.brstf.wishlist;
 
-import com.brstf.appwishlist.R;
+import com.brstf.wishlist.R;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

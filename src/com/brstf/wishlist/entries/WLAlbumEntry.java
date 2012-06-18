@@ -75,6 +75,7 @@ public class WLAlbumEntry extends WLPricedEntry {
 	
 	@Override
 	public void setFromDb(Cursor c) {
+		super.setFromDb(c);
 		setArtist(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
 		setLength(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ALBLENGTH)));
 		setTrackCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_NUMTRACKS)));

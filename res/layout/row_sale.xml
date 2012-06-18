@@ -4,9 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-    <ImageView
+    <com.brstf.wishlist.widgets.SquareImageView
         android:id="@+id/appicon"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="fill_parent"
         android:contentDescription="@string/iconViewDesc"
         android:src="@drawable/ic_launcher" />
@@ -15,7 +16,7 @@
         android:id="@+id/appname"
         android:layout_width="0dip"
         android:layout_height="fill_parent"
-        android:layout_weight="10"
+        android:layout_weight="4"
         android:gravity="center_vertical" 
         android:paddingLeft="5dip"/>
 
@@ -23,7 +24,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dip"
         android:layout_height="fill_parent"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical" >
 

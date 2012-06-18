@@ -60,7 +60,7 @@ public class WLBookEntry extends WLPricedEntry {
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(m_icon.group(1));
+		setIconPath(m_icon.group(1).replace("&amp;", "&"));
 		setPageCount(Integer.valueOf(m_pageCount.group(1)));
 		setAuthor(m_author.group(1));
 		setPublishDate(m_publish.group(1));
@@ -68,6 +68,7 @@ public class WLBookEntry extends WLPricedEntry {
 	
 	@Override
 	public void setFromDb(Cursor c) {
+		super.setFromDb(c);
 		setPageCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_PCOUNT)));
 		setAuthor(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
 		setPublishDate(c.getString(c.getColumnIndex(WLDbAdapter.KEY_DATE)));

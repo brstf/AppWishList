@@ -37,7 +37,6 @@ public class ShareActivity extends Activity {
 
 		// Open up the SQLite database
 		mDbHelper = new WLDbAdapter(this.getApplicationContext());
-		mDbHelper.open();
 
 		// Show a notification to let the user know it's being added to the
 		// wishlist
@@ -129,6 +128,7 @@ public class ShareActivity extends Activity {
 						"Failed to add app to wishlist.", Toast.LENGTH_SHORT)
 						.show();
 			} else {
+				mDbHelper.open();
 				// Otherwise, add the entry to the list
 				mDbHelper.createEntry(ent);
 
@@ -136,10 +136,10 @@ public class ShareActivity extends Activity {
 				Toast.makeText(getBaseContext(),
 						"Added " + ent.getTitle() + " to wishlist!",
 						Toast.LENGTH_SHORT).show();
+				
+				// Finally, close the db helper
+				mDbHelper.close();
 			}
-
-			// Finally, close the db helper
-			mDbHelper.close();
 		}
 	}
 }
