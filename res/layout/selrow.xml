@@ -4,8 +4,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-    <ImageView android:id="@+id/appicon"
-        android:layout_width="wrap_content"
+    <com.brstf.wishlist.widgets.SquareImageView android:id="@+id/appicon"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="fill_parent"
         android:contentDescription="@string/iconViewDesc"
         android:src="@drawable/ic_launcher"/>
