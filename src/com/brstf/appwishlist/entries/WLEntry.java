@@ -1,5 +1,9 @@
 package com.brstf.appwishlist.entries;
 
+import com.brstf.appwishlist.WLDbAdapter;
+
+import android.database.Cursor;
+
 /**
  * Class for storing information about an entry into the wishlist Stores: - URL
  * to Google Play listing - The icon of the entry
@@ -80,6 +84,19 @@ public abstract class WLEntry {
 	 *            The text obtained from the given url
 	 */
 	public abstract void setFromURLText(String url, String text);
+
+	/**
+	 * Function to set the member variables for a this particular entry from a
+	 * pointer to a database entry
+	 * 
+	 * @param c
+	 *            The cursor pointing to the database entry to set the data from
+	 */
+	public void setFromDb(Cursor c) {
+		setTitle(c.getString(c.getColumnIndex(WLDbAdapter.KEY_NAME)));
+		setURL(c.getString(c.getColumnIndex(WLDbAdapter.KEY_URL)));
+		setIconPath(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICON)));
+	}
 
 	// Mutators
 

@@ -14,7 +14,7 @@
         android:label="@string/app_name">
         
         <activity
-            android:name=".AppWishListActivity"
+            android:name=".WishListActivity"
             android:label="@string/actionbar_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -3,6 +3,8 @@ package com.brstf.appwishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.database.Cursor;
+
 /**
  * Class for storing information about an app entry in the wishlist
  */
@@ -48,5 +50,10 @@ public class WLAppEntry extends WLPricedEntry {
 
 		// Set the icon path
 		setIconPath(m_icon.group(1));
+	}
+	
+	@Override
+	public void setFromDb(Cursor c) {
+		super.setFromDb(c);
 	}
 }

@@ -3,6 +3,10 @@ package com.brstf.appwishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.database.Cursor;
+
+import com.brstf.appwishlist.WLDbAdapter;
+
 public class WLBookEntry extends WLPricedEntry {
 	private int mPageCount;
 	private String mAuthor = null;
@@ -60,9 +64,15 @@ public class WLBookEntry extends WLPricedEntry {
 		setPageCount(Integer.valueOf(m_pageCount.group(1)));
 		setAuthor(m_author.group(1));
 		setPublishDate(m_publish.group(1));
-		
 	}
-
+	
+	@Override
+	public void setFromDb(Cursor c) {
+		setPageCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_PCOUNT)));
+		setAuthor(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+		setPublishDate(c.getString(c.getColumnIndex(WLDbAdapter.KEY_DATE)));
+	}
+	
 	/**
 	 * Retrieves the number of pages in the book
 	 * 

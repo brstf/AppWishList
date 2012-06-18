@@ -3,6 +3,10 @@ package com.brstf.appwishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.database.Cursor;
+
+import com.brstf.appwishlist.WLDbAdapter;
+
 /**
  * Class for storing information about a movie entry in the wishlist
  */
@@ -66,6 +70,13 @@ public class WLMovieEntry extends WLPricedEntry {
 		setContentRating(m_cr.group(1));
 		setDirector(m_dir.group(1));
 		setMovieLength(Integer.valueOf(m_length.group(1)));
+	}
+	
+	@Override
+	public void setFromDb(Cursor c) {
+		setContentRating(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CRATING)));
+		setDirector(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+		setMovieLength(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_MOVLENGTH)));
 	}
 
 	/**

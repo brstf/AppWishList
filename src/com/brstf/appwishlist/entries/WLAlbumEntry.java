@@ -3,6 +3,10 @@ package com.brstf.appwishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.database.Cursor;
+
+import com.brstf.appwishlist.WLDbAdapter;
+
 public class WLAlbumEntry extends WLPricedEntry {
 	private String mArtist = null;
 	private String mLength = null;
@@ -67,6 +71,14 @@ public class WLAlbumEntry extends WLPricedEntry {
 		setLength(m_length.group(1));
 		setTrackCount(Integer.valueOf(m_tracks.group(1)));
 		setReleaseDate(m_release.group(1));
+	}
+	
+	@Override
+	public void setFromDb(Cursor c) {
+		setArtist(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+		setLength(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ALBLENGTH)));
+		setTrackCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_NUMTRACKS)));
+		setReleaseDate(c.getString(c.getColumnIndex(WLDbAdapter.KEY_DATE)));
 	}
 
 	/**

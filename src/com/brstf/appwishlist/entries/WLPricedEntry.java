@@ -1,5 +1,8 @@
 package com.brstf.appwishlist.entries;
 
+import android.database.Cursor;
+
+import com.brstf.appwishlist.WLDbAdapter;
 import com.brstf.appwishlist.entries.WLEntry;
 
 public abstract class WLPricedEntry extends WLEntry {
@@ -9,6 +12,14 @@ public abstract class WLPricedEntry extends WLEntry {
 
 	public WLPricedEntry(int id) {
 		super(id);
+	}
+	
+	@Override
+	public void setFromDb(Cursor c) {
+		super.setFromDb(c);
+		setCurrentPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_CPRICE)));
+		setRegularPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RPRICE)));
+		// setRating(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RATING)));
 	}
 
 	/**
