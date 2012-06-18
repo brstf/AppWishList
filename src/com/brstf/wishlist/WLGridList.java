@@ -1,6 +1,9 @@
-package com.brstf.appwishlist;
+package com.brstf.wishlist;
 
 import java.util.ArrayList;
+
+import com.brstf.appwishlist.R;
+import com.brstf.wishlist.widgets.SquareButton;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -36,7 +39,7 @@ public class WLGridList  {
 	public View getView(int position, View view) {
 		LayoutInflater inflater = (LayoutInflater) mCtx.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		//Now add two entires to the row
+		//Now add two entries to the row
 		SquareButton tile = new SquareButton(mCtx);
 		tile = (SquareButton) inflater.inflate(R.layout.gridentry, null);
 		tile.setText(mElements.get(position));

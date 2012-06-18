@@ -1,16 +1,16 @@
-package com.brstf.appwishlist.widgets;
+package com.brstf.wishlist.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Button;
+import android.widget.ImageView;
 
-public class SquareButton extends Button {
+public class SquareImageView extends ImageView {
 
-	public SquareButton(Context context) {
+	public SquareImageView(Context context) {
 	    super(context);
 	}
 	
-	public SquareButton(Context context, AttributeSet attrs) {
+	public SquareImageView(Context context, AttributeSet attrs) {
 	    super(context, attrs);
 	}
 	

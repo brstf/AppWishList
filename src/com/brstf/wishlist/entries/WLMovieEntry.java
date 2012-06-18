@@ -1,11 +1,11 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.appwishlist.WLDbAdapter;
+import com.brstf.wishlist.WLDbAdapter;
 
 /**
  * Class for storing information about a movie entry in the wishlist

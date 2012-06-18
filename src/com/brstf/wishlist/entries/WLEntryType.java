@@ -1,4 +1,4 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
 public enum WLEntryType {
 

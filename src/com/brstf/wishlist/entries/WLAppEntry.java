@@ -1,4 +1,4 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package com.brstf.appwishlist;
+package com.brstf.wishlist;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.appwishlist.entries.WLEntry;
-import com.brstf.appwishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.WLEntry;
+import com.brstf.wishlist.entries.WLEntryType;
 
 import android.app.Activity;
 import android.content.Context;

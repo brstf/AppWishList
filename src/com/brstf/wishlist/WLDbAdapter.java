@@ -1,12 +1,12 @@
-package com.brstf.appwishlist;
+package com.brstf.wishlist;
 
-import com.brstf.appwishlist.entries.WLAlbumEntry;
-import com.brstf.appwishlist.entries.WLAppEntry;
-import com.brstf.appwishlist.entries.WLArtistEntry;
-import com.brstf.appwishlist.entries.WLBookEntry;
-import com.brstf.appwishlist.entries.WLEntry;
-import com.brstf.appwishlist.entries.WLEntryType;
-import com.brstf.appwishlist.entries.WLMovieEntry;
+import com.brstf.wishlist.entries.WLAlbumEntry;
+import com.brstf.wishlist.entries.WLAppEntry;
+import com.brstf.wishlist.entries.WLArtistEntry;
+import com.brstf.wishlist.entries.WLBookEntry;
+import com.brstf.wishlist.entries.WLEntry;
+import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.WLMovieEntry;
 
 import android.content.ContentValues;
 import android.content.Context;

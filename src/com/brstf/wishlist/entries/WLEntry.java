@@ -1,6 +1,6 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
-import com.brstf.appwishlist.WLDbAdapter;
+import com.brstf.wishlist.WLDbAdapter;
 
 import android.database.Cursor;
 

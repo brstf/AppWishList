@@ -1,4 +1,4 @@
-package com.brstf.appwishlist;
+package com.brstf.wishlist;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -10,7 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.appwishlist.WLAppList.WLAdapter;
+import com.brstf.wishlist.WLAppList.WLAdapter;
 
 import android.os.AsyncTask;
 import android.util.Log;

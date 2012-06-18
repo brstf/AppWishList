@@ -1,11 +1,11 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.appwishlist.WLDbAdapter;
+import com.brstf.wishlist.WLDbAdapter;
 
 public class WLBookEntry extends WLPricedEntry {
 	private int mPageCount;

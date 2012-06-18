@@ -1,9 +1,9 @@
-package com.brstf.appwishlist.entries;
+package com.brstf.wishlist.entries;
 
 import android.database.Cursor;
 
-import com.brstf.appwishlist.WLDbAdapter;
-import com.brstf.appwishlist.entries.WLEntry;
+import com.brstf.wishlist.WLDbAdapter;
+import com.brstf.wishlist.entries.WLEntry;
 
 public abstract class WLPricedEntry extends WLEntry {
 	private float cPrice = 0.0f;

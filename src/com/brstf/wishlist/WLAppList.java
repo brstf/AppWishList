@@ -1,11 +1,12 @@
-package com.brstf.appwishlist;
+package com.brstf.wishlist;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.brstf.appwishlist.entries.WLAppEntry;
+import com.brstf.appwishlist.R;
+import com.brstf.wishlist.entries.WLAppEntry;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -87,7 +88,7 @@ public class WLAppList extends ListFragment {
 			}
 
 			// Get the ImageView associated with the row
-			ImageView icon = (ImageView) row.findViewById(R.id.appicon);
+			ImageView icon = (ImageView) row.findViewById(R.id.icon);
 
 			// First ensure that the item at this position has an associated
 			// icon
@@ -142,7 +143,7 @@ public class WLAppList extends ListFragment {
 					false);
 
 			// Set the text of the appname to be the name of the app
-			((TextView) row.findViewById(R.id.appname)).setText(ent.getTitle());
+			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
 
 			// Display the price information based on presence of a sale
 			if (ent.isOnSale()) {
