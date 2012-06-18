@@ -6,7 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.brstf.appwishlist.R;
-import com.brstf.wishlist.entries.WLAppEntry;
+import com.brstf.wishlist.entries.WLAlbumEntry;
+import com.brstf.wishlist.entries.WLEntry;
+import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.WLPricedEntry;
+import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -26,12 +30,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WLAppList extends ListFragment {
 
-	public class WLAdapter extends ArrayAdapter<WLAppEntry> {
+	public class WLAdapter extends ArrayAdapter<WLEntry> {
 		// The position id of selected menu item (for context menu)
 		private int mSelId;
 
@@ -88,7 +91,8 @@ public class WLAppList extends ListFragment {
 			}
 
 			// Get the ImageView associated with the row
-			ImageView icon = (ImageView) row.findViewById(R.id.icon);
+			SquareImageView icon = (SquareImageView) row
+					.findViewById(R.id.icon);
 
 			// First ensure that the item at this position has an associated
 			// icon
@@ -121,22 +125,20 @@ public class WLAppList extends ListFragment {
 
 		/**
 		 * Gets the View of a row that is not selected
-		 * @param position The position of the row in the list
-		 * @param parent The parent ViewGroup of the listFragment
+		 * 
+		 * @param position
+		 *            The position of the row in the list
+		 * @param parent
+		 *            The parent ViewGroup of the listFragment
 		 * @return The row view
 		 */
 		private View getNormalRow(int position, ViewGroup parent) {
 			// Get the view associated with this row
 			View row = null;
-			WLAppEntry ent = getItem(position);
+			WLEntry ent = getItem(position);
 
 			// Default to the normal row layout
-			int rowLayout = R.layout.row;
-
-			if (ent.isOnSale()) {
-				// If there's a sale, use the row_sale layout
-				rowLayout = R.layout.row_sale;
-			}
+			int rowLayout = getRowLayout(ent);
 
 			// Inflate the row View
 			row = getActivity().getLayoutInflater().inflate(rowLayout, parent,
@@ -145,11 +147,20 @@ public class WLAppList extends ListFragment {
 			// Set the text of the appname to be the name of the app
 			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
 
+			return getRow(rowLayout, ent, row);
+		}
+
+		private View getRow(int rowLayout, WLEntry ent, View row) {
+			if (rowLayout == R.layout.row_album) {
+				((TextView) row.findViewById(R.id.creator))
+						.setText(((WLAlbumEntry) ent).getArtist());
+			}
+
 			// Display the price information based on presence of a sale
-			if (ent.isOnSale()) {
+			if( rowLayout == R.layout.row_sale){
 				// Set the text of the original price textview
 				TextView priceView = ((TextView) row.findViewById(R.id.price));
-				priceView.setText(getPriceText(ent.getRegularPrice()));
+				priceView.setText(getPriceText(((WLPricedEntry) ent).getRegularPrice()));
 
 				// Set the paintflags to allow for strikethru for the sale
 				priceView.setPaintFlags(priceView.getPaintFlags()
@@ -157,12 +168,24 @@ public class WLAppList extends ListFragment {
 
 				// Finally, set the text for the currentprice
 				((TextView) row.findViewById(R.id.sale_price))
-						.setText(getPriceText(ent.getCurrentPrice()));
+						.setText(getPriceText(((WLPricedEntry) ent).getCurrentPrice()));
 			} else {
 				((TextView) row.findViewById(R.id.price))
-						.setText(getPriceText(ent.getCurrentPrice()));
+						.setText(getPriceText(((WLPricedEntry) ent).getCurrentPrice()));
 			}
 			return row;
+		}
+
+		private int getRowLayout(WLEntry ent) {
+			if (ent.getType() == WLEntryType.MUSIC_ALBUM) {
+				return R.layout.row_album;
+			} 
+			if (ent.getType() != WLEntryType.MUSIC_ARTIST && ((WLPricedEntry) ent).isOnSale()) {
+				// If there's a sale, use the row_sale layout
+				return R.layout.row_sale;
+			}
+			
+			return R.layout.row;
 		}
 
 		private String getPriceText(float price) {
@@ -220,7 +243,7 @@ public class WLAppList extends ListFragment {
 		});
 
 		// Refresh all potential info for an app listing
-		new WLPriceChecker(mListAdapter).priceCheck();
+		// new WLPriceChecker(mListAdapter).priceCheck();
 	}
 
 	/**
@@ -257,14 +280,13 @@ public class WLAppList extends ListFragment {
 		mListAdapter.clear();
 
 		c.moveToFirst();
+		int typeCol = c.getColumnIndex(WLDbAdapter.KEY_TYPE);
+		int idCol = c.getColumnIndex(WLDbAdapter.KEY_ROWID);
 		while (!c.isAfterLast()) {
 			Log.d("DBG", String.valueOf(c.getColumnCount()));
-			WLAppEntry ent = new WLAppEntry(c.getInt(0));
-			ent.setTitle(c.getString(1));
-			ent.setURL(c.getString(2));
-			ent.setIconPath(c.getString(3));
-			ent.setCurrentPrice(c.getFloat(4));
-			ent.setRegularPrice(c.getFloat(5));
+			WLEntry ent = WLEntryType.getTypeEntry(
+					WLEntryType.getTypeFromString(c.getString(typeCol)),
+					c.getInt(idCol));
 
 			mListAdapter.add(ent);
 			c.moveToNext();
