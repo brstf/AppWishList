@@ -34,6 +34,19 @@ public class ShareActivity extends Activity {
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		String url = intent.getExtras().getString("android.intent.extra.TEXT");
+		
+		// Before attempting to add this to the wishlist, see if it's already there
+		WLEntries entries = WLEntries.getInstance();
+		entries.setContext(getApplicationContext());
+		entries.reload();
+		
+		for(WLEntry ent : entries.getEntries()) {
+			if(ent.getURL().equals(url)) {
+				Toast.makeText(getBaseContext(), ent.getTitle() + " is already on your wishlist!",
+						Toast.LENGTH_SHORT).show();
+				return;
+			}
+		}
 
 		// Open up the SQLite database
 		mDbHelper = new WLDbAdapter(this.getApplicationContext());
@@ -42,6 +55,7 @@ public class ShareActivity extends Activity {
 		// wishlist
 		Toast.makeText(getBaseContext(), "Adding to wishlist..",
 				Toast.LENGTH_SHORT).show();
+		
 
 		// Start the Async Task to scrape the information, then finish this
 		// activity
@@ -139,6 +153,10 @@ public class ShareActivity extends Activity {
 				
 				// Finally, close the db helper
 				mDbHelper.close();
+				
+				WLEntries entries = WLEntries.getInstance();
+				entries.setContext(getApplicationContext());
+				entries.reload();
 			}
 		}
 	}
