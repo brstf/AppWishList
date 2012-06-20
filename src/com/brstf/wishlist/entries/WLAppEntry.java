@@ -41,7 +41,7 @@ public class WLAppEntry extends WLPricedEntry {
 		m_price.find();
 
 		// Set our variables with the retrieved information
-		setTitle(m_title.group(1));
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
 			setRegularPrice(0.0f);
 		} else {
@@ -49,7 +49,7 @@ public class WLAppEntry extends WLPricedEntry {
 		}
 
 		// Set the icon path
-		setIconPath(m_icon.group(1));
+		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 	}
 	
 	@Override

@@ -60,17 +60,17 @@ public class WLAlbumEntry extends WLPricedEntry {
 		m_release.find();
 		
 		// Set our variables with the retrieved information
-		setTitle(m_title.group(1));
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
 			setRegularPrice(0.0f);
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(m_icon.group(1));
-		setArtist(m_artist.group(1));
-		setLength(m_length.group(1));
+		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
+		setLength(android.text.Html.fromHtml(m_length.group(1)).toString());
 		setTrackCount(Integer.valueOf(m_tracks.group(1)));
-		setReleaseDate(m_release.group(1));
+		setReleaseDate(android.text.Html.fromHtml(m_release.group(1)).toString());
 	}
 	
 	@Override

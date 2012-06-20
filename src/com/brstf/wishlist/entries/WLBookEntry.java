@@ -54,16 +54,17 @@ public class WLBookEntry extends WLPricedEntry {
 		m_publish.find();
 		
 		//Set our variables with the retrieved information
-		setTitle(m_title.group(1));
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
 			setRegularPrice(0.0f);
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(m_icon.group(1).replace("&amp;", "&"));
+
+		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setPageCount(Integer.valueOf(m_pageCount.group(1)));
-		setAuthor(m_author.group(1));
-		setPublishDate(m_publish.group(1));
+		setAuthor(android.text.Html.fromHtml(m_author.group(1)).toString());
+		setPublishDate(android.text.Html.fromHtml(m_publish.group(1)).toString());
 	}
 	
 	@Override

@@ -36,7 +36,7 @@ public class WLMovieEntry extends WLPricedEntry {
 
 		// Set the patterns and corresponding matchers
 		Pattern p_title = Pattern
-				.compile("<h1 itemprop=\"name\"class=\"doc-banner-title\">(.*?)<");
+				.compile("<h1.*?class=\"doc-banner-title\">(.*?)<");
 		Pattern p_icon = Pattern
 				.compile("<img itemprop=\"image\"src=\"(.*?)\"");
 		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
@@ -60,15 +60,15 @@ public class WLMovieEntry extends WLPricedEntry {
 		m_length.find();
 		
 		// Set our variables with the retrieved information
-		setTitle(m_title.group(1));
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
 			setRegularPrice(0.0f);
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(m_icon.group(1));
-		setContentRating(m_cr.group(1));
-		setDirector(m_dir.group(1));
+		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
+		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));
 	}
 	

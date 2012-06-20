@@ -50,8 +50,8 @@ public class WLArtistEntry extends WLEntry {
 		m_icon.find();
 
 		// Set our variables with the retrieved information
-		setTitle(m_title.group(1));
-		setIconPath(m_icon.group(1));
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
+		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 	}
 
 	@Override
