@@ -52,6 +52,7 @@ public class WLArtistEntry extends WLEntry {
 		// Set our variables with the retrieved information
 		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		addTag(WLEntryType.getTypeString(getType()));
 	}
 
 	@Override

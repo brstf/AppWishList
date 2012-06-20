@@ -70,6 +70,8 @@ public class WLMovieEntry extends WLPricedEntry {
 		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
 		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));
+		
+		addTag(WLEntryType.getTypeString(getType()));
 	}
 	
 	@Override

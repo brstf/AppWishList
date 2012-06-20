@@ -28,7 +28,8 @@ public final class WLEntries {
 	 * This must be called before any operations are done, the database helper
 	 * needs the application context
 	 * 
-	 * @param ctx application context this WLEntries instance is running in
+	 * @param ctx
+	 *            application context this WLEntries instance is running in
 	 */
 	public void setContext(Context ctx) {
 		if (mDbHelper == null) {
@@ -42,7 +43,7 @@ public final class WLEntries {
 
 	/**
 	 * Constructs the WLEntries instance, reads in all entries and constructs
-	 * all useful member collections
+	 * all useful member collections.
 	 * 
 	 * @param ctx
 	 *            The application context of the initializing activity of the
@@ -64,13 +65,31 @@ public final class WLEntries {
 	}
 
 	/**
+	 * Function to return a subset of the Entries in the list filtered by which
+	 * element has the given tag.
+	 * 
+	 * @param tag
+	 *            String tag to filter the entries by
+	 * @return An ArrayList of entries that have the given tag
+	 */
+	public ArrayList<WLEntry> getEntries(String tag) {
+		ArrayList<WLEntry> filteredList = new ArrayList<WLEntry>();
+		for(WLEntry ent : mEntries) {
+			if( ent.isTagged(tag)) {
+				filteredList.add(ent);
+			}
+		}
+		return filteredList;
+	}
+
+	/**
 	 * Function to wipe and reload all data
 	 */
 	public void reload() {
 		mEntries.clear();
 		mTags.clear();
 		mTagMap.clear();
-		if( mDbHelper!= null ) {
+		if (mDbHelper != null) {
 			fillEntries();
 		}
 	}

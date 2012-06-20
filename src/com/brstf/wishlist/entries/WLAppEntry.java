@@ -3,6 +3,8 @@ package com.brstf.wishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.brstf.wishlist.WLDbAdapter;
+
 import android.database.Cursor;
 
 /**
@@ -10,9 +12,13 @@ import android.database.Cursor;
  */
 
 public class WLAppEntry extends WLPricedEntry {
+	private String mDeveloper = null;
+	private static final String TITLE_DEV_ICON_PATTERN = "class=\"doc-banner-title\">(.*?)<.*?class=\"doc-header-link\">(.*?)<.*?class=\"doc-banner-icon\"><img.*?src=\"(.*?)\"";
 
 	public WLAppEntry(int id) {
 		super(id);
+
+		mDeveloper = "";
 	}
 
 	@Override
@@ -26,34 +32,55 @@ public class WLAppEntry extends WLPricedEntry {
 		setURL(url);
 
 		// Set up the patterns and corresponding matchers
-		Pattern p_title = Pattern
-				.compile("About This App</h4><dl class=\"doc-metadata-list\" itemscope itemtype=\"http://schema.org/MobileSoftwareApplication\"><meta itemprop=\"name\" content=\"(.*?)\"");
-		Pattern p_icon = Pattern
-				.compile("<meta itemprop=\"image\" content=\"(.*?)\"");
+		Pattern p_titledevicon = Pattern.compile(TITLE_DEV_ICON_PATTERN);
 		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
-		Matcher m_title = p_title.matcher(text);
-		Matcher m_icon = p_icon.matcher(text);
+		Matcher m_titledevicon = p_titledevicon.matcher(text);
 		Matcher m_price = p_price.matcher(text);
 
 		// Find the patterns
-		m_title.find();
-		m_icon.find();
+		m_titledevicon.find();
 		m_price.find();
 
 		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
+		setTitle(android.text.Html.fromHtml(m_titledevicon.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
 			setRegularPrice(0.0f);
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
 
+		// Set the developer
+		setDeveloper(android.text.Html.fromHtml(m_titledevicon.group(2))
+				.toString());
+
 		// Set the icon path
-		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		setIconPath(android.text.Html.fromHtml(m_titledevicon.group(3))
+				.toString());
+		
+		addTag(WLEntryType.getTypeString(getType()));
 	}
-	
+
+	/**
+	 * Retrieves the developer of this app
+	 */
+	public String getDeveloper() {
+		return mDeveloper;
+	}
+
+	/**
+	 * Sets the developer of this app to the given developer.
+	 * 
+	 * @param developer
+	 *            Developer of this app
+	 */
+	public void setDeveloper(String developer) {
+		mDeveloper = developer;
+	}
+
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
+
+		setDeveloper(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
 	}
 }

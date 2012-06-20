@@ -68,9 +68,15 @@ public class WLAlbumEntry extends WLPricedEntry {
 		}
 		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
-		setLength(android.text.Html.fromHtml(m_length.group(1)).toString());
+		if(m_length.matches()) {
+			setLength(android.text.Html.fromHtml(m_length.group(1)).toString());
+		} else {
+			setLength("");
+		}
 		setTrackCount(Integer.valueOf(m_tracks.group(1)));
 		setReleaseDate(android.text.Html.fromHtml(m_release.group(1)).toString());
+		
+		addTag(WLEntryType.getTypeString(getType()));
 	}
 	
 	@Override

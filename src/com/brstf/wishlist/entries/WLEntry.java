@@ -1,5 +1,7 @@
 package com.brstf.wishlist.entries;
 
+import java.util.HashSet;
+
 import com.brstf.wishlist.WLDbAdapter;
 
 import android.database.Cursor;
@@ -16,6 +18,7 @@ public abstract class WLEntry {
 	private String mURL; // URL link to Google Play Listing
 	private String mIcon; // path to the icon file
 	private int mDbId; // ID of the entry in the database
+	private HashSet<String> mTags = null; // Set of tags "describing" this entry
 
 	/**
 	 * Default constructor, initiates all parameters to default meaningless
@@ -27,6 +30,7 @@ public abstract class WLEntry {
 		mURL = "";
 		mIcon = "";
 		mDbId = id;
+		mTags = new HashSet<String>();
 	}
 
 	// Accessors
@@ -68,6 +72,49 @@ public abstract class WLEntry {
 	}
 
 	/**
+	 * Function that adds an additional tag to this entry
+	 * 
+	 * @param tag
+	 *            Additional tag to add to the entry
+	 */
+	public void addTag(String tag) {
+		mTags.add(tag);
+	}
+
+	/**
+	 * Gets an array of all tags describing the entry
+	 * 
+	 * @return String array containing all tags describing the entry
+	 */
+	public String[] getTags() {
+		String[] tags = new String[mTags.size()];
+		return mTags.toArray(tags);
+	}
+
+	/**
+	 * Function to determine whether or not this entry is tagged with a
+	 * particular tag
+	 * 
+	 * @param tag
+	 *            String tag to test
+	 * @return True if this entry is tagged with tag, false otherwise
+	 */
+	public boolean isTagged(String tag) {
+		return mTags.contains(tag);
+	}
+
+	/**
+	 * Function to remove a tag from this entry
+	 * 
+	 * @param tag
+	 *            Tag to remove from the entry
+	 * @return True if the tag was removed, false otherwise
+	 */
+	public boolean removeTag(String tag) {
+		return mTags.remove(tag);
+	}
+
+	/**
 	 * Gets the type of this entry (App, Book, Movie, etc.)
 	 * 
 	 * @return The WLEntryType enum corresponding to the type
@@ -96,6 +143,13 @@ public abstract class WLEntry {
 		setTitle(c.getString(c.getColumnIndex(WLDbAdapter.KEY_NAME)));
 		setURL(c.getString(c.getColumnIndex(WLDbAdapter.KEY_URL)));
 		setIconPath(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICON)));
+
+		// Add all tags
+		String cseptags = c.getString(c.getColumnIndex(WLDbAdapter.KEY_TAGS));
+		String[] tags = cseptags.split(",");
+		for(String tag : tags) {
+			addTag(tag);
+		}
 	}
 
 	// Mutators

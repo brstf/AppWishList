@@ -70,7 +70,7 @@ public class WLListView extends ListFragment {
 		private View getAppRow(WLAppEntry ent, ViewGroup parent) {
 			// Get a View with the base layout
 			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_app, parent, false);
+					R.layout.row_album, parent, false);
 
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
@@ -78,6 +78,8 @@ public class WLListView extends ListFragment {
 			icon.setImageBitmap(getIconBm(ent));
 
 			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
+			((TextView) row.findViewById(R.id.creator)).setText(ent
+					.getDeveloper());
 
 			((TextView) row.findViewById(R.id.price)).setText(getPriceText(ent
 					.getCurrentPrice()));
@@ -290,7 +292,7 @@ public class WLListView extends ListFragment {
 	private void fillData() {
 		// Clear entries from the list
 		mListAdapter.clear();
-		
+
 		for (WLEntry ent : WLEntries.getInstance().getEntries()) {
 			mListAdapter.add(ent);
 		}

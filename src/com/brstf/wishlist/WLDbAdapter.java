@@ -41,6 +41,7 @@ public class WLDbAdapter {
 	public static final String KEY_DATE = "date"; // Publish date, release date
 	public static final String KEY_PCOUNT = "pcount";
 	public static final String KEY_ROWID = "_id";
+	public static final String KEY_TAGS = "tags";
 
 	private static final String TAG = "WLDbAdapter";
 	private DatabaseHelper mDbHelper;
@@ -51,7 +52,7 @@ public class WLDbAdapter {
 			+ "primary key autoincrement, type text not null, name text not null, url "
 			+ "text not null, icon text not null, cprice float, rprice float, rating "
 			+ "float, crating text, movlength int, creator text, "
-			+ "alblength text, numtracks int, date text, pcount int);";
+			+ "alblength text, numtracks int, date text, pcount int, tags text not null);";
 
 	private static final String DATABASE_NAME = "wldata";
 	private static final String DATABASE_TABLE = "wlentries";
@@ -154,8 +155,8 @@ public class WLDbAdapter {
 		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_TYPE,
 				KEY_NAME, KEY_URL, KEY_ICON, KEY_CPRICE, KEY_RPRICE,
 				KEY_RATING, KEY_CRATING, KEY_MOVLENGTH, KEY_CREATOR,
-				KEY_ALBLENGTH, KEY_NUMTRACKS, KEY_DATE, KEY_PCOUNT }, null,
-				null, null, null, null);
+				KEY_ALBLENGTH, KEY_NUMTRACKS, KEY_DATE, KEY_PCOUNT, KEY_TAGS },
+				null, null, null, null, null);
 	}
 
 	/**
@@ -168,12 +169,12 @@ public class WLDbAdapter {
 	 *             If the query to the database fails
 	 */
 	public Cursor fetchEntry(long rowId) throws SQLException {
-		Cursor mCursor = mDb.query(true, DATABASE_TABLE,
-				new String[] { KEY_ROWID, KEY_TYPE, KEY_NAME, KEY_URL,
-						KEY_ICON, KEY_CPRICE, KEY_RPRICE, KEY_RATING,
-						KEY_CRATING, KEY_MOVLENGTH, KEY_CREATOR, KEY_ALBLENGTH,
-						KEY_NUMTRACKS, KEY_DATE, KEY_PCOUNT }, KEY_ROWID + "="
-						+ rowId, null, null, null, null, null);
+		Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] {
+				KEY_ROWID, KEY_TYPE, KEY_NAME, KEY_URL, KEY_ICON, KEY_CPRICE,
+				KEY_RPRICE, KEY_RATING, KEY_CRATING, KEY_MOVLENGTH,
+				KEY_CREATOR, KEY_ALBLENGTH, KEY_NUMTRACKS, KEY_DATE,
+				KEY_PCOUNT, KEY_TAGS }, KEY_ROWID + "=" + rowId, null, null,
+				null, null, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
@@ -208,6 +209,7 @@ public class WLDbAdapter {
 		values.put(KEY_NAME, ent.getTitle());
 		values.put(KEY_URL, ent.getURL());
 		values.put(KEY_ICON, ent.getIconPath());
+		values.put(KEY_TAGS, buildTags(ent.getTags()));
 		switch (ent.getType()) {
 		case APP:
 			return createAppValues((WLAppEntry) ent, values);
@@ -227,6 +229,22 @@ public class WLDbAdapter {
 	}
 
 	/**
+	 * Function to build a comma separated string of tags of an entry
+	 * 
+	 * @param tags Array of String tags to use
+	 * @return List of tags as a single, comma separated String
+	 */
+	private String buildTags(String[] tags) {
+		StringBuilder sb = new StringBuilder();
+
+		for( int i = 0; i < tags.length; ++i ) {
+			sb.append(tags[i]);
+		}
+		
+		return sb.toString();
+	}
+
+	/**
 	 * Creates a contentValues object for the given PricedEntry
 	 * 
 	 * @param ent
@@ -239,7 +257,7 @@ public class WLDbAdapter {
 			ContentValues values) {
 		values.put(KEY_CPRICE, ent.getCurrentPrice());
 		values.put(KEY_RPRICE, ent.getRegularPrice());
-		
+
 		return values;
 	}
 
@@ -254,6 +272,7 @@ public class WLDbAdapter {
 	 */
 	private ContentValues createAppValues(WLAppEntry ent, ContentValues values) {
 		values = createPricedValues(ent, values);
+		values.put(KEY_CREATOR, ent.getDeveloper());
 
 		return values;
 	}

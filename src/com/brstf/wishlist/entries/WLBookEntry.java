@@ -64,7 +64,13 @@ public class WLBookEntry extends WLPricedEntry {
 		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setPageCount(Integer.valueOf(m_pageCount.group(1)));
 		setAuthor(android.text.Html.fromHtml(m_author.group(1)).toString());
-		setPublishDate(android.text.Html.fromHtml(m_publish.group(1)).toString());
+		if(m_publish.matches()) {
+			setPublishDate(android.text.Html.fromHtml(m_publish.group(1)).toString());
+		} else {
+			setPublishDate("");
+		}
+		
+		addTag(WLEntryType.getTypeString(getType()));
 	}
 	
 	@Override
