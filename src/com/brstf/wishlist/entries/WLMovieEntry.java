@@ -38,7 +38,7 @@ public class WLMovieEntry extends WLPricedEntry {
 		Pattern p_title = Pattern
 				.compile("<h1.*?class=\"doc-banner-title\">(.*?)<");
 		Pattern p_icon = Pattern
-				.compile("<img itemprop=\"image\"src=\"(.*?)\"");
+				.compile("class=\"doc-banner-icon\".*?<img.*?src=\"(.*?)\"");
 		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
 		Pattern p_cr = Pattern.compile("itemprop=\"contentRating\">(.*?)<");
 		Pattern p_dir = Pattern.compile("itemprop=\"director\".*?itemprop=\"name\">(.*?)<");
