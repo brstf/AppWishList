@@ -29,13 +29,13 @@ public final class R {
         public static final int btntag=0x7f050010;
         public static final int column1=0x7f050004;
         public static final int column2=0x7f050005;
-        public static final int creator=0x7f05000c;
+        public static final int creator=0x7f05000b;
         public static final int foldername=0x7f050000;
         public static final int fragment_container=0x7f050008;
         public static final int grid_container=0x7f050003;
         public static final int icon=0x7f050009;
         public static final int logo=0x7f050001;
-        public static final int price=0x7f05000b;
+        public static final int price=0x7f05000c;
         public static final int sale_price=0x7f05000f;
         public static final int shiftpos=0x7f050014;
         public static final int title=0x7f05000a;
@@ -44,10 +44,11 @@ public final class R {
         public static final int gridentry=0x7f030000;
         public static final int home=0x7f030001;
         public static final int main=0x7f030002;
-        public static final int row=0x7f030003;
-        public static final int row_album=0x7f030004;
-        public static final int row_sale=0x7f030005;
-        public static final int selrow=0x7f030006;
+        public static final int row_album=0x7f030003;
+        public static final int row_app=0x7f030004;
+        public static final int row_artist=0x7f030005;
+        public static final int row_sale=0x7f030006;
+        public static final int selrow=0x7f030007;
     }
     public static final class string {
         public static final int actionbar_name=0x7f040001;

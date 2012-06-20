@@ -1,8 +1,6 @@
 package com.brstf.wishlist;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -10,16 +8,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.WLAppList.WLAdapter;
+import com.brstf.wishlist.WLListView.WLListAdapter;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class WLPriceChecker {
-	private WLAdapter mAdapter = null;
+	private WLListAdapter mAdapter = null;
 	private WLDbAdapter mDbHelper = null;
 
-	public WLPriceChecker(WLAdapter adapter) {
+	public WLPriceChecker(WLListAdapter adapter) {
 		mAdapter = adapter;
 	}
 

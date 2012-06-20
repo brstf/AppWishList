@@ -6,12 +6,17 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 public class WishListActivity extends FragmentActivity {
+	private WLEntries entries = null;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// Create the WLEntries instance
+		entries = WLEntries.getInstance();
+		entries.setContext(getApplicationContext());
 		
 		if (findViewById(R.id.fragment_container) != null) {
 
@@ -23,7 +28,7 @@ public class WishListActivity extends FragmentActivity {
 			}
 
 			// Create an instance of ExampleFragment
-			WLAppList firstFragment = new WLAppList();
+			WLListView firstFragment = new WLListView();
 
 			// In case this activity was started with special instructions from
 			// an Intent, pass the Intent's extras to the fragment as arguments
@@ -33,6 +38,14 @@ public class WishListActivity extends FragmentActivity {
 			getFragmentManager().beginTransaction()
 					.add(R.id.fragment_container, firstFragment).commit();
 		}
+	}
+	
+	@Override
+	public void onStart(){
+		super.onStart();
+		
+		// Reload all entries
+		entries.reload();
 	}
 	
 }

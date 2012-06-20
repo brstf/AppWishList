@@ -14,11 +14,31 @@ import com.brstf.wishlist.entries.WLEntryType;
  * wish list. Supports useful functions like get all entries, get all tags,
  * filter by tags, etc.
  */
-public class WLEntries {
+public final class WLEntries {
 	private ArrayList<WLEntry> mEntries = null;
 	private ArrayList<String> mTags = null;
 	private HashMap<String, ArrayList<Integer>> mTagMap = null;
 	private WLDbAdapter mDbHelper = null;
+
+	public static WLEntries getInstance() {
+		return mInstance;
+	}
+
+	/**
+	 * This must be called before any operations are done, the database helper
+	 * needs the application context
+	 * 
+	 * @param ctx application context this WLEntries instance is running in
+	 */
+	public void setContext(Context ctx) {
+		if (mDbHelper == null) {
+			// Open up the SQLite database and fill data
+			mDbHelper = new WLDbAdapter(ctx);
+			fillEntries();
+		}
+	}
+
+	private static final WLEntries mInstance = new WLEntries();
 
 	/**
 	 * Constructs the WLEntries instance, reads in all entries and constructs
@@ -28,14 +48,31 @@ public class WLEntries {
 	 *            The application context of the initializing activity of the
 	 *            WLEntries object
 	 */
-	public WLEntries(Context ctx) {
+	private WLEntries() {
 		mEntries = new ArrayList<WLEntry>();
 		mTags = new ArrayList<String>();
 		mTagMap = new HashMap<String, ArrayList<Integer>>();
+	}
 
-		// Open up the SQLite database
-		mDbHelper = new WLDbAdapter(ctx);
-		fillEntries();
+	/**
+	 * Function to retrieve the ArrayList full of all entries
+	 * 
+	 * @return An arrayList of all entries in the database
+	 */
+	public ArrayList<WLEntry> getEntries() {
+		return mEntries;
+	}
+
+	/**
+	 * Function to wipe and reload all data
+	 */
+	public void reload() {
+		mEntries.clear();
+		mTags.clear();
+		mTagMap.clear();
+		if( mDbHelper!= null ) {
+			fillEntries();
+		}
 	}
 
 	/**
@@ -60,14 +97,13 @@ public class WLEntries {
 
 			// Add it to the list
 			mEntries.add(ent);
-			
-			//Continue moving through the entries
+
+			// Continue moving through the entries
 			c.moveToNext();
 		}
 
 		// Close up the database
 		mDbHelper.close();
 	}
-	
-	
+
 }
