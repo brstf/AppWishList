@@ -73,9 +73,35 @@ public final class WLEntries {
 	 * @return An ArrayList of entries that have the given tag
 	 */
 	public ArrayList<WLEntry> getEntries(String tag) {
+		if(tag == null) {
+			return getEntries();
+		}
+		
+		tag = tag.toLowerCase();
 		ArrayList<WLEntry> filteredList = new ArrayList<WLEntry>();
-		for(WLEntry ent : mEntries) {
-			if( ent.isTagged(tag)) {
+		for (WLEntry ent : mEntries) {
+			if (ent.isTagged(tag)) {
+				filteredList.add(ent);
+			}
+		}
+		return filteredList;
+	}
+
+	/**
+	 * Function to return a subset of the passed in entries in the list filtered
+	 * by the given tag
+	 * 
+	 * @param ents
+	 *            List of entries to filter
+	 * @param tag
+	 *            Tag to filter the entries by
+	 * @return An ArrayList of entries that were in ents and have the given tag
+	 */
+	public static ArrayList<WLEntry> getEntries(ArrayList<WLEntry> ents, String tag) {
+		tag = tag.toLowerCase();
+		final ArrayList<WLEntry> filteredList = new ArrayList<WLEntry>();
+		for (WLEntry ent : ents) {
+			if (ent.isTagged(tag)) {
 				filteredList.add(ent);
 			}
 		}

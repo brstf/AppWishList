@@ -257,6 +257,7 @@ public class WLDbAdapter {
 			ContentValues values) {
 		values.put(KEY_CPRICE, ent.getCurrentPrice());
 		values.put(KEY_RPRICE, ent.getRegularPrice());
+		values.put(KEY_RATING, ent.getRating());
 
 		return values;
 	}

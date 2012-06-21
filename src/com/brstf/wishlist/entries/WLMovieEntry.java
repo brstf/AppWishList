@@ -41,16 +41,20 @@ public class WLMovieEntry extends WLPricedEntry {
 				.compile("class=\"doc-banner-icon\".*?<img.*?src=\"(.*?)\"");
 		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
 		Pattern p_cr = Pattern.compile("itemprop=\"contentRating\">(.*?)<");
-		Pattern p_dir = Pattern.compile("itemprop=\"director\".*?itemprop=\"name\">(.*?)<");
-		Pattern p_length = Pattern.compile("<dt>Movie Length:</dt><dd>(.*?) minutes");
-		
+		Pattern p_dir = Pattern
+				.compile("itemprop=\"director\".*?itemprop=\"name\">(.*?)<");
+		Pattern p_length = Pattern
+				.compile("<dt>Movie Length:</dt><dd>(.*?) minutes");
+		Pattern p_rating = Pattern.compile(RATING_PATTERN);
+
 		Matcher m_title = p_title.matcher(text);
 		Matcher m_icon = p_icon.matcher(text);
 		Matcher m_price = p_price.matcher(text);
 		Matcher m_cr = p_cr.matcher(text);
 		Matcher m_dir = p_dir.matcher(text);
 		Matcher m_length = p_length.matcher(text);
-		
+		Matcher m_rating = p_rating.matcher(text);
+
 		// Find the patterns
 		m_title.find();
 		m_icon.find();
@@ -58,7 +62,7 @@ public class WLMovieEntry extends WLPricedEntry {
 		m_cr.find();
 		m_dir.find();
 		m_length.find();
-		
+
 		// Set our variables with the retrieved information
 		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
@@ -70,10 +74,16 @@ public class WLMovieEntry extends WLPricedEntry {
 		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
 		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));
-		
+
+		if (m_rating.find()) {
+			setRating(Float.parseFloat(m_rating.group(1)));
+		} else {
+			setRating(0.0f);
+		}
+
 		addTag(WLEntryType.getTypeString(getType()));
 	}
-	
+
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);

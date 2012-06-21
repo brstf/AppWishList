@@ -41,6 +41,7 @@ public class WLAlbumEntry extends WLPricedEntry {
 				.compile("Tracks<.*?class=\"meta-details-value\">(.*?)<");
 		Pattern p_release = Pattern
 				.compile("Released<.*?class=\"meta-details-value\">(.*?)<");
+		Pattern p_rating = Pattern.compile(RATING_PATTERN);
 
 		Matcher m_title = p_title.matcher(text);
 		Matcher m_icon = p_icon.matcher(text);
@@ -49,16 +50,16 @@ public class WLAlbumEntry extends WLPricedEntry {
 		Matcher m_length = p_length.matcher(text);
 		Matcher m_tracks = p_tracks.matcher(text);
 		Matcher m_release = p_release.matcher(text);
-		
+		Matcher m_rating = p_rating.matcher(text);
+
 		// Find the patterns
 		m_title.find();
 		m_icon.find();
 		m_price.find();
 		m_artist.find();
-		m_length.find();
 		m_tracks.find();
 		m_release.find();
-		
+
 		// Set our variables with the retrieved information
 		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		if (m_price.group(1).equals("Free")) {
@@ -68,17 +69,26 @@ public class WLAlbumEntry extends WLPricedEntry {
 		}
 		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
-		if(m_length.matches()) {
+		
+		if (m_length.find()) {
 			setLength(android.text.Html.fromHtml(m_length.group(1)).toString());
 		} else {
 			setLength("");
 		}
-		setTrackCount(Integer.valueOf(m_tracks.group(1)));
-		setReleaseDate(android.text.Html.fromHtml(m_release.group(1)).toString());
 		
+		setTrackCount(Integer.valueOf(m_tracks.group(1)));
+		setReleaseDate(android.text.Html.fromHtml(m_release.group(1))
+				.toString());
+
+		if (m_rating.find()) {
+			setRating(Float.parseFloat(m_rating.group(1)));
+		} else {
+			setRating(0.0f);
+		}
+
 		addTag(WLEntryType.getTypeString(getType()));
 	}
-	
+
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);

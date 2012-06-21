@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +34,13 @@ public class ShareActivity extends Activity {
 
 		// Get the intent that started this activity
 		Intent intent = getIntent();
-		String url = intent.getExtras().getString("android.intent.extra.TEXT");
+		String url = null;
+		if(intent.getAction().equals(Intent.ACTION_VIEW)) {
+			Uri uri = intent.getData();
+			url = uri.toString();
+		} else {
+			url = intent.getExtras().getString("android.intent.extra.TEXT");
+		}
 		
 		// Before attempting to add this to the wishlist, see if it's already there
 		WLEntries entries = WLEntries.getInstance();

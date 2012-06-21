@@ -78,7 +78,7 @@ public abstract class WLEntry {
 	 *            Additional tag to add to the entry
 	 */
 	public void addTag(String tag) {
-		mTags.add(tag);
+		mTags.add(tag.toLowerCase());
 	}
 
 	/**

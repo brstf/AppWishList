@@ -9,6 +9,7 @@ public abstract class WLPricedEntry extends WLEntry {
 	private float cPrice = -1.0f;
 	private float rPrice = -1.0f;
 	private float rating = 0.0f;
+	public static String RATING_PATTERN = "class=\"doc-details-ratings-price\".*?Rating: (.*?) stars";
 
 	public WLPricedEntry(int id) {
 		super(id);
@@ -19,7 +20,7 @@ public abstract class WLPricedEntry extends WLEntry {
 		super.setFromDb(c);
 		setCurrentPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_CPRICE)));
 		setRegularPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RPRICE)));
-		// setRating(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RATING)));
+		setRating(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RATING)));
 	}
 
 	/**
