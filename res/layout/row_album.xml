@@ -21,12 +21,13 @@
 	        android:layout_height="wrap_content"
 	        android:gravity="center_vertical"
 	        android:paddingLeft="5dip"
+	        android:maxLines="1"
 	        android:textAppearance="?android:attr/textAppearanceMedium"/>
-	    
+
 	    <TextView android:id="@+id/creator"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:gravity="center_vertical"
+	        android:gravity="left"
 	        android:paddingLeft="5dip"/>
     </LinearLayout>
     
