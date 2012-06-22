@@ -124,7 +124,7 @@ public class ShareActivity extends Activity {
 				FileOutputStream fos = getApplicationContext().openFileOutput(
 						ent.getTitle() + ".png", Context.MODE_PRIVATE);
 				Bitmap bitmap = BitmapFactory
-						.decodeStream((InputStream) new URL(ent.getIconPath())
+						.decodeStream((InputStream) new URL(ent.getIconUrl())
 								.getContent());
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 				fos.close();

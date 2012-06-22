@@ -16,7 +16,8 @@ import android.database.Cursor;
 public abstract class WLEntry {
 	private String mTitle; // Name of the app
 	private String mURL; // URL link to Google Play Listing
-	private String mIcon; // path to the icon file
+	private String mIconPath; // path to the icon file
+	private String mIconUrl; // URL link to the icon
 	private int mDbId; // ID of the entry in the database
 	private HashSet<String> mTags = null; // Set of tags "describing" this entry
 
@@ -28,7 +29,8 @@ public abstract class WLEntry {
 		// Initiate to default parameters
 		mTitle = "";
 		mURL = "";
-		mIcon = "";
+		mIconPath = "";
+		mIconUrl = "";
 		mDbId = id;
 		mTags = new HashSet<String>();
 	}
@@ -59,7 +61,16 @@ public abstract class WLEntry {
 	 * @return The path to the icon
 	 */
 	public String getIconPath() {
-		return mIcon;
+		return mIconPath;
+	}
+
+	/**
+	 * Gets the url link to the icon in the Play store
+	 * 
+	 * @return URL link to the icon in the Play store
+	 */
+	public String getIconUrl() {
+		return mIconUrl;
 	}
 
 	/**
@@ -142,12 +153,13 @@ public abstract class WLEntry {
 	public void setFromDb(Cursor c) {
 		setTitle(c.getString(c.getColumnIndex(WLDbAdapter.KEY_NAME)));
 		setURL(c.getString(c.getColumnIndex(WLDbAdapter.KEY_URL)));
-		setIconPath(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICON)));
+		setIconPath(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICONPATH)));
+		setIconUrl(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICONURL)));
 
 		// Add all tags
 		String cseptags = c.getString(c.getColumnIndex(WLDbAdapter.KEY_TAGS));
 		String[] tags = cseptags.split(",");
-		for(String tag : tags) {
+		for (String tag : tags) {
 			addTag(tag);
 		}
 	}
@@ -190,6 +202,16 @@ public abstract class WLEntry {
 	 *            The new icon path of the entry
 	 */
 	public void setIconPath(String icon) {
-		mIcon = icon;
+		mIconPath = icon;
+	}
+
+	/**
+	 * Sets the icon url of this entry
+	 * 
+	 * @param icon
+	 *            New url link to the icon of this entry
+	 */
+	public void setIconUrl(String icon) {
+		mIconUrl = icon;
 	}
 }

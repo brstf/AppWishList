@@ -70,7 +70,7 @@ public class WLMovieEntry extends WLPricedEntry {
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
 		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));

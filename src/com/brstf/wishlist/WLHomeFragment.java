@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.widgets.SquareButton;
 
-import android.app.Fragment;
+import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -17,6 +19,18 @@ import android.widget.LinearLayout;
  * category
  */
 public class WLHomeFragment extends Fragment {
+	private OnTileSelectedListener mCallback;
+
+	public interface OnTileSelectedListener {
+		/**
+		 * Called by WLHomeFragment when a tag tile is selected
+		 * 
+		 * @param position
+		 *            The position of the
+		 */
+		public void onTagSelected(String tag);
+	}
+
 	private ArrayList<String> mElements = null;
 
 	/**
@@ -25,11 +39,11 @@ public class WLHomeFragment extends Fragment {
 	public WLHomeFragment() {
 		super();
 
+		// Add one element per tag
 		mElements = new ArrayList<String>();
-		mElements.add("Apps");
-		mElements.add("Movies");
-		mElements.add("Books");
-		mElements.add("Music");
+		for (String tag : WLEntries.getInstance().getTags()) {
+			mElements.add(tag);
+		}
 	}
 
 	@Override
@@ -53,6 +67,19 @@ public class WLHomeFragment extends Fragment {
 		return grid;
 	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		// Attach the callback listener to the activity
+		try {
+			mCallback = (OnTileSelectedListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnTileSelectedListener");
+		}
+	}
+
 	/**
 	 * Function to get the tile entry at the given position
 	 * 
@@ -68,6 +95,16 @@ public class WLHomeFragment extends Fragment {
 		SquareButton tile = (SquareButton) inflater.inflate(R.layout.gridentry,
 				null);
 		tile.setText(mElements.get(position));
+
+		// Add a click listener to each button, when pressed call the callback
+		// function
+		tile.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mCallback
+						.onTagSelected(((SquareButton) v).getText().toString());
+			}
+		});
 
 		return tile;
 	}

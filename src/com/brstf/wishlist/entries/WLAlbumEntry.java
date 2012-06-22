@@ -67,7 +67,7 @@ public class WLAlbumEntry extends WLPricedEntry {
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		setIconPath(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
 		
 		if (m_length.find()) {

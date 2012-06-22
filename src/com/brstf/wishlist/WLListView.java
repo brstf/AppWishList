@@ -16,7 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.app.ListFragment;
+import android.support.v4.app.ListFragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -252,10 +252,20 @@ public class WLListView extends ListFragment {
 	}
 
 	private WLListAdapter mListAdapter = null;
+	public static String ARG_FILTERTAG = "filter_tag";
+	private String filtertag = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Get the arguments passed in
+		Bundle args = this.getArguments();
+		if (args != null) {
+			// If there were arguments, grab the filter tag to filter the list
+			// by
+			filtertag = args.getString(ARG_FILTERTAG);
+		}
 
 		// Instantiate the adapter and use it
 		mListAdapter = new WLListAdapter(this.getActivity(),
@@ -293,7 +303,7 @@ public class WLListView extends ListFragment {
 		// Clear entries from the list
 		mListAdapter.clear();
 
-		for (WLEntry ent : WLEntries.getInstance().getEntries()) {
+		for (WLEntry ent : WLEntries.getInstance().getEntries(filtertag)) {
 			mListAdapter.add(ent);
 		}
 	}

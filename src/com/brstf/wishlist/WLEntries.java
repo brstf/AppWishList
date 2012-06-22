@@ -2,6 +2,7 @@ package com.brstf.wishlist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -73,10 +74,10 @@ public final class WLEntries {
 	 * @return An ArrayList of entries that have the given tag
 	 */
 	public ArrayList<WLEntry> getEntries(String tag) {
-		if(tag == null) {
+		if (tag == null) {
 			return getEntries();
 		}
-		
+
 		tag = tag.toLowerCase();
 		ArrayList<WLEntry> filteredList = new ArrayList<WLEntry>();
 		for (WLEntry ent : mEntries) {
@@ -85,6 +86,15 @@ public final class WLEntries {
 			}
 		}
 		return filteredList;
+	}
+
+	/**
+	 * Function to return all of the tags describing entries in the list
+	 * 
+	 * @return ArrayList of String tags of all tags
+	 */
+	public Set<String> getTags() {
+		return mTagMap.keySet();
 	}
 
 	/**
@@ -97,7 +107,8 @@ public final class WLEntries {
 	 *            Tag to filter the entries by
 	 * @return An ArrayList of entries that were in ents and have the given tag
 	 */
-	public static ArrayList<WLEntry> getEntries(ArrayList<WLEntry> ents, String tag) {
+	public static ArrayList<WLEntry> getEntries(ArrayList<WLEntry> ents,
+			String tag) {
 		tag = tag.toLowerCase();
 		final ArrayList<WLEntry> filteredList = new ArrayList<WLEntry>();
 		for (WLEntry ent : ents) {
@@ -131,6 +142,9 @@ public final class WLEntries {
 		Cursor c = mDbHelper.fetchAllEntries();
 		c.moveToFirst();
 
+		// Index of entry
+		int i = 0;
+		
 		// Loop through each entry
 		while (!c.isAfterLast()) {
 			// Get the type of the entry at c
@@ -142,6 +156,16 @@ public final class WLEntries {
 
 			// Add it to the list
 			mEntries.add(ent);
+
+			// Add all tags to the tag list
+			for (String tag : ent.getTags()) {
+				mTags.add(tag);
+				
+				if(!mTagMap.containsKey(tag)) {
+					mTagMap.put(tag, new ArrayList<Integer>());
+				}
+				mTagMap.get(tag).add(i);
+			}
 
 			// Continue moving through the entries
 			c.moveToNext();

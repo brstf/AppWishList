@@ -56,7 +56,7 @@ public class WLAppEntry extends WLPricedEntry {
 				.toString());
 
 		// Set the icon path
-		setIconPath(android.text.Html.fromHtml(m_titledevicon.group(3))
+		setIconUrl(android.text.Html.fromHtml(m_titledevicon.group(3))
 				.toString());
 		
 		if(m_rating.find()) {
