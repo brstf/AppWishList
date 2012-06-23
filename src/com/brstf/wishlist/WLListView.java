@@ -118,6 +118,9 @@ public class WLListView extends ListFragment {
 
 			WLEntry ent = getItem(position);
 
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
 			// Switch on the type of entry this is
 			switch (ent.getType()) {
 			case APP:
@@ -147,9 +150,9 @@ public class WLListView extends ListFragment {
 		 */
 		private View getAppRow(WLAppEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
-
+			holder.icon.setImageDrawable(getResources().getDrawable(
+					R.drawable.appsph));
+			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getDeveloper());
 
@@ -169,9 +172,9 @@ public class WLListView extends ListFragment {
 		 */
 		private View getArtistRow(WLArtistEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
-
+			holder.icon.setImageDrawable(getResources().getDrawable(
+					R.drawable.musicph));
+			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getGenres());
 
@@ -191,9 +194,9 @@ public class WLListView extends ListFragment {
 		 */
 		private View getAlbumRow(WLAlbumEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
-
+			holder.icon.setImageDrawable(getResources().getDrawable(
+					R.drawable.musicph));
+			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getArtist());
 
@@ -213,9 +216,9 @@ public class WLListView extends ListFragment {
 		 */
 		private View getBookRow(WLBookEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
-
+			holder.icon.setImageDrawable(getResources().getDrawable(
+					R.drawable.booksph));
+			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getAuthor());
 
@@ -235,9 +238,9 @@ public class WLListView extends ListFragment {
 		 */
 		private View getMovieRow(WLMovieEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
-
+			holder.icon.setImageDrawable(getResources().getDrawable(
+					R.drawable.moviesph));
+			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getDirector());
 
