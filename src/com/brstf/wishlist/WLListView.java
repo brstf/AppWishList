@@ -12,12 +12,14 @@ import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLMovieEntry;
 import com.brstf.wishlist.widgets.SquareImageView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.ListFragment;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,174 +32,31 @@ import android.widget.TextView;
  * @author brstf
  */
 public class WLListView extends ListFragment {
-	public class WLListAdapter extends ArrayAdapter<WLEntry> {
+	private static class ViewHolder {
+		public SquareImageView icon;
+		public TextView title;
+		public TextView creator;
+		public TextView price;
+		public int position;
+	}
 
-		public WLListAdapter(Context context, int textViewResourceId) {
-			super(context, textViewResourceId);
+	private static class IconTask extends AsyncTask<Activity, Object, Bitmap> {
+		private WLEntry mEnt;
+		private int mPosition;
+		private ViewHolder mHolder;
+
+		public IconTask(WLEntry ent, int position, ViewHolder holder) {
+			mEnt = ent;
+			mPosition = position;
+			mHolder = holder;
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			WLEntry ent = getItem(position);
-
-			View row = convertView;
-			if (row == null) {
-				row = getActivity().getLayoutInflater().inflate(R.layout.row,
-						parent, false);
-			}
-
-			// Switch on the type of entry this is
-			switch (ent.getType()) {
-			case APP:
-				return getAppRow((WLAppEntry) ent, row, parent);
-			case MUSIC_ARTIST:
-				return getArtistRow((WLArtistEntry) ent, row, parent);
-			case MUSIC_ALBUM:
-				return getAlbumRow((WLAlbumEntry) ent, row, parent);
-			case BOOK:
-				return getBookRow((WLBookEntry) ent, row, parent);
-			case MOVIE:
-				return getMovieRow((WLMovieEntry) ent, row, parent);
-			}
-
-			// Should never happen.
-			return null;
-		}
-
-		/**
-		 * Function to return a row layout for an App entry
-		 * 
-		 * @param ent
-		 *            The App entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getAppRow(WLAppEntry ent, View row, ViewGroup parent) {
-			// Fill in the details
-			final SquareImageView icon = (SquareImageView) row
-					.findViewById(R.id.icon);
-			icon.setImageBitmap(getIconBm(ent));
-
-			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
-			((TextView) row.findViewById(R.id.creator)).setText(ent
-					.getDeveloper());
-
-			((TextView) row.findViewById(R.id.price)).setText(getPriceText(ent
-					.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for an Artist entry
-		 * 
-		 * @param ent
-		 *            The Artist entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getArtistRow(WLArtistEntry ent, View row, ViewGroup parent) {
-			// Fill in the details
-			final SquareImageView icon = (SquareImageView) row
-					.findViewById(R.id.icon);
-			icon.setImageBitmap(getIconBm(ent));
-
-			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
-			((TextView) row.findViewById(R.id.creator))
-					.setText(ent.getGenres());
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for an Album entry
-		 * 
-		 * @param ent
-		 *            The Album entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getAlbumRow(WLAlbumEntry ent, View row, ViewGroup parent) {
-			// Fill in the details
-			final SquareImageView icon = (SquareImageView) row
-					.findViewById(R.id.icon);
-			icon.setImageBitmap(getIconBm(ent));
-
-			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
-			((TextView) row.findViewById(R.id.creator))
-					.setText(ent.getArtist());
-
-			((TextView) row.findViewById(R.id.price)).setText(getPriceText(ent
-					.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for a Book entry
-		 * 
-		 * @param ent
-		 *            The Book entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getBookRow(WLBookEntry ent, View row, ViewGroup parent) {
-			// Fill in the details
-			final SquareImageView icon = (SquareImageView) row
-					.findViewById(R.id.icon);
-			icon.setImageBitmap(getIconBm(ent));
-
-			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
-			((TextView) row.findViewById(R.id.creator))
-					.setText(ent.getAuthor());
-
-			((TextView) row.findViewById(R.id.price)).setText(getPriceText(ent
-					.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for a Movieentry
-		 * 
-		 * @param ent
-		 *            The Movie entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getMovieRow(WLMovieEntry ent, View row, ViewGroup parent) {
-			// Fill in the details
-			final SquareImageView icon = (SquareImageView) row
-					.findViewById(R.id.icon);
-			icon.setImageBitmap(getIconBm(ent));
-
-			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
-			((TextView) row.findViewById(R.id.creator)).setText(ent
-					.getDirector());
-
-			((TextView) row.findViewById(R.id.price)).setText(getPriceText(ent
-					.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to get the icon of a particular WLEntry as a Bitmap
-		 * 
-		 * @param ent
-		 *            The entry whose icon to retrieve
-		 * @return The icon of said entry as a Bitmap
-		 */
-		private Bitmap getIconBm(WLEntry ent) {
+		protected Bitmap doInBackground(Activity... params) {
 			// Try to read in the icon file
 			FileInputStream fis = null;
 			try {
-				fis = getActivity().openFileInput(ent.getIconPath());
+				fis = params[0].openFileInput(mEnt.getIconPath());
 				// If successful, set the icon
 				return BitmapFactory.decodeStream(fis);
 			} catch (FileNotFoundException e) {
@@ -214,9 +73,177 @@ public class WLListView extends ListFragment {
 				}
 			}
 
-			// If we failed at reading in an icon, return a default icon
-			return BitmapFactory.decodeResource(getResources(),
-					R.drawable.ic_launcher);
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap bitmap) {
+			if (bitmap == null)
+				return;
+			if (mHolder.position == mPosition) {
+				mHolder.icon.setImageBitmap(bitmap);
+			}
+		}
+	}
+
+	public class WLListAdapter extends ArrayAdapter<WLEntry> {
+
+		public WLListAdapter(Context context, int textViewResourceId) {
+			super(context, textViewResourceId);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			View row = convertView;
+			if (row == null) {
+				row = getActivity().getLayoutInflater().inflate(R.layout.row,
+						parent, false);
+
+				// If the convert view was null, we need to construct a new view
+				// holder for it
+				holder = new ViewHolder();
+				holder.icon = (SquareImageView) row.findViewById(R.id.icon);
+				holder.title = (TextView) row.findViewById(R.id.title);
+				holder.creator = (TextView) row.findViewById(R.id.creator);
+				holder.price = (TextView) row.findViewById(R.id.price);
+
+				row.setTag(holder);
+			} else {
+				// If it wasn't null, get the ViewHolder from the convertView
+				holder = (ViewHolder) row.getTag();
+			}
+
+			holder.position = position;
+
+			WLEntry ent = getItem(position);
+
+			// Switch on the type of entry this is
+			switch (ent.getType()) {
+			case APP:
+				return getAppRow((WLAppEntry) ent, row, holder);
+			case MUSIC_ARTIST:
+				return getArtistRow((WLArtistEntry) ent, row, holder);
+			case MUSIC_ALBUM:
+				return getAlbumRow((WLAlbumEntry) ent, row, holder);
+			case BOOK:
+				return getBookRow((WLBookEntry) ent, row, holder);
+			case MOVIE:
+				return getMovieRow((WLMovieEntry) ent, row, holder);
+			}
+
+			// Should never happen.
+			return null;
+		}
+
+		/**
+		 * Function to return a row layout for an App entry
+		 * 
+		 * @param ent
+		 *            The App entry to get a row view for
+		 * @param parent
+		 *            The parent ViewGroup that this row should go in
+		 * @return The corresponding View of the row
+		 */
+		private View getAppRow(WLAppEntry ent, View row, ViewHolder holder) {
+			// Fill in the details
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
+			holder.title.setText(ent.getTitle());
+			holder.creator.setText(ent.getDeveloper());
+
+			holder.price.setText(getPriceText(ent.getCurrentPrice()));
+
+			return row;
+		}
+
+		/**
+		 * Function to return a row layout for an Artist entry
+		 * 
+		 * @param ent
+		 *            The Artist entry to get a row view for
+		 * @param parent
+		 *            The parent ViewGroup that this row should go in
+		 * @return The corresponding View of the row
+		 */
+		private View getArtistRow(WLArtistEntry ent, View row, ViewHolder holder) {
+			// Fill in the details
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
+			holder.title.setText(ent.getTitle());
+			holder.creator.setText(ent.getGenres());
+
+			holder.price.setText("");
+
+			return row;
+		}
+
+		/**
+		 * Function to return a row layout for an Album entry
+		 * 
+		 * @param ent
+		 *            The Album entry to get a row view for
+		 * @param parent
+		 *            The parent ViewGroup that this row should go in
+		 * @return The corresponding View of the row
+		 */
+		private View getAlbumRow(WLAlbumEntry ent, View row, ViewHolder holder) {
+			// Fill in the details
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
+			holder.title.setText(ent.getTitle());
+			holder.creator.setText(ent.getArtist());
+
+			holder.price.setText(getPriceText(ent.getCurrentPrice()));
+
+			return row;
+		}
+
+		/**
+		 * Function to return a row layout for a Book entry
+		 * 
+		 * @param ent
+		 *            The Book entry to get a row view for
+		 * @param parent
+		 *            The parent ViewGroup that this row should go in
+		 * @return The corresponding View of the row
+		 */
+		private View getBookRow(WLBookEntry ent, View row, ViewHolder holder) {
+			// Fill in the details
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
+			holder.title.setText(ent.getTitle());
+			holder.creator.setText(ent.getAuthor());
+
+			holder.price.setText(getPriceText(ent.getCurrentPrice()));
+
+			return row;
+		}
+
+		/**
+		 * Function to return a row layout for a Movieentry
+		 * 
+		 * @param ent
+		 *            The Movie entry to get a row view for
+		 * @param parent
+		 *            The parent ViewGroup that this row should go in
+		 * @return The corresponding View of the row
+		 */
+		private View getMovieRow(WLMovieEntry ent, View row, ViewHolder holder) {
+			// Fill in the details
+			new IconTask(ent, holder.position, holder).executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+
+			holder.title.setText(ent.getTitle());
+			holder.creator.setText(ent.getDirector());
+
+			holder.price.setText(getPriceText(ent.getCurrentPrice()));
+
+			return row;
 		}
 
 		/**
@@ -256,8 +283,7 @@ public class WLListView extends ListFragment {
 		}
 
 		// Instantiate the adapter and use it
-		mListAdapter = new WLListAdapter(this.getActivity(),
-				R.layout.row);
+		mListAdapter = new WLListAdapter(this.getActivity(), R.layout.row);
 		setListAdapter(mListAdapter);
 	}
 
