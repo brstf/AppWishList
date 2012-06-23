@@ -31,57 +31,43 @@ public class WLMovieEntry extends WLPricedEntry {
 
 	@Override
 	public void setFromURLText(String url, String text) {
-		// Set the url
-		setURL(url);
+		super.setFromURLText(url, text);
 
 		// Set the patterns and corresponding matchers
-		Pattern p_title = Pattern
-				.compile("<h1.*?class=\"doc-banner-title\">(.*?)<");
-		Pattern p_icon = Pattern
-				.compile("class=\"doc-banner-icon\".*?<img.*?src=\"(.*?)\"");
-		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
 		Pattern p_cr = Pattern.compile("itemprop=\"contentRating\">(.*?)<");
 		Pattern p_dir = Pattern
 				.compile("itemprop=\"director\".*?itemprop=\"name\">(.*?)<");
 		Pattern p_length = Pattern
 				.compile("<dt>Movie Length:</dt><dd>(.*?) minutes");
-		Pattern p_rating = Pattern.compile(RATING_PATTERN);
 
-		Matcher m_title = p_title.matcher(text);
-		Matcher m_icon = p_icon.matcher(text);
-		Matcher m_price = p_price.matcher(text);
 		Matcher m_cr = p_cr.matcher(text);
 		Matcher m_dir = p_dir.matcher(text);
 		Matcher m_length = p_length.matcher(text);
-		Matcher m_rating = p_rating.matcher(text);
 
 		// Find the patterns
-		m_title.find();
-		m_icon.find();
-		m_price.find();
 		m_cr.find();
 		m_dir.find();
 		m_length.find();
 
 		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
-		if (m_price.group(1).equals("Free")) {
-			setRegularPrice(0.0f);
-		} else {
-			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
-		}
-		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
 		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));
+	}
 
-		if (m_rating.find()) {
-			setRating(Float.parseFloat(m_rating.group(1)));
-		} else {
-			setRating(0.0f);
-		}
+	@Override
+	protected String getPricePattern() {
+		return "data-docPrice=\"(.*?)\"";
+	}
 
-		addTag(WLEntryType.getTypeString(getType()));
+	@Override
+	protected String getTitlePattern() {
+		return "<h1.*?class=\"doc-banner-title\">(.*?)<";
+	}
+
+	@Override
+	protected String getIconPattern() {
+		return "class=\"doc-banner-icon\".*?<img.*?src=\"(.*?)\"";
 	}
 
 	@Override
@@ -148,5 +134,4 @@ public class WLMovieEntry extends WLPricedEntry {
 	public void setMovieLength(int length) {
 		mLength = length;
 	}
-
 }

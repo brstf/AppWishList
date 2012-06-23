@@ -13,7 +13,7 @@ import android.database.Cursor;
 
 public class WLAppEntry extends WLPricedEntry {
 	private String mDeveloper = null;
-	private static final String TITLE_DEV_ICON_PATTERN = "class=\"doc-banner-title\">(.*?)<.*?class=\"doc-header-link\">(.*?)<.*?class=\"doc-banner-icon\"><img.*?src=\"(.*?)\"";
+	private static final String DEV_PATTERN = "class=\"doc-header-link\">(.*?)<";
 
 	public WLAppEntry(int id) {
 		super(id);
@@ -28,44 +28,33 @@ public class WLAppEntry extends WLPricedEntry {
 
 	@Override
 	public void setFromURLText(String url, String text) {
-		// Set the url
-		setURL(url);
+		super.setFromURLText(url, text);
 
 		// Set up the patterns and corresponding matchers
-		Pattern p_titledevicon = Pattern.compile(TITLE_DEV_ICON_PATTERN);
-		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
-		Pattern p_rating = Pattern.compile(RATING_PATTERN);
-		Matcher m_titledevicon = p_titledevicon.matcher(text);
-		Matcher m_price = p_price.matcher(text);
-		Matcher m_rating = p_rating.matcher(text);
+		Pattern p_dev = Pattern.compile(DEV_PATTERN);
+		Matcher m_dev = p_dev.matcher(text);
 
 		// Find the patterns
-		m_titledevicon.find();
-		m_price.find();
+		m_dev.find();
 		
-		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_titledevicon.group(1)).toString());
-		if (m_price.group(1).equals("Free")) {
-			setRegularPrice(0.0f);
-		} else {
-			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
-		}
-
 		// Set the developer
-		setDeveloper(android.text.Html.fromHtml(m_titledevicon.group(2))
+		setDeveloper(android.text.Html.fromHtml(m_dev.group(1))
 				.toString());
+	}
+	
+	@Override
+	protected String getPricePattern() {
+		return "data-docPrice=\"(.*?)\"";
+	}
 
-		// Set the icon path
-		setIconUrl(android.text.Html.fromHtml(m_titledevicon.group(3))
-				.toString());
-		
-		if(m_rating.find()) {
-			setRating(Float.parseFloat(m_rating.group(1)));
-		} else {
-			setRating(0.0f);
-		}
+	@Override
+	protected String getTitlePattern() {
+		return "class=\"doc-banner-title\">(.*?)<";
+	}
 
-		addTag(WLEntryType.getTypeString(getType()));
+	@Override
+	protected String getIconPattern() {
+		return "class=\"doc-banner-icon\"><img.*?src=\"(.*?)\"";
 	}
 
 	/**

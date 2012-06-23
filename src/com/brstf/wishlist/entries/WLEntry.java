@@ -1,6 +1,8 @@
 package com.brstf.wishlist.entries;
 
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.brstf.wishlist.WLDbAdapter;
 
@@ -141,7 +143,42 @@ public abstract class WLEntry {
 	 * @param text
 	 *            The text obtained from the given url
 	 */
-	public abstract void setFromURLText(String url, String text);
+	public void setFromURLText(String url, String text) {
+		// Set the url
+		setURL(url);
+
+		// Set up the patterns and corresponding matchers
+		Pattern p_title = Pattern.compile(getTitlePattern());
+		Pattern p_icon = Pattern.compile(getIconPattern());
+
+		Matcher m_title = p_title.matcher(text);
+		Matcher m_icon = p_icon.matcher(text);
+
+		// Find the patterns
+		m_title.find();
+		m_icon.find();
+
+		// Set our variables with the retrieved information
+		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
+		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
+		addTag(WLEntryType.getTypeString(getType()));
+	}
+
+	/**
+	 * Class method to retrieve the regular expression pattern to find the title
+	 * of this entry
+	 * 
+	 * @return Regular expression pattern that finds the title of this entry
+	 */
+	protected abstract String getTitlePattern();
+
+	/**
+	 * Class method to retrieve the regular expression pattern to find the icon
+	 * url of this entry
+	 * 
+	 * @return Regular expression pattern that finds the icon url of this entry
+	 */
+	protected abstract String getIconPattern();
 
 	/**
 	 * Function to set the member variables for a this particular entry from a

@@ -1,5 +1,8 @@
 package com.brstf.wishlist.entries;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.database.Cursor;
 
 import com.brstf.wishlist.WLDbAdapter;
@@ -9,12 +12,51 @@ public abstract class WLPricedEntry extends WLEntry {
 	private float cPrice = -1.0f;
 	private float rPrice = -1.0f;
 	private float rating = 0.0f;
-	public static String RATING_PATTERN = "class=\"doc-details-ratings-price\".*?Rating: (.*?) stars";
 
 	public WLPricedEntry(int id) {
 		super(id);
 	}
-	
+
+	public void setFromURLText(String url, String text) {
+		super.setFromURLText(url, text);
+
+		// Set up the patterns and corresponding matchers
+		Pattern p_price = Pattern.compile(getPricePattern());
+		Pattern p_rating = Pattern.compile(getRatingPattern());
+
+		Matcher m_price = p_price.matcher(text);
+		Matcher m_rating = p_rating.matcher(text);
+
+		// Find the patterns
+		m_price.find();
+		m_rating.find();
+
+		// Set our variables with the retrieved information
+		if (m_price.group(1).equals("Free")) {
+			setRegularPrice(0.0f);
+		} else {
+			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
+		}
+		
+		if (m_rating.find()) {
+			setRating(Float.parseFloat(m_rating.group(1)));
+		} else {
+			setRating(0.0f);
+		}
+	}
+
+	protected abstract String getPricePattern();
+
+	/**
+	 * Class method to retrieve the regular expression pattern to find the
+	 * rating of this entry
+	 * 
+	 * @return Regular expression pattern that finds the rating of this entry
+	 */
+	protected String getRatingPattern() {
+		return "class=\"doc-details-ratings-price\".*?Rating: (.*?) stars";
+	}
+
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
@@ -40,7 +82,7 @@ public abstract class WLPricedEntry extends WLEntry {
 	public float getRegularPrice() {
 		return rPrice;
 	}
-	
+
 	/**
 	 * Retrieves the rating of the entry
 	 * 
@@ -49,7 +91,7 @@ public abstract class WLPricedEntry extends WLEntry {
 	public float getRating() {
 		return rating;
 	}
-	
+
 	/**
 	 * Returns whether or not this entry is on sale
 	 * 
@@ -94,16 +136,17 @@ public abstract class WLPricedEntry extends WLEntry {
 		}
 
 		rPrice = price;
-		
-		if( cPrice == -1.0f ) {
+
+		if (cPrice == -1.0f) {
 			setCurrentPrice(price);
 		}
 	}
-	
+
 	/**
 	 * Sets the new rating of the entry
 	 * 
-	 * @param nRating The new rating of the entry
+	 * @param nRating
+	 *            The new rating of the entry
 	 */
 	public void setRating(float nRating) {
 		// Ensure a valid price
@@ -111,7 +154,7 @@ public abstract class WLPricedEntry extends WLEntry {
 			System.err.println("Invalid Rating: " + nRating);
 			return;
 		}
-		
+
 		rating = nRating;
 	}
 

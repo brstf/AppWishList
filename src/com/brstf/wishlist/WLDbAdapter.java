@@ -242,6 +242,7 @@ public class WLDbAdapter {
 
 		for (int i = 0; i < tags.length; ++i) {
 			sb.append(tags[i]);
+			sb.append(",");
 		}
 
 		return sb.toString();

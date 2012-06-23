@@ -1,8 +1,5 @@
 package com.brstf.wishlist.entries;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
 import android.database.Cursor;
 
 /**
@@ -34,25 +31,17 @@ public class WLArtistEntry extends WLEntry {
 
 	@Override
 	public void setFromURLText(String url, String text) {
-		// Set the url
-		setURL(url);
+		super.setFromURLText(url, text);
 
-		// Set up the patterns and corresponding matchers
-		Pattern p_title = Pattern.compile("class=\"doc-header-title\">(.*?)<");
-		Pattern p_icon = Pattern
-				.compile("<img itemprop=\"image\"src=\"(.*?)\"");
-
-		Matcher m_title = p_title.matcher(text);
-		Matcher m_icon = p_icon.matcher(text);
-
-		// Find the patterns
-		m_title.find();
-		m_icon.find();
-
-		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
-		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
-		addTag(WLEntryType.getTypeString(getType()));
+		addTag("Music");
+	}
+	
+	protected String getTitlePattern(){ 
+		return "class=\"doc-header-title\">(.*?)<";
+	}
+	
+	protected String getIconPattern() {
+		return "<img itemprop=\"image\"src=\"(.*?)\"";
 	}
 
 	@Override

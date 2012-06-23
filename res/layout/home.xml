@@ -33,9 +33,6 @@
                     android:id="@+id/btnall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="4dip"
-                    android:layout_marginRight="4dip"
-                    android:background="#FF8800"
                     android:clickable="true"
                     android:text="@string/btnalltext"
                     android:typeface="sans" />

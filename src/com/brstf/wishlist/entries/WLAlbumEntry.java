@@ -24,15 +24,9 @@ public class WLAlbumEntry extends WLPricedEntry {
 
 	@Override
 	public void setFromURLText(String url, String text) {
-		// Set the url
-		setURL(url);
+		super.setFromURLText(url, text);
 
 		// Set up the patterns and corresponding matchers
-		Pattern p_title = Pattern.compile("class=\"doc-header-title\">(.*?)<");
-		Pattern p_icon = Pattern
-				.compile("<img itemprop=\"image\"src=\"(.*?)\"");
-		Pattern p_price = Pattern
-				.compile("<span itemprop=\"price\" content=\"(.*?)\"");
 		Pattern p_artist = Pattern
 				.compile("href=\"/store/music/artist/.*?\">(.*?)<");
 		Pattern p_length = Pattern
@@ -41,33 +35,18 @@ public class WLAlbumEntry extends WLPricedEntry {
 				.compile("Tracks<.*?class=\"meta-details-value\">(.*?)<");
 		Pattern p_release = Pattern
 				.compile("Released<.*?class=\"meta-details-value\">(.*?)<");
-		Pattern p_rating = Pattern.compile(RATING_PATTERN);
 
-		Matcher m_title = p_title.matcher(text);
-		Matcher m_icon = p_icon.matcher(text);
-		Matcher m_price = p_price.matcher(text);
 		Matcher m_artist = p_artist.matcher(text);
 		Matcher m_length = p_length.matcher(text);
 		Matcher m_tracks = p_tracks.matcher(text);
 		Matcher m_release = p_release.matcher(text);
-		Matcher m_rating = p_rating.matcher(text);
 
 		// Find the patterns
-		m_title.find();
-		m_icon.find();
-		m_price.find();
 		m_artist.find();
 		m_tracks.find();
 		m_release.find();
 
 		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
-		if (m_price.group(1).equals("Free")) {
-			setRegularPrice(0.0f);
-		} else {
-			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
-		}
-		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
 		
 		if (m_length.find()) {
@@ -80,13 +59,22 @@ public class WLAlbumEntry extends WLPricedEntry {
 		setReleaseDate(android.text.Html.fromHtml(m_release.group(1))
 				.toString());
 
-		if (m_rating.find()) {
-			setRating(Float.parseFloat(m_rating.group(1)));
-		} else {
-			setRating(0.0f);
-		}
+		addTag("Music");
+	}
+	
+	@Override
+	protected String getPricePattern() {
+		return "<span itemprop=\"price\" content=\"(.*?)\"";
+	}
 
-		addTag(WLEntryType.getTypeString(getType()));
+	@Override
+	protected String getTitlePattern() {
+		return "class=\"doc-header-title\">(.*?)<";
+	}
+
+	@Override
+	protected String getIconPattern() {
+		return "<img itemprop=\"image\"src=\"(.*?)\"";
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 /**
@@ -39,11 +40,7 @@ public class WLHomeFragment extends Fragment {
 	public WLHomeFragment() {
 		super();
 
-		// Add one element per tag
 		mElements = new ArrayList<String>();
-		for (String tag : WLEntries.getInstance().getTags()) {
-			mElements.add(tag);
-		}
 	}
 
 	@Override
@@ -51,6 +48,15 @@ public class WLHomeFragment extends Fragment {
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View grid = inflater.inflate(R.layout.home, container, false);
+
+		// Add a listener to the "all" button
+		Button btnall = (Button) grid.findViewById(R.id.btnall);
+		btnall.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mCallback.onTagSelected(null);
+			}
+		});
 
 		LinearLayout col1 = (LinearLayout) grid.findViewById(R.id.column1);
 		LinearLayout col2 = (LinearLayout) grid.findViewById(R.id.column2);
@@ -68,8 +74,24 @@ public class WLHomeFragment extends Fragment {
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		mElements.clear();
+		
+		// Add one element per tag
+		for (String tag : WLEntries.getInstance().getTags()) {
+			mElements.add(tag);
+		}
+	}
+
+	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		
+		// Add one element per tag
+		for (String tag : WLEntries.getInstance().getTags()) {
+			mElements.add(tag);
+		}
 
 		// Attach the callback listener to the activity
 		try {

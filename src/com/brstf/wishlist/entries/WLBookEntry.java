@@ -27,44 +27,24 @@ public class WLBookEntry extends WLPricedEntry {
 
 	@Override
 	public void setFromURLText(String url, String text) {
-		// Set the url
-		setURL(url);
+		super.setFromURLText(url, text);
 
 		// Set up the patterns and corresponding matchers
-		Pattern p_title = Pattern.compile("data-docTitle=\"(.*?)\"");
-		Pattern p_icon = Pattern.compile("data-docIconUrl=\"(.*?)\"");
-		Pattern p_price = Pattern.compile("data-docPrice=\"(.*?)\"");
 		Pattern p_pageCount = Pattern
 				.compile("<dd itemprop=\"numberOfPages\">(.*?)<");
 		Pattern p_author = Pattern
 				.compile("<a href=\"/store/books/author?.*?\" itemprop=\"url\">(.*?)<");
 		Pattern p_publish = Pattern.compile("<dt>Published:</dt><dd>(.*?)<");
-		Pattern p_rating = Pattern.compile(RATING_PATTERN);
-
-		Matcher m_title = p_title.matcher(text);
-		Matcher m_icon = p_icon.matcher(text);
-		Matcher m_price = p_price.matcher(text);
+		
 		Matcher m_pageCount = p_pageCount.matcher(text);
 		Matcher m_author = p_author.matcher(text);
 		Matcher m_publish = p_publish.matcher(text);
-		Matcher m_rating = p_rating.matcher(text);
 
 		// Find the patterns
-		m_title.find();
-		m_icon.find();
-		m_price.find();
 		m_pageCount.find();
 		m_author.find();
 
 		// Set our variables with the retrieved information
-		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
-		if (m_price.group(1).equals("Free")) {
-			setRegularPrice(0.0f);
-		} else {
-			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
-		}
-
-		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
 		setPageCount(Integer.valueOf(m_pageCount.group(1)));
 		setAuthor(android.text.Html.fromHtml(m_author.group(1)).toString());
 		if (m_publish.find()) {
@@ -73,14 +53,22 @@ public class WLBookEntry extends WLPricedEntry {
 		} else {
 			setPublishDate("");
 		}
+	}
+	
+	@Override
+	protected String getPricePattern() {
+		// TODO Auto-generated method stub
+		return "data-docPrice=\"(.*?)\"";
+	}
 
-		if (m_rating.find()) {
-			setRating(Float.parseFloat(m_rating.group(1)));
-		} else {
-			setRating(0.0f);
-		}
+	@Override
+	protected String getTitlePattern() {
+		return "data-docTitle=\"(.*?)\"";
+	}
 
-		addTag(WLEntryType.getTypeString(getType()));
+	@Override
+	protected String getIconPattern() {
+		return "data-docIconUrl=\"(.*?)\"";
 	}
 
 	@Override

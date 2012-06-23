@@ -65,6 +65,7 @@ public class WishListActivity extends FragmentActivity implements
 
 		// Replace and add this to the back stack
 		transaction.replace(R.id.fragment_container, newFragment);
+		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		transaction.addToBackStack(null);
 
 		// Commit the transaction
