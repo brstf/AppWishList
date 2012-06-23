@@ -40,18 +40,24 @@ public class WLListView extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			WLEntry ent = getItem(position);
 
+			View row = convertView;
+			if (row == null) {
+				row = getActivity().getLayoutInflater().inflate(R.layout.row,
+						parent, false);
+			}
+
 			// Switch on the type of entry this is
 			switch (ent.getType()) {
 			case APP:
-				return getAppRow((WLAppEntry) ent, parent);
+				return getAppRow((WLAppEntry) ent, row, parent);
 			case MUSIC_ARTIST:
-				return getArtistRow((WLArtistEntry) ent, parent);
+				return getArtistRow((WLArtistEntry) ent, row, parent);
 			case MUSIC_ALBUM:
-				return getAlbumRow((WLAlbumEntry) ent, parent);
+				return getAlbumRow((WLAlbumEntry) ent, row, parent);
 			case BOOK:
-				return getBookRow((WLBookEntry) ent, parent);
+				return getBookRow((WLBookEntry) ent, row, parent);
 			case MOVIE:
-				return getMovieRow((WLMovieEntry) ent, parent);
+				return getMovieRow((WLMovieEntry) ent, row, parent);
 			}
 
 			// Should never happen.
@@ -67,11 +73,7 @@ public class WLListView extends ListFragment {
 		 *            The parent ViewGroup that this row should go in
 		 * @return The corresponding View of the row
 		 */
-		private View getAppRow(WLAppEntry ent, ViewGroup parent) {
-			// Get a View with the base layout
-			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_album, parent, false);
-
+		private View getAppRow(WLAppEntry ent, View row, ViewGroup parent) {
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
 					.findViewById(R.id.icon);
@@ -96,11 +98,7 @@ public class WLListView extends ListFragment {
 		 *            The parent ViewGroup that this row should go in
 		 * @return The corresponding View of the row
 		 */
-		private View getArtistRow(WLArtistEntry ent, ViewGroup parent) {
-			// Get a View with the base layout
-			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_album, parent, false);
-
+		private View getArtistRow(WLArtistEntry ent, View row, ViewGroup parent) {
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
 					.findViewById(R.id.icon);
@@ -122,11 +120,7 @@ public class WLListView extends ListFragment {
 		 *            The parent ViewGroup that this row should go in
 		 * @return The corresponding View of the row
 		 */
-		private View getAlbumRow(WLAlbumEntry ent, ViewGroup parent) {
-			// Get a View with the base layout
-			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_album, parent, false);
-
+		private View getAlbumRow(WLAlbumEntry ent, View row, ViewGroup parent) {
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
 					.findViewById(R.id.icon);
@@ -151,11 +145,7 @@ public class WLListView extends ListFragment {
 		 *            The parent ViewGroup that this row should go in
 		 * @return The corresponding View of the row
 		 */
-		private View getBookRow(WLBookEntry ent, ViewGroup parent) {
-			// Get a View with the base layout
-			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_album, parent, false);
-
+		private View getBookRow(WLBookEntry ent, View row, ViewGroup parent) {
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
 					.findViewById(R.id.icon);
@@ -180,11 +170,7 @@ public class WLListView extends ListFragment {
 		 *            The parent ViewGroup that this row should go in
 		 * @return The corresponding View of the row
 		 */
-		private View getMovieRow(WLMovieEntry ent, ViewGroup parent) {
-			// Get a View with the base layout
-			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_album, parent, false);
-
+		private View getMovieRow(WLMovieEntry ent, View row, ViewGroup parent) {
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
 					.findViewById(R.id.icon);
@@ -271,7 +257,7 @@ public class WLListView extends ListFragment {
 
 		// Instantiate the adapter and use it
 		mListAdapter = new WLListAdapter(this.getActivity(),
-				R.layout.row_artist);
+				R.layout.row);
 		setListAdapter(mListAdapter);
 	}
 
