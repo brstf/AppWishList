@@ -99,7 +99,7 @@ public class WLListView extends ListFragment {
 		private View getArtistRow(WLArtistEntry ent, ViewGroup parent) {
 			// Get a View with the base layout
 			final View row = getActivity().getLayoutInflater().inflate(
-					R.layout.row_artist, parent, false);
+					R.layout.row_album, parent, false);
 
 			// Fill in the details
 			final SquareImageView icon = (SquareImageView) row
@@ -107,6 +107,8 @@ public class WLListView extends ListFragment {
 			icon.setImageBitmap(getIconBm(ent));
 
 			((TextView) row.findViewById(R.id.title)).setText(ent.getTitle());
+			((TextView) row.findViewById(R.id.creator))
+					.setText(ent.getGenres());
 
 			return row;
 		}

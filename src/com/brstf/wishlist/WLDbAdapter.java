@@ -330,6 +330,9 @@ public class WLDbAdapter {
 	 */
 	private ContentValues createArtistValues(WLArtistEntry ent,
 			ContentValues values) {
+		// Sort of an oddity, creator here is set to genres
+		values.put(KEY_CREATOR, ent.getGenres());
+		
 		return values;
 	}
 
