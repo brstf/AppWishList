@@ -3,6 +3,7 @@ package com.brstf.wishlist;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLAppEntry;
@@ -17,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.ListFragment;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,6 +34,9 @@ import android.widget.TextView;
  * @author brstf
  */
 public class WLListView extends ListFragment {
+	// Hash map mapping icon name to already loaded icons
+	private static HashMap<String, Bitmap> icons = null;
+
 	private static class ViewHolder {
 		public SquareImageView icon;
 		public TextView title;
@@ -78,6 +83,7 @@ public class WLListView extends ListFragment {
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
+			icons.put(mEnt.getIconPath(), bitmap);
 			if (bitmap == null)
 				return;
 			if (mHolder.position == mPosition) {
@@ -118,8 +124,27 @@ public class WLListView extends ListFragment {
 
 			WLEntry ent = getItem(position);
 
-			new IconTask(ent, holder.position, holder).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+			if (icons.containsKey(ent.getIconPath())) {
+				holder.icon.setImageBitmap(icons.get(ent.getIconPath()));
+			} else {
+				new IconTask(ent, holder.position, holder).executeOnExecutor(
+						AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+				switch (ent.getType()) {
+				case APP:
+					holder.icon.setImageDrawable(appsPh);
+					break;
+				case MUSIC_ARTIST:
+				case MUSIC_ALBUM:
+					holder.icon.setImageDrawable(musicPh);
+					break;
+				case BOOK:
+					holder.icon.setImageDrawable(booksPh);
+					break;
+				case MOVIE:
+					holder.icon.setImageDrawable(moviesPh);
+					break;
+				}
+			}
 
 			// Switch on the type of entry this is
 			switch (ent.getType()) {
@@ -150,9 +175,6 @@ public class WLListView extends ListFragment {
 		 */
 		private View getAppRow(WLAppEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			holder.icon.setImageDrawable(getResources().getDrawable(
-					R.drawable.appsph));
-			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getDeveloper());
 
@@ -172,9 +194,6 @@ public class WLListView extends ListFragment {
 		 */
 		private View getArtistRow(WLArtistEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			holder.icon.setImageDrawable(getResources().getDrawable(
-					R.drawable.musicph));
-			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getGenres());
 
@@ -194,9 +213,6 @@ public class WLListView extends ListFragment {
 		 */
 		private View getAlbumRow(WLAlbumEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			holder.icon.setImageDrawable(getResources().getDrawable(
-					R.drawable.musicph));
-			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getArtist());
 
@@ -216,9 +232,6 @@ public class WLListView extends ListFragment {
 		 */
 		private View getBookRow(WLBookEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			holder.icon.setImageDrawable(getResources().getDrawable(
-					R.drawable.booksph));
-			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getAuthor());
 
@@ -238,9 +251,6 @@ public class WLListView extends ListFragment {
 		 */
 		private View getMovieRow(WLMovieEntry ent, View row, ViewHolder holder) {
 			// Fill in the details
-			holder.icon.setImageDrawable(getResources().getDrawable(
-					R.drawable.moviesph));
-			
 			holder.title.setText(ent.getTitle());
 			holder.creator.setText(ent.getDirector());
 
@@ -272,10 +282,22 @@ public class WLListView extends ListFragment {
 	private WLListAdapter mListAdapter = null;
 	public static String ARG_FILTERTAG = "filter_tag";
 	private String filtertag = null;
+	private Drawable musicPh = null;
+	private Drawable appsPh = null;
+	private Drawable moviesPh = null;
+	private Drawable booksPh = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		musicPh = getResources().getDrawable(R.drawable.musicph);
+		appsPh = getResources().getDrawable(R.drawable.appsph);
+		moviesPh = getResources().getDrawable(R.drawable.moviesph);
+		booksPh = getResources().getDrawable(R.drawable.booksph);
+
+		// On create, make a new hashmap for the icons that will be filled in
+		icons = new HashMap<String, Bitmap>();
 
 		// Get the arguments passed in
 		Bundle args = this.getArguments();

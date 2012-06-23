@@ -55,7 +55,7 @@ public class WLArtistEntry extends WLEntry {
 	 */
 	private void addGenre(String genre) {
 		if (!mGenres.equals("")) {
-			mGenres = mGenres + ",";
+			mGenres = mGenres + ", ";
 		}
 
 		mGenres = mGenres + android.text.Html.fromHtml(genre);
