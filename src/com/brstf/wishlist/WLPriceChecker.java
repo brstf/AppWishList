@@ -1,6 +1,7 @@
 package com.brstf.wishlist;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -8,17 +9,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.WLListView.WLListAdapter;
+import com.brstf.wishlist.entries.WLEntry;
+import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.WLPricedEntry;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class WLPriceChecker {
-	private WLListAdapter mAdapter = null;
-	private WLDbAdapter mDbHelper = null;
+	ArrayList<WLEntry> mEntries = null;
 
-	public WLPriceChecker(WLListAdapter adapter) {
-		mAdapter = adapter;
+	public WLPriceChecker() {
+		mEntries = WLEntries.getInstance().getEntries();
 	}
 
 	/**
@@ -26,16 +28,9 @@ public class WLPriceChecker {
 	 * information has changed
 	 */
 	public void priceCheck() {
-		// Open up the SQLite database
-		mDbHelper = new WLDbAdapter(mAdapter.getContext()
-				.getApplicationContext());
-		mDbHelper.open();
-
 		new WLPriceCheck().execute("");
 	}
 
-	// For lack of a better method, stolen right from ShareActivity
-	// TODO: Find a better method.
 	/**
 	 * Method to download a web page's text from a given URL. Used by the
 	 * private class WLAddApp to add app info to the list
@@ -61,27 +56,24 @@ public class WLPriceChecker {
 		}
 	}
 
-	private class WLPriceCheck extends AsyncTask<String, Integer, String> {
-		private boolean items_changed = false;
-
+	private class WLPriceCheck extends AsyncTask<String, Object, String> {
 		@Override
 		protected String doInBackground(String... params) {
 			// Loop through each entry in the list, scrape the data and update
 			// the price if necessary
-			for (int i = 0; i < mAdapter.getCount(); ++i) {
+			for (int i = 0; i < mEntries.size(); ++i) {
+				WLEntry ent = mEntries.get(i);
+
 				// Grab the text from the url
-				String url = mAdapter.getItem(i).getURL();
+				String url = ent.getURL();
 				String result = downloadURL(url);
 
-				// Check if these values are different than the existing values
-				/*if (price != mAdapter.getItem(i).getCurrentPrice()) {
-					mAdapter.getItem(i).setCurrentPrice(price);
-					if (price > mAdapter.getItem(i).getRegularPrice()) {
-						mAdapter.getItem(i).setRegularPrice(price);
-					}
-					onProgressUpdate(i);
-					items_changed = true;
-				}*/
+				// The up-to-date entry
+				WLEntry uEnt = (WLEntry) WLEntryType.getTypeEntry(
+						ent.getType(), -1);
+				uEnt.setFromURLText(url, result);
+
+				onProgressUpdate(new Object[] { i, uEnt });
 			}
 
 			// Successful exit
@@ -89,22 +81,11 @@ public class WLPriceChecker {
 		}
 
 		@Override
-		protected void onProgressUpdate(Integer... values) {
+		protected void onProgressUpdate(Object... values) {
 			// Update the updated item (progress update is only called if an
 			// entry's information is changed)
-			mDbHelper.updateEntry(mAdapter.getItem(values[0]).getId(),
-					mAdapter.getItem(values[0]));
-		}
-
-		@Override
-		protected void onPostExecute(String result) {// If the string returned
-														// is null, we
-														// encountered an error
-			if (items_changed) {
-				mAdapter.notifyDataSetChanged();
-			}
-			// Be sure to close the dbhelper
-			mDbHelper.close();
+			WLEntries.getInstance().updateEntry((Integer) values[0],
+					(WLEntry) values[1]);
 		}
 	}
 }

@@ -1,14 +1,23 @@
 package com.brstf.wishlist;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.Toast;
 
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.WLPricedEntry;
 
 /**
  * WLEntries object is an object that loads in and manages all entries of the
@@ -20,6 +29,7 @@ public final class WLEntries {
 	private ArrayList<String> mTags = null;
 	private HashMap<String, ArrayList<Integer>> mTagMap = null;
 	private WLDbAdapter mDbHelper = null;
+	private Context mCtx = null;
 
 	public static WLEntries getInstance() {
 		return mInstance;
@@ -37,6 +47,7 @@ public final class WLEntries {
 			// Open up the SQLite database and fill data
 			mDbHelper = new WLDbAdapter(ctx);
 			fillEntries();
+			mCtx = ctx;
 		}
 	}
 
@@ -144,7 +155,7 @@ public final class WLEntries {
 
 		// Index of entry
 		int i = 0;
-		
+
 		// Loop through each entry
 		while (!c.isAfterLast()) {
 			// Get the type of the entry at c
@@ -160,8 +171,8 @@ public final class WLEntries {
 			// Add all tags to the tag list
 			for (String tag : ent.getTags()) {
 				mTags.add(tag);
-				
-				if(!mTagMap.containsKey(tag)) {
+
+				if (!mTagMap.containsKey(tag)) {
 					mTagMap.put(tag, new ArrayList<Integer>());
 				}
 				mTagMap.get(tag).add(i);
@@ -175,4 +186,48 @@ public final class WLEntries {
 		mDbHelper.close();
 	}
 
+	public void updateEntry(int index, WLEntry uEnt) {
+		// If this entry is a priced entry of some sort, update price and rating
+		if (uEnt.getType() != WLEntryType.MUSIC_ARTIST) {
+			((WLPricedEntry) mEntries.get(index))
+					.setCurrentPrice(((WLPricedEntry) uEnt).getCurrentPrice());
+			((WLPricedEntry) mEntries.get(index))
+					.setRating(((WLPricedEntry) uEnt).getRating());
+		}
+
+		// If the icon path is empty or the icon got deleted somehow, download
+		// it
+		if (mEntries.get(index).getIconPath().equals("")
+				|| !(new File(mEntries.get(index).getIconPath()).exists())) {
+			// Download the icon if necessary
+			try {
+				// Create a FileOutputStream and write the image to file
+				FileOutputStream fos = mCtx.openFileOutput(uEnt.getTitle()
+						+ ".png", Context.MODE_PRIVATE);
+				Bitmap bitmap = BitmapFactory
+						.decodeStream((InputStream) new URL(uEnt.getIconUrl())
+								.getContent());
+				bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+				fos.close();
+
+				mEntries.get(index).setIconPath(uEnt.getTitle() + ".png");
+			} catch (IOException e) {
+				Toast.makeText(mCtx,
+						"Failed to download icon for " + uEnt.getTitle(),
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	/**
+	 * Function to update all entries in the database and notify any adapters
+	 * that entries have changed
+	 */
+	public void writeToDb() {
+		mDbHelper.open();
+		for (WLEntry ent : mEntries) {
+			mDbHelper.updateEntry(ent.getId(), ent);
+		}
+		mDbHelper.close();
+	}
 }

@@ -117,7 +117,6 @@ public class ShareActivity extends Activity {
 				ent = WLEntryType.getTypeEntry(WLEntryType.getTypeFromURL(url),
 						-1);
 
-				// TODO: LOADSA MONEY!
 				ent.setFromURLText(url, result);
 
 				// Create a FileOutputStream and write the image to file

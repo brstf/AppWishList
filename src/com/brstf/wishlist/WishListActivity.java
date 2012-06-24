@@ -46,8 +46,19 @@ public class WishListActivity extends FragmentActivity implements
 	public void onStart() {
 		super.onStart();
 
+		// Everytime the activity starts, check for updates!
+		new WLPriceChecker().priceCheck();
+
 		// Reload all entries
 		entries.reload();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
+		// When stopping write all entries from the entries list to the database
+		entries.writeToDb();
 	}
 
 	@Override
@@ -55,7 +66,7 @@ public class WishListActivity extends FragmentActivity implements
 		// When a tag button is selected, we'll want to replace this fragment
 		// with the wishlist
 		WLListView newFragment = new WLListView();
-		
+
 		// Pass in the tag to the wishlist view
 		Bundle args = new Bundle();
 		args.putString(WLListView.ARG_FILTERTAG, tag);

@@ -124,9 +124,12 @@ public class WLListView extends ListFragment {
 
 			WLEntry ent = getItem(position);
 
+			// If the icon is cached, simply retrieved the cached icon
 			if (icons.containsKey(ent.getIconPath())) {
 				holder.icon.setImageBitmap(icons.get(ent.getIconPath()));
 			} else {
+				// Otherwise, set the place holder and spin off an asynctask to
+				// load in the icon
 				new IconTask(ent, holder.position, holder).executeOnExecutor(
 						AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
 				switch (ent.getType()) {
