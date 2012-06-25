@@ -32,7 +32,7 @@ public class WLAlbumEntry extends WLPricedEntry {
 		Pattern p_length = Pattern
 				.compile("Total Length<.*?class=\"meta-details-value\">(.*?)<");
 		Pattern p_tracks = Pattern
-				.compile("Tracks<.*?class=\"meta-details-value\">(.*?)<");
+				.compile("Tracks</td.*?class=\"meta-details-value\">(.*?)<");
 		Pattern p_release = Pattern
 				.compile("Released<.*?class=\"meta-details-value\">(.*?)<");
 

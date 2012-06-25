@@ -71,14 +71,16 @@ public class WLAddEntry extends AsyncTask<String, String, String> {
 			ent.setFromURLText(url, result);
 
 			// Create a FileOutputStream and write the image to file
+			String fileName = ent.getTitle() + ".png";
+			fileName = fileName.replaceAll("[/\\\\?\\.<>$]", "");
 			FileOutputStream fos = entries.getContext().openFileOutput(
-					ent.getTitle() + ".png", Context.MODE_PRIVATE);
+					fileName, Context.MODE_PRIVATE);
 			Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(
 					ent.getIconUrl()).getContent());
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 			fos.close();
 
-			ent.setIconPath(ent.getTitle() + ".png");
+			ent.setIconPath(fileName);
 
 			// Successful exit
 			return "Success";

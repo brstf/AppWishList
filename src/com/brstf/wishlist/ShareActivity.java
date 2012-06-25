@@ -1,7 +1,10 @@
 package com.brstf.wishlist;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -39,17 +42,34 @@ public class ShareActivity extends Activity {
 						rc + " is already on your wishlist!",
 						Toast.LENGTH_SHORT).show();
 			}
-		} else {
-
+		} else if (isNetworkAvailable()) {
 			// Show a notification to let the user know it's being added to the
 			// wishlist
 			Toast.makeText(getBaseContext(), "Adding to wishlist..",
 					Toast.LENGTH_SHORT).show();
-	
+
 			// Start the Async Task to scrape the information, then finish this
 			// activity
 			new WLAddEntry().execute(url);
+		} else {
+			Toast.makeText(
+					getBaseContext(),
+					"No network connection (Entry will be added when connection restored)",
+					Toast.LENGTH_SHORT).show();
 		}
 		finish();
+	}
+
+	/**
+	 * Private function to determine whether or not an internet connection is
+	 * available
+	 * 
+	 * @return True if the internet is reachable, false otherwise
+	 */
+	private boolean isNetworkAvailable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		return activeNetworkInfo != null;
 	}
 }

@@ -27,7 +27,9 @@ public class WLPriceChecker {
 	 * information has changed
 	 */
 	public void priceCheck() {
-		new WLPriceCheck().execute("");
+		if( WLEntries.getInstance().isNetworkAvailable() ) {
+			new WLPriceCheck().execute("");
+		}
 	}
 
 	/**

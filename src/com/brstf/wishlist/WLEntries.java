@@ -15,6 +15,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import com.brstf.wishlist.entries.WLEntry;
@@ -78,7 +80,6 @@ public final class WLEntries {
 		mEntries = new ArrayList<WLEntry>();
 		mTags = new ArrayList<String>();
 		mTagMap = new HashMap<String, ArrayList<Integer>>();
-		fillPendingEntres();
 	}
 
 	/**
@@ -198,6 +199,8 @@ public final class WLEntries {
 
 		// Close up the database
 		mDbHelper.close();
+		
+		fillPendingEntres();
 	}
 
 	public void updateEntry(int index, WLEntry uEnt) {
@@ -296,6 +299,17 @@ public final class WLEntries {
 						Toast.LENGTH_SHORT).show();
 			}
 		}
+		clearPending();
+	}
+
+	/**
+	 * Function to attempt to clear all pending entries from the pending list
+	 */
+	public synchronized void clearPending() {
+		// If there are still pending entries, continue trying to clear them
+		if (getNumPendingEntries() > 0 && isNetworkAvailable()) {
+			new WLAddEntry().execute(mPending.get(0));
+		}
 	}
 
 	/**
@@ -338,11 +352,12 @@ public final class WLEntries {
 	 */
 	public void removePendingEntry(String url) {
 		mPending.remove(url);
+		clearPending();
 	}
 
 	/**
 	 * Function to check whether a url is contained in this list of entries or
-	 * not.  If it is not contained, it is added to the pending list.
+	 * not. If it is not contained, it is added to the pending list.
 	 * 
 	 * @param url
 	 *            Url to check presence of
@@ -365,8 +380,19 @@ public final class WLEntries {
 		}
 
 		addPendingEntry(url);
-		
+
 		// If we did not encounter it, return null
 		return null;
+	}
+	
+	/**
+	 * Private function to determine whether or not an internet connection is available
+	 * @return True if the internet is reachable, false otherwise
+	 */
+	public boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) mCtx.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null;
 	}
 }

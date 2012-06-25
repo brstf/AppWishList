@@ -71,7 +71,9 @@ public class WLListView extends ListFragment {
 			} finally {
 				// Finally, close our input stream
 				try {
-					fis.close();
+					if( fis != null) {
+						fis.close();
+					}
 				} catch (IOException e) {
 					// Catch any nasty IO Exceptions
 					e.printStackTrace();
