@@ -11,7 +11,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
-import com.brstf.wishlist.entries.WLPricedEntry;
 
 import android.os.AsyncTask;
 import android.util.Log;

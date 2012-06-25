@@ -1,12 +1,14 @@
 package com.brstf.wishlist;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import android.content.Context;
@@ -25,11 +27,13 @@ import com.brstf.wishlist.entries.WLPricedEntry;
  * filter by tags, etc.
  */
 public final class WLEntries {
+	private ArrayList<String> mPending = null;
 	private ArrayList<WLEntry> mEntries = null;
-	private ArrayList<String> mTags = null;
+	private List<String> mTags = null;
 	private HashMap<String, ArrayList<Integer>> mTagMap = null;
 	private WLDbAdapter mDbHelper = null;
 	private Context mCtx = null;
+	public static final String WL_PENDING = "PENDING";
 
 	public static WLEntries getInstance() {
 		return mInstance;
@@ -51,6 +55,15 @@ public final class WLEntries {
 		}
 	}
 
+	/**
+	 * Retrieves the context of the WLEntries instance
+	 * 
+	 * @return Context of the WLEntries instance
+	 */
+	public Context getContext() {
+		return mCtx;
+	}
+
 	private static final WLEntries mInstance = new WLEntries();
 
 	/**
@@ -65,6 +78,7 @@ public final class WLEntries {
 		mEntries = new ArrayList<WLEntry>();
 		mTags = new ArrayList<String>();
 		mTagMap = new HashMap<String, ArrayList<Integer>>();
+		fillPendingEntres();
 	}
 
 	/**
@@ -220,6 +234,20 @@ public final class WLEntries {
 	}
 
 	/**
+	 * Function to add a "Pending" entry to the list. This is added to the
+	 * pending list of entries, so that while an entry is constructed, and
+	 * before it is added to the list of entries, a duplicate entry cannot be
+	 * added. Additionally, while the device is offline, pending entries can be
+	 * stored, and details will be filled in when the device comes back online.
+	 * 
+	 * @param url
+	 *            Url of the entry to add to the pending list of entries
+	 */
+	private synchronized void addPendingEntry(String url) {
+		mPending.add(url);
+	}
+
+	/**
 	 * Function to update all entries in the database and notify any adapters
 	 * that entries have changed
 	 */
@@ -229,5 +257,116 @@ public final class WLEntries {
 			mDbHelper.updateEntry(ent.getId(), ent);
 		}
 		mDbHelper.close();
+
+		// Write the pending list out to a file
+		String pending = getPendingString();
+		try {
+			FileOutputStream fos = mCtx.openFileOutput("PENDING",
+					Context.MODE_PRIVATE);
+			fos.write(pending.getBytes());
+			fos.close();
+		} catch (IOException e) {
+			Toast.makeText(mCtx, "Failed to save Pending entries",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	/**
+	 * Private function to fill pending entries from the PENDING file (if it
+	 * exists).
+	 */
+	private void fillPendingEntres() {
+		File pFile = new File("PENDING");
+		if (mPending == null) {
+			mPending = new ArrayList<String>();
+		}
+
+		if (pFile.exists()) {
+			try {
+				FileInputStream fis = mCtx.openFileInput("PENDING");
+				byte[] data = new byte[fis.available()];
+				fis.read(data);
+				String pending = new String(data);
+
+				for (String s : pending.split("\n")) {
+					addPendingEntry(s);
+				}
+			} catch (IOException e) {
+				Toast.makeText(mCtx, "Failed to read in Pending entries",
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	/**
+	 * Gets a comma separated list of all pending urls
+	 * 
+	 * @return
+	 */
+	public String getPendingString() {
+		StringBuilder pending = new StringBuilder("");
+		for (String p : mPending) {
+			pending.append(p + "\n");
+		}
+		return pending.toString();
+	}
+
+	/**
+	 * Retrieves the list of pending entries
+	 * 
+	 * @return ArrayList of pending entry urls
+	 */
+	public List<String> getPendingEntries() {
+		return mPending;
+	}
+
+	/**
+	 * Retrieves the number of pending entries that haven't yet been added to
+	 * the list
+	 * 
+	 * @return Number of pending entries
+	 */
+	public int getNumPendingEntries() {
+		return mPending.size();
+	}
+
+	/**
+	 * Removes a pending entry with the given url
+	 * 
+	 * @param url
+	 *            Url of the pending entry to remove
+	 */
+	public void removePendingEntry(String url) {
+		mPending.remove(url);
+	}
+
+	/**
+	 * Function to check whether a url is contained in this list of entries or
+	 * not.  If it is not contained, it is added to the pending list.
+	 * 
+	 * @param url
+	 *            Url to check presence of
+	 * @return Name of the entry in the list if it's found, WL_PENDING if this
+	 *         url is pending addition, and null if the url was not found
+	 */
+	public synchronized String addPending(String url) {
+		// First check entries
+		for (WLEntry ent : mEntries) {
+			if (ent.getURL().equals(url)) {
+				return ent.getTitle();
+			}
+		}
+
+		// Next check pending entries
+		for (String p : mPending) {
+			if (p.equals(url)) {
+				return WL_PENDING;
+			}
+		}
+
+		addPendingEntry(url);
+		
+		// If we did not encounter it, return null
+		return null;
 	}
 }
