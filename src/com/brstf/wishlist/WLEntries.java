@@ -35,7 +35,15 @@ public final class WLEntries {
 	private HashMap<String, ArrayList<Integer>> mTagMap = null;
 	private WLDbAdapter mDbHelper = null;
 	private Context mCtx = null;
+	private WLChangedListener mCallback = null;
 	public static final String WL_PENDING = "PENDING";
+
+	public interface WLChangedListener {
+		/**
+		 * This callback is triggered when the WLEntries data set is changed
+		 */
+		public void onDataSetChanged();
+	}
 
 	public static WLEntries getInstance() {
 		return mInstance;
@@ -55,6 +63,16 @@ public final class WLEntries {
 			fillEntries();
 			mCtx = ctx;
 		}
+	}
+
+	/**
+	 * Sets the DataSetChangedListener of this WLEntries instance
+	 * 
+	 * @param dscl
+	 *            New DataSetChangedListener for the WLEntries instance
+	 */
+	public void setWLChangedListener(WLChangedListener dscl) {
+		mCallback = dscl;
 	}
 
 	/**
@@ -199,8 +217,13 @@ public final class WLEntries {
 
 		// Close up the database
 		mDbHelper.close();
-		
+
 		fillPendingEntres();
+
+		if (mCallback != null) {
+			// Notify about the changed dataset
+			mCallback.onDataSetChanged();
+		}
 	}
 
 	public void updateEntry(int index, WLEntry uEnt) {
@@ -214,20 +237,22 @@ public final class WLEntries {
 
 		// If the icon path is empty or the icon got deleted somehow, download
 		// it
+		String fileName = uEnt.getTitle() + ".png";
+		fileName = fileName.replaceAll("[/\\\\?\\.<>$]", "");
 		if (mEntries.get(index).getIconPath().equals("")
-				|| !(new File(mEntries.get(index).getIconPath()).exists())) {
+				|| !(new File(fileName).exists())) {
 			// Download the icon if necessary
 			try {
 				// Create a FileOutputStream and write the image to file
-				FileOutputStream fos = mCtx.openFileOutput(uEnt.getTitle()
-						+ ".png", Context.MODE_PRIVATE);
+				FileOutputStream fos = mCtx.openFileOutput(fileName,
+						Context.MODE_PRIVATE);
 				Bitmap bitmap = BitmapFactory
 						.decodeStream((InputStream) new URL(uEnt.getIconUrl())
 								.getContent());
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 				fos.close();
 
-				mEntries.get(index).setIconPath(uEnt.getTitle() + ".png");
+				mEntries.get(index).setIconPath(fileName);
 			} catch (IOException e) {
 				Toast.makeText(mCtx,
 						"Failed to download icon for " + uEnt.getTitle(),
@@ -279,11 +304,12 @@ public final class WLEntries {
 	 * exists).
 	 */
 	private void fillPendingEntres() {
-		File pFile = new File("PENDING");
+		// If the pending list hasn't been initialized, create it
 		if (mPending == null) {
 			mPending = new ArrayList<String>();
 		}
 
+		File pFile = new File("PENDING");
 		if (pFile.exists()) {
 			try {
 				FileInputStream fis = mCtx.openFileInput("PENDING");
@@ -299,6 +325,7 @@ public final class WLEntries {
 						Toast.LENGTH_SHORT).show();
 			}
 		}
+
 		clearPending();
 	}
 
@@ -352,7 +379,6 @@ public final class WLEntries {
 	 */
 	public void removePendingEntry(String url) {
 		mPending.remove(url);
-		clearPending();
 	}
 
 	/**
@@ -384,15 +410,18 @@ public final class WLEntries {
 		// If we did not encounter it, return null
 		return null;
 	}
-	
+
 	/**
-	 * Private function to determine whether or not an internet connection is available
+	 * Private function to determine whether or not an internet connection is
+	 * available
+	 * 
 	 * @return True if the internet is reachable, false otherwise
 	 */
 	public boolean isNetworkAvailable() {
-	    ConnectivityManager connectivityManager 
-	          = (ConnectivityManager) mCtx.getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	    return activeNetworkInfo != null;
+		ConnectivityManager connectivityManager = (ConnectivityManager) mCtx
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		return activeNetworkInfo != null;
 	}
 }

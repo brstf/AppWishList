@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLAppEntry;
 import com.brstf.wishlist.entries.WLArtistEntry;
@@ -33,7 +34,7 @@ import android.widget.TextView;
  * 
  * @author brstf
  */
-public class WLListView extends ListFragment {
+public class WLListView extends ListFragment implements WLChangedListener {
 	// Hash map mapping icon name to already loaded icons
 	private static HashMap<String, Bitmap> icons = null;
 
@@ -71,7 +72,7 @@ public class WLListView extends ListFragment {
 			} finally {
 				// Finally, close our input stream
 				try {
-					if( fis != null) {
+					if (fis != null) {
 						fis.close();
 					}
 				} catch (IOException e) {
@@ -320,9 +321,17 @@ public class WLListView extends ListFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
+		WLEntries.getInstance().setWLChangedListener(this);
 
 		// Fill in the data from the WLEntries list
 		fillData();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		WLEntries.getInstance().setWLChangedListener(null);
 	}
 
 	/**
@@ -350,5 +359,11 @@ public class WLListView extends ListFragment {
 		for (WLEntry ent : WLEntries.getInstance().getEntries(filtertag)) {
 			mListAdapter.add(ent);
 		}
+	}
+
+	@Override
+	public void onDataSetChanged() {
+		mListAdapter.clear();
+		fillData();
 	}
 }

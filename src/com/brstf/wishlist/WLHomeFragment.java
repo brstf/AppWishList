@@ -3,6 +3,7 @@ package com.brstf.wishlist;
 import java.util.ArrayList;
 
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.widgets.SquareButton;
 
 import android.app.Activity;
@@ -19,15 +20,15 @@ import android.widget.LinearLayout;
  * Fragment for the Home screen: The logo, an all button, and buttons for each
  * category
  */
-public class WLHomeFragment extends Fragment {
+public class WLHomeFragment extends Fragment implements WLChangedListener {
 	private OnTileSelectedListener mCallback;
 
 	public interface OnTileSelectedListener {
 		/**
 		 * Called by WLHomeFragment when a tag tile is selected
 		 * 
-		 * @param position
-		 *            The position of the
+		 * @param tag
+		 *            Tag on the tile selected
 		 */
 		public void onTagSelected(String tag);
 	}
@@ -77,7 +78,7 @@ public class WLHomeFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		mElements.clear();
-		
+
 		// Add one element per tag
 		for (String tag : WLEntries.getInstance().getTags()) {
 			mElements.add(tag);
@@ -87,7 +88,7 @@ public class WLHomeFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		
+
 		// Add one element per tag
 		for (String tag : WLEntries.getInstance().getTags()) {
 			mElements.add(tag);
@@ -129,5 +130,10 @@ public class WLHomeFragment extends Fragment {
 		});
 
 		return tile;
+	}
+
+	@Override
+	public void onDataSetChanged() {
+		// Do nothing for now, this view is too hard to change at the moment
 	}
 }
