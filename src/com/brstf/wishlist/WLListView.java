@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLAppEntry;
@@ -20,21 +23,23 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.ListFragment;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Class to display the the list of wished items
  * 
  * @author brstf
  */
-public class WLListView extends ListFragment implements WLChangedListener {
+public class WLListView extends SherlockListFragment implements
+		WLChangedListener {
 	// Hash map mapping icon name to already loaded icons
 	private static HashMap<String, Bitmap> icons = null;
 
@@ -318,6 +323,12 @@ public class WLListView extends ListFragment implements WLChangedListener {
 		setListAdapter(mListAdapter);
 	}
 
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Toast.makeText(getSherlockActivity(), "Touched any fucking thing",
+				Toast.LENGTH_SHORT).show();
+		return true;
+	}
+
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -365,5 +376,10 @@ public class WLListView extends ListFragment implements WLChangedListener {
 	public void onDataSetChanged() {
 		mListAdapter.clear();
 		fillData();
+	}
+	
+	public void filter(String tag) {
+		filtertag = tag;
+		onDataSetChanged();
 	}
 }

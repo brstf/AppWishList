@@ -2,12 +2,13 @@ package com.brstf.wishlist;
 
 import java.util.ArrayList;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.widgets.SquareButton;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,8 @@ import android.widget.LinearLayout;
  * Fragment for the Home screen: The logo, an all button, and buttons for each
  * category
  */
-public class WLHomeFragment extends Fragment implements WLChangedListener {
+public class WLHomeFragment extends SherlockFragment implements
+		WLChangedListener {
 	private OnTileSelectedListener mCallback;
 
 	public interface OnTileSelectedListener {
@@ -47,6 +49,7 @@ public class WLHomeFragment extends Fragment implements WLChangedListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		initActionBar();
 		// Inflate the layout for this fragment
 		View grid = inflater.inflate(R.layout.home, container, false);
 
@@ -75,8 +78,28 @@ public class WLHomeFragment extends Fragment implements WLChangedListener {
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		initActionBar();
+	}
+
+	/**
+	 * Private function to initialize the action bar
+	 */
+	private void initActionBar() {
+		// ActionBar!
+		final ActionBar ab = getSherlockActivity().getSupportActionBar();
+		ab.setDisplayHomeAsUpEnabled(false);
+		ab.setHomeButtonEnabled(false);
+		ab.setDisplayShowTitleEnabled(true);
+		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		ab.show();
+	}
+
+	@Override
 	public void onStart() {
 		super.onStart();
+
 		mElements.clear();
 
 		// Add one element per tag

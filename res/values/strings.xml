@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Add to Wishlist</string>
+    <string name="app_name">Wishlist</string>
+    <string name="add_name">Add to Wishlist</string>
     <string name="actionbar_name">Wishlist</string>
     <string name="iconViewDesc">Icon</string>
     <string name="btndelDesc">Remove from List</string>
