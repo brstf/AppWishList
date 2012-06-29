@@ -424,4 +424,16 @@ public final class WLEntries {
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null;
 	}
+	
+	/**
+	 * Capitalizes the first letter of the tag and returns it
+	 * @param tag String tag to convert
+	 * @return Tag with the first letter capitalized (e.g. 'apps' -> 'Apps')
+	 */
+	public static String getDisplayTag(String tag) {
+		if(tag == null) {
+			throw new IllegalArgumentException("tag cannot be null");
+		}
+		return tag.substring(0, 1).toUpperCase() + tag.substring(1);
+	}
 }

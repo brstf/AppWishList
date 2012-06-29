@@ -1,10 +1,10 @@
-package com.brstf.wishlist;
+package com.brstf.wishlist.ui;
 
 import java.util.ArrayList;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.widgets.SquareButton;
 
@@ -49,7 +49,6 @@ public class WLHomeFragment extends SherlockFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		initActionBar();
 		// Inflate the layout for this fragment
 		View grid = inflater.inflate(R.layout.home, container, false);
 
@@ -80,20 +79,6 @@ public class WLHomeFragment extends SherlockFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		initActionBar();
-	}
-
-	/**
-	 * Private function to initialize the action bar
-	 */
-	private void initActionBar() {
-		// ActionBar!
-		final ActionBar ab = getSherlockActivity().getSupportActionBar();
-		ab.setDisplayHomeAsUpEnabled(false);
-		ab.setHomeButtonEnabled(false);
-		ab.setDisplayShowTitleEnabled(true);
-		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		ab.show();
 	}
 
 	@Override
@@ -104,7 +89,7 @@ public class WLHomeFragment extends SherlockFragment implements
 
 		// Add one element per tag
 		for (String tag : WLEntries.getInstance().getTags()) {
-			mElements.add(tag);
+			mElements.add(WLEntries.getDisplayTag(tag));
 		}
 	}
 
@@ -114,7 +99,7 @@ public class WLHomeFragment extends SherlockFragment implements
 
 		// Add one element per tag
 		for (String tag : WLEntries.getInstance().getTags()) {
-			mElements.add(tag);
+			mElements.add(WLEntries.getDisplayTag(tag));
 		}
 
 		// Attach the callback listener to the activity
@@ -147,8 +132,8 @@ public class WLHomeFragment extends SherlockFragment implements
 		tile.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mCallback
-						.onTagSelected(((SquareButton) v).getText().toString());
+				mCallback.onTagSelected(((SquareButton) v).getText().toString()
+						.toLowerCase());
 			}
 		});
 

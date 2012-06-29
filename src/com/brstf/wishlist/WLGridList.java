@@ -43,17 +43,6 @@ public class WLGridList  {
 		SquareButton tile = new SquareButton(mCtx);
 		tile = (SquareButton) inflater.inflate(R.layout.gridentry, null);
 		tile.setText(mElements.get(position));
-		/*if(tile.getText().equals("Apps")) {
-			tile.setBackgroundResource(R.drawable.apps);
-		} else if(tile.getText().equals("Music")) {
-			tile.setBackgroundResource(R.drawable.music);
-		} else if(tile.getText().equals("Books")) {
-			tile.setBackgroundResource(R.drawable.books);
-		} else if(tile.getText().equals("Movies")) {
-			tile.setBackgroundResource(R.drawable.movies);
-		} else {
-			tile.setBackgroundResource(R.drawable.ic_launcher);
-		}*/
 		
 		return tile;
 	}

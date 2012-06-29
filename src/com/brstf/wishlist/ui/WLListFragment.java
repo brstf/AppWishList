@@ -1,13 +1,13 @@
-package com.brstf.wishlist;
+package com.brstf.wishlist.ui;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.MenuItem;
+import com.brstf.wishlist.R;
+import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLAppEntry;
@@ -29,19 +29,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Class to display the the list of wished items
  * 
  * @author brstf
  */
-public class WLListView extends SherlockListFragment implements
+public class WLListFragment extends SherlockListFragment implements
 		WLChangedListener {
 	// Hash map mapping icon name to already loaded icons
 	private static HashMap<String, Bitmap> icons = null;
+	public static final String EXTRA_TAG = "filter_tag";
 
 	private static class ViewHolder {
 		public SquareImageView icon;
@@ -291,7 +290,6 @@ public class WLListView extends SherlockListFragment implements
 	}
 
 	private WLListAdapter mListAdapter = null;
-	public static String ARG_FILTERTAG = "filter_tag";
 	private String filtertag = null;
 	private Drawable musicPh = null;
 	private Drawable appsPh = null;
@@ -315,18 +313,12 @@ public class WLListView extends SherlockListFragment implements
 		if (args != null) {
 			// If there were arguments, grab the filter tag to filter the list
 			// by
-			filtertag = args.getString(ARG_FILTERTAG);
+			filtertag = args.getString(EXTRA_TAG);
 		}
 
 		// Instantiate the adapter and use it
 		mListAdapter = new WLListAdapter(this.getActivity(), R.layout.row);
 		setListAdapter(mListAdapter);
-	}
-
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Toast.makeText(getSherlockActivity(), "Touched any fucking thing",
-				Toast.LENGTH_SHORT).show();
-		return true;
 	}
 
 	@Override
@@ -381,5 +373,9 @@ public class WLListView extends SherlockListFragment implements
 	public void filter(String tag) {
 		filtertag = tag;
 		onDataSetChanged();
+	}
+	
+	public String getFilter() {
+		return filtertag;
 	}
 }
