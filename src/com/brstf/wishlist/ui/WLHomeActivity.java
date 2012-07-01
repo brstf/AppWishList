@@ -1,7 +1,6 @@
 package com.brstf.wishlist.ui;
 
 import com.brstf.wishlist.R;
-import com.brstf.wishlist.WLPriceChecker;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,7 +46,7 @@ public class WLHomeActivity extends BaseActivity implements
 		super.onStart();
 
 		// Every time the activity starts, check for updates!
-		new WLPriceChecker().priceCheck();
+		//new WLPriceChecker().priceCheck();
 
 		// Reload all entries
 		getActivityHelper().getEntries().reload();

@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/CustomTheme" >
         <activity
-            android:name=".WishListActivity"
+            android:name=".ui.WLHomeActivity"
             android:label="@string/actionbar_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +28,7 @@
         <!-- Start the share activity to add a Play listing (Activity is transparent) -->
         <activity
             android:name="com.brstf.wishlist.ShareActivity"
+            android:label="@string/add_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -50,6 +51,13 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="com.brstf.wishlist.ui.WLListActivity"
+            android:label="@string/actionbar_name" />
+        
+        <service android:name=".service.IconService"/>
+        <service android:name=".service.AddEntryService"/>
     </application>
 
 </manifest>

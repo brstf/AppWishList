@@ -1,6 +1,7 @@
 package com.brstf.wishlist;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.brstf.wishlist.service.AddEntryService;
 
 import android.content.Context;
 import android.content.Intent;
@@ -49,9 +50,11 @@ public class ShareActivity extends SherlockActivity {
 			Toast.makeText(getBaseContext(), "Adding to wishlist..",
 					Toast.LENGTH_SHORT).show();
 
-			// Start the Async Task to scrape the information, then finish this
+			// Start AddEntryService to scrape the information, then finish this
 			// activity
-			new WLAddEntry().execute(url);
+			final Intent addIntent = new Intent(this, AddEntryService.class);
+			addIntent.putExtra(AddEntryService.EXTRA_URL, url);
+			startService(addIntent);
 		} else {
 			Toast.makeText(
 					getBaseContext(),

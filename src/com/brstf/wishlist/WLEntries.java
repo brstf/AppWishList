@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.entries.WLPricedEntry;
+import com.brstf.wishlist.service.AddEntryService;
 
 /**
  * WLEntries object is an object that loads in and manages all entries of the
@@ -335,7 +337,9 @@ public final class WLEntries {
 	public synchronized void clearPending() {
 		// If there are still pending entries, continue trying to clear them
 		if (getNumPendingEntries() > 0 && isNetworkAvailable()) {
-			new WLAddEntry().execute(mPending.get(0));
+			final Intent addIntent = new Intent(mCtx, AddEntryService.class);
+			addIntent.putExtra(AddEntryService.EXTRA_URL, mPending.get(0));
+			mCtx.startService(addIntent);
 		}
 	}
 
