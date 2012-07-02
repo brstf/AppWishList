@@ -24,14 +24,18 @@ public class WLListActivity extends BaseActivity implements
 				android.R.layout.simple_spinner_dropdown_item);
 
 		if (findViewById(R.id.fragment_container) != null) {
-			if (savedInstanceState != null) {
-				return;
+			mFilter = null;
+			
+			// If we have a saved state, restore the previous filter tag
+			if(savedInstanceState != null) {
+				mFilter = savedInstanceState.getString(KEY_FILTER);
+				mFilter = mFilter == null ? "all" : mFilter;
 			}
-
+			
 			mFrag = new WLListFragment();
 			mFrag.setArguments(getIntent().getExtras());
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, mFrag).commit();
+					.replace(R.id.fragment_container, mFrag).commit();
 		}
 	}
 
@@ -51,21 +55,10 @@ public class WLListActivity extends BaseActivity implements
 
 		// If we have a fragment initialized, grab the filter, and set it as the
 		// filter tag
-		if (mFrag != null) {
+		if(mFilter == null) {
 			mFilter = mFrag.getFilter();
 			mFilter = mFilter == null ? "all" : mFilter;
-			getSupportActionBar().setSelectedNavigationItem(
-					mAdapter.getPosition(WLEntries.getDisplayTag(mFilter)));
-
 		}
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		// On restore instance state, get the filter tag that we saved in
-		// onSaveInstanceState
-		mFilter = savedInstanceState.getString(KEY_FILTER);
-		mFilter = mFilter == null ? "all" : mFilter;
 		getSupportActionBar().setSelectedNavigationItem(
 				mAdapter.getPosition(WLEntries.getDisplayTag(mFilter)));
 	}
@@ -84,27 +77,17 @@ public class WLListActivity extends BaseActivity implements
 			tag = null;
 		}
 
-		// If our activity was destroyed, mFrag will be null when we set our
-		// ActionBar to a list navigation mode
-		if (mFrag != null) {
-			mFrag.filter(tag);
-		}
+		mFrag.filter(tag);
 		return true;
 	}
 
 	@Override
-	public void onDestroy() {
-		mFilter = mFrag.getFilter();
-
-		getSupportFragmentManager().beginTransaction().remove(mFrag).commit();
-	}
-
-	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-
 		// If the app is exiting and we have to save state, save the current
 		// filter tag so we can restore it
+		mFilter = mFrag.getFilter();
 		outState.putString(KEY_FILTER, mFilter);
+
+		super.onSaveInstanceState(outState);
 	}
 }

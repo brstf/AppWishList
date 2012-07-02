@@ -168,7 +168,7 @@ public final class WLEntries {
 	/**
 	 * Function to wipe and reload all data
 	 */
-	public void reload() {
+	public synchronized void reload() {
 		mEntries.clear();
 		mTags.clear();
 		mTagMap.clear();
@@ -180,7 +180,7 @@ public final class WLEntries {
 	/**
 	 * Method to initialize and fill in all member collections
 	 */
-	private void fillEntries() {
+	private synchronized void fillEntries() {
 		// Open the database to obtain entries
 		mDbHelper.open();
 
@@ -228,7 +228,7 @@ public final class WLEntries {
 		}
 	}
 
-	public void updateEntry(int index, WLEntry uEnt) {
+	public synchronized void updateEntry(int index, WLEntry uEnt) {
 		// If this entry is a priced entry of some sort, update price and rating
 		if (uEnt.getType() != WLEntryType.MUSIC_ARTIST) {
 			((WLPricedEntry) mEntries.get(index))
