@@ -823,35 +823,39 @@ containing a value of this type.
         public static final int abs__title=0x7f04001b;
         public static final int abs__titleDivider=0x7f04001c;
         public static final int abs__up=0x7f04000b;
-        public static final int appicon=0x7f040034;
-        public static final int appname=0x7f040035;
+        public static final int appicon=0x7f040035;
+        public static final int appname=0x7f040036;
         public static final int btnadd=0x7f04002d;
         public static final int btnall=0x7f040029;
-        public static final int btndel=0x7f040039;
+        public static final int btndel=0x7f04003a;
         public static final int btnpur=0x7f04002e;
-        public static final int btnrev=0x7f04003a;
-        public static final int btnshr=0x7f040038;
-        public static final int btntag=0x7f040037;
+        public static final int btnrev=0x7f04003b;
+        public static final int btnshr=0x7f040039;
+        public static final int btntag=0x7f040038;
         public static final int column1=0x7f04002b;
         public static final int column2=0x7f04002c;
-        public static final int creator=0x7f040032;
+        public static final int creator=0x7f040033;
         public static final int disableHome=0x7f040009;
         public static final int foldername=0x7f040027;
         public static final int fragment_container=0x7f04002f;
         public static final int grid_container=0x7f04002a;
         public static final int homeAsUp=0x7f040006;
-        public static final int icon=0x7f040030;
+        public static final int icon=0x7f040031;
         public static final int listMode=0x7f040002;
         public static final int logo=0x7f040028;
+        public static final int menu_delete=0x7f04003d;
+        public static final int menu_search=0x7f04003f;
+        public static final int menu_tag=0x7f04003e;
         public static final int normal=0x7f040001;
-        public static final int price=0x7f040033;
-        public static final int sale_price=0x7f040036;
-        public static final int shiftpos=0x7f04003b;
+        public static final int price=0x7f040034;
+        public static final int rowbackground=0x7f040030;
+        public static final int sale_price=0x7f040037;
+        public static final int shiftpos=0x7f04003c;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
         public static final int tabMode=0x7f040003;
-        public static final int title=0x7f040031;
+        public static final int title=0x7f040032;
         public static final int useLogo=0x7f040004;
         public static final int wrap_content=0x7f040000;
     }
@@ -879,14 +883,20 @@ containing a value of this type.
         public static final int abs__screen_action_bar_overlay=0x7f030011;
         public static final int abs__screen_simple=0x7f030012;
         public static final int abs__screen_simple_overlay_action_mode=0x7f030013;
-        public static final int gridentry=0x7f030014;
-        public static final int home=0x7f030015;
-        public static final int main=0x7f030016;
-        public static final int row=0x7f030017;
-        public static final int row_sale=0x7f030018;
-        public static final int selrow=0x7f030019;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001a;
-        public static final int sherlock_spinner_item=0x7f03001b;
+        public static final int collapsible_edittext=0x7f030014;
+        public static final int gridentry=0x7f030015;
+        public static final int home=0x7f030016;
+        public static final int listselector=0x7f030017;
+        public static final int main=0x7f030018;
+        public static final int row=0x7f030019;
+        public static final int row_sale=0x7f03001a;
+        public static final int selrow=0x7f03001b;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001c;
+        public static final int sherlock_spinner_item=0x7f03001d;
+    }
+    public static final class menu {
+        public static final int actionmenu=0x7f0b0000;
+        public static final int default_menu_items=0x7f0b0001;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -919,17 +929,21 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abs__shareactionprovider_share_with_application=0x7f090009;
-        public static final int actionbar_name=0x7f09000c;
-        public static final int add_name=0x7f09000b;
-        public static final int app_name=0x7f09000a;
-        public static final int btnaddtext=0x7f090013;
-        public static final int btnalltext=0x7f090012;
-        public static final int btndelDesc=0x7f09000e;
-        public static final int btnpurtext=0x7f090014;
-        public static final int btnrevDesc=0x7f09000f;
-        public static final int chooser_diag=0x7f090010;
-        public static final int empty=0x7f090011;
-        public static final int iconViewDesc=0x7f09000d;
+        public static final int actionbar_name=0x7f090010;
+        public static final int add_name=0x7f09000f;
+        public static final int app_name=0x7f09000e;
+        public static final int btnaddtext=0x7f090017;
+        public static final int btnalltext=0x7f090016;
+        public static final int btndelDesc=0x7f090012;
+        public static final int btnpurtext=0x7f090018;
+        public static final int btnrevDesc=0x7f090013;
+        public static final int chooser_diag=0x7f090014;
+        public static final int description_search=0x7f09000a;
+        public static final int empty=0x7f090015;
+        public static final int hint_search=0x7f09000b;
+        public static final int iconViewDesc=0x7f090011;
+        public static final int menu_delete=0x7f09000c;
+        public static final int menu_tag=0x7f09000d;
     }
     public static final class style {
         public static final int CustomTheme=0x7f0a0058;
