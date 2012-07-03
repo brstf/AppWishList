@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <string name="description_search">Search</string>
-    
-    <string name="hint_search">Search</string>
 
+    <string name="description_search">Search</string>
+    <string name="hint_search">Search</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_tag">Tag</string>
     <string name="app_name">Wishlist</string>
     <string name="add_name">Add to Wishlist</string>
     <string name="actionbar_name">Wishlist</string>

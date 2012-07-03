@@ -161,7 +161,7 @@ public abstract class WLEntry {
 		// Set our variables with the retrieved information
 		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
-		setIconPath((getTitle() + ".png").replaceAll("[/\\\\?\\.<>$]", ""));
+		setIconPath((getTitle() + ".png").replaceAll("[/\\\\?\\<>$]", ""));
 		addTag(WLEntryType.getTypeString(getType()));
 	}
 

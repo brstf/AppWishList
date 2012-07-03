@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
@@ -22,14 +24,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Class to display the the list of wished items
@@ -43,6 +51,7 @@ public class WLListFragment extends SherlockListFragment implements
 	public static final String EXTRA_TAG = "filter_tag";
 
 	private static class ViewHolder {
+		public LinearLayout background;
 		public SquareImageView icon;
 		public TextView title;
 		public TextView creator;
@@ -100,9 +109,15 @@ public class WLListFragment extends SherlockListFragment implements
 	}
 
 	public class WLListAdapter extends ArrayAdapter<WLEntry> {
+		private SparseBooleanArray mSelected;
 
 		public WLListAdapter(Context context, int textViewResourceId) {
 			super(context, textViewResourceId);
+		}
+
+		public void setSelected(SparseBooleanArray selected) {
+			mSelected = selected;
+			notifyDataSetChanged();
 		}
 
 		@Override
@@ -116,6 +131,8 @@ public class WLListFragment extends SherlockListFragment implements
 				// If the convert view was null, we need to construct a new view
 				// holder for it
 				holder = new ViewHolder();
+				holder.background = (LinearLayout) row
+						.findViewById(R.id.rowbackground);
 				holder.icon = (SquareImageView) row.findViewById(R.id.icon);
 				holder.title = (TextView) row.findViewById(R.id.title);
 				holder.creator = (TextView) row.findViewById(R.id.creator);
@@ -130,6 +147,11 @@ public class WLListFragment extends SherlockListFragment implements
 			holder.position = position;
 
 			WLEntry ent = getItem(position);
+			if (mSelected != null && mSelected.get(position)) {
+				holder.background.setBackgroundColor(0x7820A1A4);
+			} else {
+				holder.background.setBackgroundColor(Color.TRANSPARENT);
+			}
 
 			// If the icon is cached, simply retrieved the cached icon
 			if (icons.containsKey(ent.getIconPath())) {
@@ -328,6 +350,9 @@ public class WLListFragment extends SherlockListFragment implements
 
 		// Fill in the data from the WLEntries list
 		fillData();
+
+		this.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		getListView().setMultiChoiceModeListener(mStarredListener);
 	}
 
 	@Override
@@ -369,13 +394,65 @@ public class WLListFragment extends SherlockListFragment implements
 		mListAdapter.clear();
 		fillData();
 	}
-	
+
 	public void filter(String tag) {
 		filtertag = tag;
 		onDataSetChanged();
 	}
-	
+
 	public String getFilter() {
 		return filtertag;
 	}
+
+	private MultiChoiceModeListener mStarredListener = new MultiChoiceModeListener() {
+
+		@Override
+		public boolean onActionItemClicked(android.view.ActionMode mode,
+				android.view.MenuItem item) {
+			switch (item.getItemId()) {
+			case R.id.menu_delete:
+				int[] ids = new int[WLListFragment.this.getListView()
+						.getCheckedItemCount()];
+				SparseBooleanArray sba = WLListFragment.this.getListView()
+						.getCheckedItemPositions();
+				for (int i = 0; i < ids.length; ++i) {
+					ids[i] = WLListFragment.this.mListAdapter.getItem(
+							sba.keyAt(i)).getId();
+				}
+				WLEntries.getInstance().removeEntries(ids);
+			}
+			Toast.makeText(WLListFragment.this.getSherlockActivity(),
+					"Got click: " + item, Toast.LENGTH_SHORT).show();
+			mode.finish();
+			return true;
+		}
+
+		@Override
+		public boolean onCreateActionMode(android.view.ActionMode mode,
+				android.view.Menu menu) {
+			WLListFragment.this.getActivity().getMenuInflater()
+					.inflate(R.menu.actionmenu, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(android.view.ActionMode mode) {
+		}
+
+		@Override
+		public boolean onPrepareActionMode(android.view.ActionMode mode,
+				android.view.Menu menu) {
+			return false;
+		}
+
+		@Override
+		public void onItemCheckedStateChanged(android.view.ActionMode mode,
+				int position, long id, boolean checked) {
+			final int count = WLListFragment.this.getListView()
+					.getCheckedItemCount();
+			WLListFragment.this.mListAdapter.setSelected(WLListFragment.this
+					.getListView().getCheckedItemPositions());
+			mode.setTitle(Integer.toString(count));
+		}
+	};
 }

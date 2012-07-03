@@ -263,6 +263,26 @@ public final class WLEntries {
 		}
 	}
 
+	public synchronized void removeEntries(int[] ids) {
+		mDbHelper.open();
+		for (WLEntry ent : mEntries) {
+			for (int i = 0; i < ids.length; ++i) {
+				if (ent.getId() == ids[i]) {
+					mDbHelper.deleteEntry(ent.getId());
+					File f = new File(mCtx.getFilesDir().getAbsolutePath()
+							+ "/" + ent.getIconPath());
+					if (f.exists()) {
+						f.delete();
+					}
+				}
+			}
+		}
+		mDbHelper.close();
+		reload();
+		if (mCallback != null)
+			mCallback.onDataSetChanged();
+	}
+
 	/**
 	 * Function to add a "Pending" entry to the list. This is added to the
 	 * pending list of entries, so that while an entry is constructed, and
@@ -428,14 +448,16 @@ public final class WLEntries {
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null;
 	}
-	
+
 	/**
 	 * Capitalizes the first letter of the tag and returns it
-	 * @param tag String tag to convert
+	 * 
+	 * @param tag
+	 *            String tag to convert
 	 * @return Tag with the first letter capitalized (e.g. 'apps' -> 'Apps')
 	 */
 	public static String getDisplayTag(String tag) {
-		if(tag == null) {
+		if (tag == null) {
 			throw new IllegalArgumentException("tag cannot be null");
 		}
 		return tag.substring(0, 1).toUpperCase() + tag.substring(1);

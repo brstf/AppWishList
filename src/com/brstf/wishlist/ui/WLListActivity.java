@@ -2,11 +2,15 @@ package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 public class WLListActivity extends BaseActivity implements
 		OnNavigationListener {
@@ -25,13 +29,13 @@ public class WLListActivity extends BaseActivity implements
 
 		if (findViewById(R.id.fragment_container) != null) {
 			mFilter = null;
-			
+
 			// If we have a saved state, restore the previous filter tag
-			if(savedInstanceState != null) {
+			if (savedInstanceState != null) {
 				mFilter = savedInstanceState.getString(KEY_FILTER);
 				mFilter = mFilter == null ? "all" : mFilter;
 			}
-			
+
 			mFrag = new WLListFragment();
 			mFrag.setArguments(getIntent().getExtras());
 			getSupportFragmentManager().beginTransaction()
@@ -55,7 +59,7 @@ public class WLListActivity extends BaseActivity implements
 
 		// If we have a fragment initialized, grab the filter, and set it as the
 		// filter tag
-		if(mFilter == null) {
+		if (mFilter == null) {
 			mFilter = mFrag.getFilter();
 			mFilter = mFilter == null ? "all" : mFilter;
 		}
