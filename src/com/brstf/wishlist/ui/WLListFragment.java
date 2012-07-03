@@ -359,6 +359,8 @@ public class WLListFragment extends SherlockListFragment implements
 	public void onStop() {
 		super.onStop();
 
+		// Clear out the icon list, and clear the callback
+		icons.clear();
 		WLEntries.getInstance().setWLChangedListener(null);
 	}
 
