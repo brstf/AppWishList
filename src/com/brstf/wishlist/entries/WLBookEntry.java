@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.wishlist.WLDbAdapter;
+import com.brstf.wishlist.util.WLDbAdapter;
 
 public class WLBookEntry extends WLPricedEntry {
 	private int mPageCount;

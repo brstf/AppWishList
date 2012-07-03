@@ -1,4 +1,4 @@
-package com.brstf.wishlist;
+package com.brstf.wishlist.util;
 
 import com.brstf.wishlist.entries.WLAlbumEntry;
 import com.brstf.wishlist.entries.WLAppEntry;
@@ -123,6 +123,18 @@ public class WLDbAdapter {
 	public void close() {
 		mDbHelper.close();
 	}
+	
+	public void beginTransaction() {
+		mDb.beginTransaction();
+	}
+	
+	public void setTransactionSuccessful() {
+		mDb.setTransactionSuccessful();
+	}
+	
+	public void endTransaction() {
+		mDb.endTransaction();
+	}
 
 	/**
 	 * Creates an entry in the database with the values specified from the
@@ -140,10 +152,10 @@ public class WLDbAdapter {
 	 * Function to delete a specified entry from the database
 	 * 
 	 * @param rowId
-	 *            The long id of the entry in the database to delete
+	 *            The integer id of the entry in the database to delete
 	 * @return True on successful deletion, false if deletion failed
 	 */
-	public boolean deleteEntry(long rowId) {
+	public boolean deleteEntry(int rowId) {
 		return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 
@@ -164,12 +176,12 @@ public class WLDbAdapter {
 	 * Function to get a specific entry from the database
 	 * 
 	 * @param rowId
-	 *            The long id of the entry to retrieve
+	 *            The integer id of the entry to retrieve
 	 * @return A Cursor pointing to the desired entry
 	 * @throws SQLException
 	 *             If the query to the database fails
 	 */
-	public Cursor fetchEntry(long rowId) throws SQLException {
+	public Cursor fetchEntry(int rowId) throws SQLException {
 		Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] {
 				KEY_ROWID, KEY_TYPE, KEY_NAME, KEY_URL, KEY_ICONPATH,
 				KEY_ICONURL, KEY_CPRICE, KEY_RPRICE, KEY_RATING, KEY_CRATING,
@@ -187,12 +199,12 @@ public class WLDbAdapter {
 	 * entry
 	 * 
 	 * @param rowId
-	 *            The rowid of the entry to update
+	 *            The integer id of the entry to update
 	 * @param ent
 	 *            The entry whose values to use for updating
 	 * @return True if the entry was successfully updated, false otherwise
 	 */
-	public boolean updateEntry(long rowId, WLEntry ent) {
+	public boolean updateEntry(int rowId, WLEntry ent) {
 		return mDb.update(DATABASE_TABLE, createValues(ent), KEY_ROWID + "="
 				+ rowId, null) > 0;
 	}

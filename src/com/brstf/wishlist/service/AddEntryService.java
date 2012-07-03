@@ -8,10 +8,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.WLDbAdapter;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.util.WLDbAdapter;
 
 import android.app.IntentService;
 import android.content.Intent;

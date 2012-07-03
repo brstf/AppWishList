@@ -24,6 +24,7 @@ import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.entries.WLPricedEntry;
 import com.brstf.wishlist.service.AddEntryService;
+import com.brstf.wishlist.util.WLDbAdapter;
 
 /**
  * WLEntries object is an object that loads in and manages all entries of the
@@ -272,6 +273,7 @@ public final class WLEntries {
 	public synchronized void removeEntries(int[] ids) {
 		// Open the database
 		mDbHelper.open();
+		mDbHelper.beginTransaction();
 
 		// Loop through and find all entries with matching ids
 		for (WLEntry ent : mEntries) {
@@ -288,6 +290,8 @@ public final class WLEntries {
 				}
 			}
 		}
+		mDbHelper.setTransactionSuccessful();
+		mDbHelper.endTransaction();
 		mDbHelper.close();
 		reload();
 		if (mCallback != null)
