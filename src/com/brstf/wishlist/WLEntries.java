@@ -263,11 +263,22 @@ public final class WLEntries {
 		}
 	}
 
+	/**
+	 * Deletes a set of items from the Entries list.
+	 * 
+	 * @param ids
+	 *            Integer array of the ids of the entries to delete
+	 */
 	public synchronized void removeEntries(int[] ids) {
+		// Open the database
 		mDbHelper.open();
+
+		// Loop through and find all entries with matching ids
 		for (WLEntry ent : mEntries) {
 			for (int i = 0; i < ids.length; ++i) {
 				if (ent.getId() == ids[i]) {
+					// Delete the entry from the database, and delete the cached
+					// icon
 					mDbHelper.deleteEntry(ent.getId());
 					File f = new File(mCtx.getFilesDir().getAbsolutePath()
 							+ "/" + ent.getIconPath());

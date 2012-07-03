@@ -1,13 +1,10 @@
 package com.brstf.wishlist.ui;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
@@ -56,18 +53,16 @@ public class WLListFragment extends SherlockListFragment implements
 		public TextView title;
 		public TextView creator;
 		public TextView price;
-		public int position;
 	}
 
-	private static class IconTask extends AsyncTask<Activity, Object, Bitmap> {
-		private WLEntry mEnt;
-		private int mPosition;
-		private ViewHolder mHolder;
+	private static class IconTask extends AsyncTask<Activity, Void, Bitmap> {
+		private String mIconPath;
+		private SquareImageView mImageView;
 
-		public IconTask(WLEntry ent, int position, ViewHolder holder) {
-			mEnt = ent;
-			mPosition = position;
-			mHolder = holder;
+		public IconTask(String iconPath, ViewHolder holder) {
+			mIconPath = iconPath;
+			mImageView = holder.icon;
+			mImageView.setTag(this);
 		}
 
 		@Override
@@ -75,12 +70,13 @@ public class WLListFragment extends SherlockListFragment implements
 			// Try to read in the icon file
 			FileInputStream fis = null;
 			try {
-				fis = params[0].openFileInput(mEnt.getIconPath());
+				fis = params[0].openFileInput(mIconPath);
 				// If successful, set the icon
-				return BitmapFactory.decodeStream(fis);
-			} catch (FileNotFoundException e) {
+				final Bitmap bm = BitmapFactory.decodeStream(fis);
+				fis.close();
+				return bm;
+			} catch (IOException e) {
 				// Catch any exceptions
-				// TODO: Throw in a default setting here?
 				e.printStackTrace();
 			} finally {
 				// Finally, close our input stream
@@ -99,11 +95,11 @@ public class WLListFragment extends SherlockListFragment implements
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			icons.put(mEnt.getIconPath(), bitmap);
+			icons.put(mIconPath, bitmap);
 			if (bitmap == null)
 				return;
-			if (mHolder.position == mPosition) {
-				mHolder.icon.setImageBitmap(bitmap);
+			if (mImageView.getTag() == this) {
+				mImageView.setImageBitmap(bitmap);
 			}
 		}
 	}
@@ -115,6 +111,12 @@ public class WLListFragment extends SherlockListFragment implements
 			super(context, textViewResourceId);
 		}
 
+		/**
+		 * Sets the array of which entries are selected.
+		 * 
+		 * @param selected
+		 *            SparseBooleanArray of all selected entries of the list
+		 */
 		public void setSelected(SparseBooleanArray selected) {
 			mSelected = selected;
 			notifyDataSetChanged();
@@ -144,8 +146,6 @@ public class WLListFragment extends SherlockListFragment implements
 				holder = (ViewHolder) row.getTag();
 			}
 
-			holder.position = position;
-
 			WLEntry ent = getItem(position);
 			if (mSelected != null && mSelected.get(position)) {
 				holder.background.setBackgroundColor(0x7820A1A4);
@@ -153,14 +153,14 @@ public class WLListFragment extends SherlockListFragment implements
 				holder.background.setBackgroundColor(Color.TRANSPARENT);
 			}
 
-			// If the icon is cached, simply retrieved the cached icon
+			// If the icon is cached, simply retrieve the cached icon
 			if (icons.containsKey(ent.getIconPath())) {
 				holder.icon.setImageBitmap(icons.get(ent.getIconPath()));
 			} else {
 				// Otherwise, set the place holder and spin off an asynctask to
 				// load in the icon
-				new IconTask(ent, holder.position, holder).executeOnExecutor(
-						AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+				new IconTask(ent.getIconPath(), holder).executeOnExecutor(
+						AsyncTask.THREAD_POOL_EXECUTOR, getSherlockActivity());
 				switch (ent.getType()) {
 				case APP:
 					holder.icon.setImageDrawable(appsPh);
@@ -373,6 +373,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		// Create the intent and start it
 		// TODO: Should this only start the Play store?
+		// TODO: This shouldn't be able to Add to Wishlist
 		Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
 		startActivity(webIntent);
 	}

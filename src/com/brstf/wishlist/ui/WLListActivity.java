@@ -2,15 +2,11 @@ package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 public class WLListActivity extends BaseActivity implements
 		OnNavigationListener {
