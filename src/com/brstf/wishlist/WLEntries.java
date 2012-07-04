@@ -197,21 +197,23 @@ public final class WLEntries {
 			// Get the type of the entry at c
 			WLEntryType type = WLEntryType.getTypeFromString(c.getString(1));
 
-			// Construct the entry of the given type and set its values
-			WLEntry ent = WLEntryType.getTypeEntry(type, c.getInt(0));
-			ent.setFromDb(c);
+			if (type != WLEntryType.PENDING) {
+				// Construct the entry of the given type and set its values
+				WLEntry ent = WLEntryType.getTypeEntry(type, c.getInt(0));
+				ent.setFromDb(c);
 
-			// Add it to the list
-			mEntries.add(ent);
+				// Add it to the list
+				mEntries.add(ent);
 
-			// Add all tags to the tag list
-			for (String tag : ent.getTags()) {
-				mTags.add(tag);
+				// Add all tags to the tag list
+				for (String tag : ent.getTags()) {
+					mTags.add(tag);
 
-				if (!mTagMap.containsKey(tag)) {
-					mTagMap.put(tag, new ArrayList<Integer>());
+					if (!mTagMap.containsKey(tag)) {
+						mTagMap.put(tag, new ArrayList<Integer>());
+					}
+					mTagMap.get(tag).add(i);
 				}
-				mTagMap.get(tag).add(i);
 			}
 
 			// Continue moving through the entries

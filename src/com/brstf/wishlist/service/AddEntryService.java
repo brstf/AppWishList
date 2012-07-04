@@ -68,24 +68,28 @@ public class AddEntryService extends IntentService {
 		// Add this entry to the database
 		WLDbAdapter mDbHelper = new WLDbAdapter(this.getBaseContext());
 		mDbHelper.open();
-		mDbHelper.createEntry(ent);
+		int rowid = mDbHelper.fetchId(url);
+		if (rowid == -1) {
+			Log.e(TAG, "Did not find pending entry!");
+		} else {
+			mDbHelper.updateEntry(rowid, ent);
 
-		// Show that the app was successfully added to the wishlist
-		mHandler.post(new Runnable() {
+			// Show that the app was successfully added to the wishlist
+			mHandler.post(new Runnable() {
 
-			@Override
-			public void run() {
-				Toast.makeText(AddEntryService.this,
-						"Added " + ent.getTitle() + " to wishlist!",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
+				@Override
+				public void run() {
+					Toast.makeText(AddEntryService.this,
+							"Added " + ent.getTitle() + " to wishlist!",
+							Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
 
 		// Finally, close the db helper
 		mDbHelper.close();
 
 		// Remove this entry from the pending list
-		mEntries.removePendingEntry(url);
 		mEntries.reload();
 	}
 

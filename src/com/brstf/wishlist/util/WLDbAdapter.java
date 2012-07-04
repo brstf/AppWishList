@@ -50,10 +50,10 @@ public class WLDbAdapter {
 
 	// Helper strings to assist in the operation of the SQLite database
 	private static final String DATABASE_CREATE = "create table wlentries (_id integer "
-			+ "primary key autoincrement, type text not null, name text not null, url "
-			+ "text not null, iconpath text not null, iconurl text not null, cprice float, "
+			+ "primary key autoincrement, type text not null, name text, url "
+			+ "text not null, iconpath text, iconurl text, cprice float, "
 			+ "rprice float, rating float, crating text, movlength int, creator text, "
-			+ "alblength text, numtracks int, date text, pcount int, tags text not null);";
+			+ "alblength text, numtracks int, date text, pcount int, tags text);";
 
 	private static final String DATABASE_NAME = "wldata";
 	private static final String DATABASE_TABLE = "wlentries";
@@ -123,17 +123,85 @@ public class WLDbAdapter {
 	public void close() {
 		mDbHelper.close();
 	}
-	
+
+	/**
+	 * Begins a transaction in exclusive mode on the database.
+	 */
 	public void beginTransaction() {
 		mDb.beginTransaction();
 	}
-	
+
+	/**
+	 * Marks the current transaction on the database successful.
+	 */
 	public void setTransactionSuccessful() {
 		mDb.setTransactionSuccessful();
 	}
-	
+
+	/**
+	 * Ends the current transaction on the database.
+	 */
 	public void endTransaction() {
 		mDb.endTransaction();
+	}
+
+	/**
+	 * Checks if an entry with the given url exists in the database.
+	 * 
+	 * @param url
+	 *            URL to check existence of
+	 * @return Name of the entry if found, "PENDING" if entry does not yet have
+	 *         a name, null if entry is not found
+	 */
+	public synchronized String containsUrl(String url) {
+		String[] columns = { WLDbAdapter.KEY_URL, WLDbAdapter.KEY_NAME };
+		String selection = WLDbAdapter.KEY_URL + " = ?";
+		String[] selectionArgs = { url };
+		Cursor c = mDb.query(true, DATABASE_TABLE, columns, selection,
+				selectionArgs, null, null, null, null);
+
+		// If no row was found, return null
+		if (!c.moveToFirst()) {
+			return null;
+		}
+
+		// Otherwise, check the name, if the name was null, it's pending
+		String name = c.getString(c.getColumnIndex(KEY_NAME));
+		if (name == null) {
+			return "PENDING";
+		} else {
+			return name;
+		}
+	}
+
+	/**
+	 * Fetches the _id column of the row with the given url.
+	 * 
+	 * @param url
+	 *            URL to find row _id of
+	 * @return Row _id of entry with given URL, -1 if not found
+	 */
+	public synchronized int fetchId(String url) {
+		String[] columns = { KEY_ROWID };
+		String selection = KEY_URL + " = ?";
+		String[] selectionArgs = { url };
+		Cursor c = mDb.query(true, DATABASE_TABLE, columns, selection,
+				selectionArgs, null, null, null, null);
+
+		// If no row was found, return -1
+		if (!c.moveToFirst()) {
+			return -1;
+		}
+
+		// Otherwise, return the id
+		return c.getInt(c.getColumnIndex(KEY_ROWID));
+	}
+
+	public Cursor query(boolean distinct, String[] columns, String selection,
+			String[] selectionArgs, String groupBy, String having,
+			String orderBy, String limit) {
+		return mDb.query(distinct, DATABASE_TABLE, columns, selection,
+				selectionArgs, groupBy, having, orderBy, limit);
 	}
 
 	/**
@@ -146,6 +214,10 @@ public class WLDbAdapter {
 	 */
 	public long createEntry(WLEntry ent) {
 		return mDb.insert(DATABASE_TABLE, null, createValues(ent));
+	}
+
+	public long insert(ContentValues values) {
+		return mDb.insert(DATABASE_TABLE, null, values);
 	}
 
 	/**

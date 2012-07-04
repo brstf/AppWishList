@@ -1,8 +1,11 @@
 package com.brstf.wishlist;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.service.AddEntryService;
+import com.brstf.wishlist.util.WLDbAdapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -29,13 +32,9 @@ public class ShareActivity extends SherlockActivity {
 
 		// Before attempting to add this to the wishlist, see if it's already
 		// there
-		WLEntries entries = WLEntries.getInstance();
-		entries.setContext(getApplicationContext());
-		entries.reload();
-
-		String rc = entries.addPending(url);
+		String rc = addPending(url);
 		if (rc != null) {
-			if (rc == WLEntries.WL_PENDING) {
+			if (rc == WLEntryType.getTypeString(WLEntryType.PENDING)) {
 				Toast.makeText(getBaseContext(),
 						"This entry is pending attition to your wishlist!",
 						Toast.LENGTH_SHORT).show();
@@ -62,6 +61,30 @@ public class ShareActivity extends SherlockActivity {
 					Toast.LENGTH_SHORT).show();
 		}
 		finish();
+	}
+
+	/**
+	 * Function to check if this url exists in the database.
+	 * 
+	 * @param url
+	 */
+	private synchronized String addPending(String url) {
+		WLDbAdapter dbhelper = new WLDbAdapter(this);
+		dbhelper.open();
+		String rc = dbhelper.containsUrl(url);
+
+		// If this wasn't pending or in the list, add a pending entry to the
+		// database
+		if (rc == null) {
+			ContentValues values = new ContentValues();
+			values.put(WLDbAdapter.KEY_URL, url);
+			values.put(WLDbAdapter.KEY_TYPE,
+					WLEntryType.getTypeString(WLEntryType.PENDING));
+			dbhelper.insert(values);
+		}
+		dbhelper.close();
+
+		return rc;
 	}
 
 	/**

@@ -2,7 +2,7 @@ package com.brstf.wishlist.entries;
 
 public enum WLEntryType {
 
-	NONE, APP, BOOK, MOVIE, MUSIC_ARTIST, MUSIC_ALBUM;
+	NONE, APP, BOOK, MOVIE, MUSIC_ARTIST, MUSIC_ALBUM, PENDING;
 
 	/**
 	 * Constructs a new WLEntry based on the given type
@@ -50,6 +50,8 @@ public enum WLEntryType {
 			return "ARTIST";
 		case MUSIC_ALBUM:
 			return "ALBUM";
+		case PENDING:
+			return "PENDING";
 		default:
 			return null;
 		}
@@ -74,27 +76,31 @@ public enum WLEntryType {
 			return MUSIC_ARTIST;
 		} else if (type.equals("ALBUM")) {
 			return MUSIC_ALBUM;
+		} else if (type.equals("PENDING")) {
+			return PENDING;
 		} else {
 			return NONE;
 		}
 	}
-	
+
 	/**
-	 * Function to retrieve the type of entry based on a give Google Play store URL
+	 * Function to retrieve the type of entry based on a give Google Play store
+	 * URL
 	 * 
-	 * @param url The Google Play URL to retrieve type from
+	 * @param url
+	 *            The Google Play URL to retrieve type from
 	 * @return The entry type of the given Google Play URL
 	 */
 	public static WLEntryType getTypeFromURL(String url) {
-		if( url.contains("/store/apps/")) {
+		if (url.contains("/store/apps/")) {
 			return APP;
-		} else if( url.contains("/store/movies/")) {
+		} else if (url.contains("/store/movies/")) {
 			return MOVIE;
-		} else if( url.contains("/store/books/")) {
+		} else if (url.contains("/store/books/")) {
 			return BOOK;
-		} else if( url.contains("/store/music/artist")) {
+		} else if (url.contains("/store/music/artist")) {
 			return MUSIC_ARTIST;
-		} else if( url.contains("/store/music/album")) {
+		} else if (url.contains("/store/music/album")) {
 			return MUSIC_ALBUM;
 		} else {
 			return NONE;
