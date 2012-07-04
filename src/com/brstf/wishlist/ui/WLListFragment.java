@@ -72,7 +72,6 @@ public class WLListFragment extends SherlockListFragment implements
 			// Try to read in the icon file
 			FileInputStream fis = null;
 			try {
-				Log.d("ICONPATH", mIconPath);
 				fis = params[0].getBaseContext().openFileInput(mIconPath);
 				// If successful, set the icon
 				final Bitmap bm = BitmapFactory.decodeStream(fis);
@@ -124,13 +123,8 @@ public class WLListFragment extends SherlockListFragment implements
 			String selection = WLDbAdapter.KEY_TYPE + " <> ?";
 			String[] selectionArgs = { WLEntryType
 					.getTypeString(WLEntryType.PENDING) };
-			mDbHelper.open();
 			return mDbHelper.query(true, columns, selection, selectionArgs,
 					null, null, null, null);
-		}
-
-		public void closeDb() {
-			mDbHelper.close();
 		}
 	}
 
@@ -270,6 +264,7 @@ public class WLListFragment extends SherlockListFragment implements
 	private WLDbAdapter getHelper() {
 		if (mDbHelper == null) {
 			mDbHelper = new WLDbAdapter(this.getSherlockActivity());
+			mDbHelper.open();
 		}
 		return mDbHelper;
 	}
@@ -277,6 +272,9 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		mDbHelper = new WLDbAdapter(this.getSherlockActivity());
+		mDbHelper.open();
 
 		musicPh = getResources().getDrawable(R.drawable.musicph);
 		appsPh = getResources().getDrawable(R.drawable.appsph);
@@ -306,6 +304,9 @@ public class WLListFragment extends SherlockListFragment implements
 	public void onStart() {
 		super.onStart();
 		WLEntries.getInstance().setWLChangedListener(this);
+		if (mListAdapter.getCursor() != null) {
+			mListAdapter.getCursor().requery();
+		}
 
 		this.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		getListView().setMultiChoiceModeListener(mStarredListener);
@@ -342,7 +343,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 	@Override
 	public void onDataSetChanged() {
-		mListAdapter.notifyDataSetChanged();
+		// TODO: UPDATE THE LIST
 	}
 
 	public void filter(String tag) {
@@ -352,6 +353,12 @@ public class WLListFragment extends SherlockListFragment implements
 
 	public String getFilter() {
 		return filtertag;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		mDbHelper.close();
 	}
 
 	private MultiChoiceModeListener mStarredListener = new MultiChoiceModeListener() {
@@ -383,7 +390,6 @@ public class WLListFragment extends SherlockListFragment implements
 				}
 
 				// Loop through each id, and remove it from the database
-				mDbHelper.open();
 				mDbHelper.beginTransaction();
 				for (int i = 0; i < checkedCount; ++i) {
 					// Remove from the database and delete icon
@@ -397,16 +403,13 @@ public class WLListFragment extends SherlockListFragment implements
 				}
 				mDbHelper.setTransactionSuccessful();
 				mDbHelper.endTransaction();
-				mDbHelper.close();
 
 				// Remove references
 				ids = null;
 				paths = null;
 
-				// Force reload the list
-				// TODO: Better way of doing this?
-				WLListFragment.this.getSherlockActivity()
-						.getSupportLoaderManager().getLoader(0).forceLoad();
+				// Reload the list
+				mListAdapter.getCursor().requery();
 			}
 			mode.finish();
 			return true;
@@ -453,7 +456,6 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mListAdapter.swapCursor(data);
-		((WLCursorLoader) loader).closeDb();
 	}
 
 	@Override
