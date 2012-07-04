@@ -35,7 +35,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Class to display the the list of wished items
@@ -123,9 +122,12 @@ public class WLListFragment extends SherlockListFragment implements
 			String[] selectionArgs = { WLEntryType
 					.getTypeString(WLEntryType.PENDING) };
 			mDbHelper.open();
-			Cursor cursor = mDbHelper.query(true, columns, selection,
-					selectionArgs, null, null, null, null);
-			return cursor;
+			return mDbHelper.query(true, columns, selection, selectionArgs,
+					null, null, null, null);
+		}
+		
+		public void closeDb() {
+			mDbHelper.close();
 		}
 	}
 
@@ -356,18 +358,37 @@ public class WLListFragment extends SherlockListFragment implements
 				android.view.MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
-				// int[] ids = new int[WLListFragment.this.getListView()
-				// .getCheckedItemCount()];
-				// SparseBooleanArray sba = WLListFragment.this.getListView()
-				// .getCheckedItemPositions();
-				// for (int i = 0; i < ids.length; ++i) {
-				// ids[i] = WLListFragment.this.mListAdapter.getItem(
-				// sba.keyAt(i)).getId();
-				// }
-				// WLEntries.getInstance().removeEntries(ids);
+				SparseBooleanArray sba = WLListFragment.this.getListView()
+						.getCheckedItemPositions();
+				int checkedCount = WLListFragment.this.getListView()
+						.getCheckedItemCount();
+				int[] ids = new int[checkedCount];
+
+				// Retrieve the database ids of all checked items
+				int position = 0;
+				Cursor cursor = mListAdapter.getCursor();
+				for (int i = 0; i < checkedCount; ++i) {
+					position = sba.keyAt(i);
+					cursor.moveToPosition(position);
+					ids[i] = cursor.getInt(cursor
+							.getColumnIndex(WLDbAdapter.KEY_ROWID));
+				}
+
+				// Loop through each id, and remove it from the database
+				mDbHelper.open();
+				mDbHelper.beginTransaction();
+				for (int id : ids) {
+					mDbHelper.deleteEntry(id);
+				}
+				mDbHelper.setTransactionSuccessful();
+				mDbHelper.endTransaction();
+				mDbHelper.close();
+
+				// Force reload the list
+				// TODO: Better way of doing this?
+				WLListFragment.this.getSherlockActivity()
+						.getSupportLoaderManager().getLoader(0).forceLoad();
 			}
-			Toast.makeText(WLListFragment.this.getSherlockActivity(),
-					"Got click: " + item, Toast.LENGTH_SHORT).show();
 			mode.finish();
 			return true;
 		}
@@ -412,8 +433,8 @@ public class WLListFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
 		mListAdapter.swapCursor(data);
+		((WLCursorLoader) loader).closeDb();
 	}
 
 	@Override
