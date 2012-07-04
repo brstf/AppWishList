@@ -8,17 +8,15 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
-import com.brstf.wishlist.entries.WLAlbumEntry;
-import com.brstf.wishlist.entries.WLAppEntry;
-import com.brstf.wishlist.entries.WLArtistEntry;
-import com.brstf.wishlist.entries.WLBookEntry;
-import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.entries.WLMovieEntry;
+import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.util.SimpleCursorLoader;
+import com.brstf.wishlist.util.WLDbAdapter;
 import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -26,11 +24,14 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,7 +43,7 @@ import android.widget.Toast;
  * @author brstf
  */
 public class WLListFragment extends SherlockListFragment implements
-		WLChangedListener {
+		WLChangedListener, LoaderCallbacks<Cursor> {
 	// Hash map mapping icon name to already loaded icons
 	private static HashMap<String, Bitmap> icons = null;
 	public static final String EXTRA_TAG = "filter_tag";
@@ -104,11 +105,42 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 	}
 
-	public class WLListAdapter extends ArrayAdapter<WLEntry> {
-		private SparseBooleanArray mSelected;
+	public static final class WLCursorLoader extends SimpleCursorLoader {
+		private WLDbAdapter mDbHelper;
 
-		public WLListAdapter(Context context, int textViewResourceId) {
-			super(context, textViewResourceId);
+		public WLCursorLoader(Context context, WLDbAdapter dbhelper) {
+			super(context);
+			mDbHelper = dbhelper;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			String[] columns = { WLDbAdapter.KEY_ROWID, WLDbAdapter.KEY_TYPE,
+					WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
+					WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
+					WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+			String selection = WLDbAdapter.KEY_TYPE + " <> ?";
+			String[] selectionArgs = { WLEntryType
+					.getTypeString(WLEntryType.PENDING) };
+			mDbHelper.open();
+			Cursor cursor = mDbHelper.query(true, columns, selection,
+					selectionArgs, null, null, null, null);
+			return cursor;
+		}
+	}
+
+	public class WLListAdapter extends CursorAdapter {
+		private SparseBooleanArray mSelected;
+		private final LayoutInflater mInflater;
+
+		public WLListAdapter(Context context, Cursor c, int flags) {
+			super(context, c, flags);
+			mInflater = LayoutInflater.from(context);
+		}
+
+		public WLListAdapter(Context context, Cursor c, boolean autoRequery) {
+			super(context, c, autoRequery);
+			mInflater = LayoutInflater.from(context);
 		}
 
 		/**
@@ -123,45 +155,47 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder holder;
-			View row = convertView;
-			if (row == null) {
-				row = getActivity().getLayoutInflater().inflate(R.layout.row,
-						parent, false);
+		public void bindView(View view, Context context, Cursor cursor) {
+			ViewHolder holder = (ViewHolder) view.getTag();
 
-				// If the convert view was null, we need to construct a new view
-				// holder for it
-				holder = new ViewHolder();
-				holder.background = (LinearLayout) row
-						.findViewById(R.id.rowbackground);
-				holder.icon = (SquareImageView) row.findViewById(R.id.icon);
-				holder.title = (TextView) row.findViewById(R.id.title);
-				holder.creator = (TextView) row.findViewById(R.id.creator);
-				holder.price = (TextView) row.findViewById(R.id.price);
+			// Fill in the view holder
+			fillViewHolder(holder, cursor);
+		}
 
-				row.setTag(holder);
-			} else {
-				// If it wasn't null, get the ViewHolder from the convertView
-				holder = (ViewHolder) row.getTag();
-			}
+		@Override
+		public View newView(Context c, Cursor cursor, ViewGroup parent) {
+			View row = mInflater.inflate(R.layout.row, parent, false);
 
-			WLEntry ent = getItem(position);
-			if (mSelected != null && mSelected.get(position)) {
-				holder.background.setBackgroundColor(0x7820A1A4);
-			} else {
-				holder.background.setBackgroundColor(Color.TRANSPARENT);
-			}
+			// If the convert view was null, we need to construct a new view
+			// holder for it
+			ViewHolder holder = new ViewHolder();
+			holder.background = (LinearLayout) row
+					.findViewById(R.id.rowbackground);
+			holder.icon = (SquareImageView) row.findViewById(R.id.icon);
+			holder.title = (TextView) row.findViewById(R.id.title);
+			holder.creator = (TextView) row.findViewById(R.id.creator);
+			holder.price = (TextView) row.findViewById(R.id.price);
 
+			row.setTag(holder);
+			return row;
+		}
+
+		private void fillViewHolder(ViewHolder holder, Cursor cursor) {
 			// If the icon is cached, simply retrieve the cached icon
-			if (icons.containsKey(ent.getIconPath())) {
-				holder.icon.setImageBitmap(icons.get(ent.getIconPath()));
+			int pathindex = cursor.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
+			String iconPath = cursor.getString(pathindex);
+			if (icons.containsKey(iconPath)) {
+				holder.icon.setImageBitmap(icons.get(iconPath));
 			} else {
 				// Otherwise, set the place holder and spin off an asynctask to
 				// load in the icon
-				new IconTask(ent.getIconPath(), holder).executeOnExecutor(
+				new IconTask(iconPath, holder).executeOnExecutor(
 						AsyncTask.THREAD_POOL_EXECUTOR, getSherlockActivity());
-				switch (ent.getType()) {
+
+				int typeindex = cursor.getColumnIndex(WLDbAdapter.KEY_TYPE);
+				WLEntryType type = WLEntryType.getTypeFromString(cursor
+						.getString(typeindex));
+				switch (type) {
 				case APP:
 					holder.icon.setImageDrawable(appsPh);
 					break;
@@ -178,117 +212,26 @@ public class WLListFragment extends SherlockListFragment implements
 				}
 			}
 
-			// Switch on the type of entry this is
-			switch (ent.getType()) {
-			case APP:
-				return getAppRow((WLAppEntry) ent, row, holder);
-			case MUSIC_ARTIST:
-				return getArtistRow((WLArtistEntry) ent, row, holder);
-			case MUSIC_ALBUM:
-				return getAlbumRow((WLAlbumEntry) ent, row, holder);
-			case BOOK:
-				return getBookRow((WLBookEntry) ent, row, holder);
-			case MOVIE:
-				return getMovieRow((WLMovieEntry) ent, row, holder);
+			// Set the title and creator
+			holder.title.setText(cursor.getString(cursor
+					.getColumnIndex(WLDbAdapter.KEY_NAME)));
+			holder.creator.setText(cursor.getString(cursor
+					.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+
+			// Set the price if it exists
+			if (cursor.getString(cursor.getColumnIndex(WLDbAdapter.KEY_CPRICE)) != null) {
+				holder.price.setText(getPriceText(cursor.getFloat(cursor
+						.getColumnIndex(WLDbAdapter.KEY_CPRICE))));
+			} else {
+				holder.price.setText(null);
 			}
 
-			// Should never happen.
-			return null;
-		}
-
-		/**
-		 * Function to return a row layout for an App entry
-		 * 
-		 * @param ent
-		 *            The App entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getAppRow(WLAppEntry ent, View row, ViewHolder holder) {
-			// Fill in the details
-			holder.title.setText(ent.getTitle());
-			holder.creator.setText(ent.getDeveloper());
-
-			holder.price.setText(getPriceText(ent.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for an Artist entry
-		 * 
-		 * @param ent
-		 *            The Artist entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getArtistRow(WLArtistEntry ent, View row, ViewHolder holder) {
-			// Fill in the details
-			holder.title.setText(ent.getTitle());
-			holder.creator.setText(ent.getGenres());
-
-			holder.price.setText("");
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for an Album entry
-		 * 
-		 * @param ent
-		 *            The Album entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getAlbumRow(WLAlbumEntry ent, View row, ViewHolder holder) {
-			// Fill in the details
-			holder.title.setText(ent.getTitle());
-			holder.creator.setText(ent.getArtist());
-
-			holder.price.setText(getPriceText(ent.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for a Book entry
-		 * 
-		 * @param ent
-		 *            The Book entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getBookRow(WLBookEntry ent, View row, ViewHolder holder) {
-			// Fill in the details
-			holder.title.setText(ent.getTitle());
-			holder.creator.setText(ent.getAuthor());
-
-			holder.price.setText(getPriceText(ent.getCurrentPrice()));
-
-			return row;
-		}
-
-		/**
-		 * Function to return a row layout for a Movieentry
-		 * 
-		 * @param ent
-		 *            The Movie entry to get a row view for
-		 * @param parent
-		 *            The parent ViewGroup that this row should go in
-		 * @return The corresponding View of the row
-		 */
-		private View getMovieRow(WLMovieEntry ent, View row, ViewHolder holder) {
-			// Fill in the details
-			holder.title.setText(ent.getTitle());
-			holder.creator.setText(ent.getDirector());
-
-			holder.price.setText(getPriceText(ent.getCurrentPrice()));
-
-			return row;
+			// Set the selected background
+			if (mSelected != null && mSelected.get(cursor.getPosition())) {
+				holder.background.setBackgroundColor(0x7820A1A4);
+			} else {
+				holder.background.setBackgroundColor(Color.TRANSPARENT);
+			}
 		}
 
 		/**
@@ -317,6 +260,14 @@ public class WLListFragment extends SherlockListFragment implements
 	private Drawable appsPh = null;
 	private Drawable moviesPh = null;
 	private Drawable booksPh = null;
+	private WLDbAdapter mDbHelper = null;
+
+	private WLDbAdapter getHelper() {
+		if (mDbHelper == null) {
+			mDbHelper = new WLDbAdapter(this.getSherlockActivity());
+		}
+		return mDbHelper;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -339,17 +290,17 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 
 		// Instantiate the adapter and use it
-		mListAdapter = new WLListAdapter(this.getActivity(), R.layout.row);
+		mListAdapter = new WLListAdapter(this.getSherlockActivity(), null, true);
 		setListAdapter(mListAdapter);
+
+		this.getSherlockActivity().getSupportLoaderManager()
+				.initLoader(0, null, this);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 		WLEntries.getInstance().setWLChangedListener(this);
-
-		// Fill in the data from the WLEntries list
-		fillData();
 
 		this.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		getListView().setMultiChoiceModeListener(mStarredListener);
@@ -371,7 +322,11 @@ public class WLListFragment extends SherlockListFragment implements
 	public void onListItemClick(android.widget.ListView l, View v,
 			int position, long id) {
 		// Create the url to open
-		Uri webpage = Uri.parse(mListAdapter.getItem(position).getURL());
+		Cursor cursor = mListAdapter.getCursor();
+		cursor.moveToPosition(position);
+		int urlindex = cursor.getColumnIndex(WLDbAdapter.KEY_URL);
+
+		Uri webpage = Uri.parse(cursor.getString(urlindex));
 
 		// Create the intent and start it
 		// TODO: Should this only start the Play store?
@@ -380,22 +335,9 @@ public class WLListFragment extends SherlockListFragment implements
 		startActivity(webIntent);
 	}
 
-	/**
-	 * Function to add all entries from the WLEntries list our list adapter
-	 */
-	private void fillData() {
-		// Clear entries from the list
-		mListAdapter.clear();
-
-		for (WLEntry ent : WLEntries.getInstance().getEntries(filtertag)) {
-			mListAdapter.add(ent);
-		}
-	}
-
 	@Override
 	public void onDataSetChanged() {
-		mListAdapter.clear();
-		fillData();
+		mListAdapter.notifyDataSetChanged();
 	}
 
 	public void filter(String tag) {
@@ -414,15 +356,15 @@ public class WLListFragment extends SherlockListFragment implements
 				android.view.MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
-				int[] ids = new int[WLListFragment.this.getListView()
-						.getCheckedItemCount()];
-				SparseBooleanArray sba = WLListFragment.this.getListView()
-						.getCheckedItemPositions();
-				for (int i = 0; i < ids.length; ++i) {
-					ids[i] = WLListFragment.this.mListAdapter.getItem(
-							sba.keyAt(i)).getId();
-				}
-				WLEntries.getInstance().removeEntries(ids);
+				// int[] ids = new int[WLListFragment.this.getListView()
+				// .getCheckedItemCount()];
+				// SparseBooleanArray sba = WLListFragment.this.getListView()
+				// .getCheckedItemPositions();
+				// for (int i = 0; i < ids.length; ++i) {
+				// ids[i] = WLListFragment.this.mListAdapter.getItem(
+				// sba.keyAt(i)).getId();
+				// }
+				// WLEntries.getInstance().removeEntries(ids);
 			}
 			Toast.makeText(WLListFragment.this.getSherlockActivity(),
 					"Got click: " + item, Toast.LENGTH_SHORT).show();
@@ -458,4 +400,24 @@ public class WLListFragment extends SherlockListFragment implements
 			mode.setTitle(Integer.toString(count));
 		}
 	};
+
+	// //////////////////////////////
+	// Loader callbacks
+	//
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return new WLCursorLoader(this.getSherlockActivity(), getHelper());
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+		mListAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mListAdapter.swapCursor(null);
+	}
 }

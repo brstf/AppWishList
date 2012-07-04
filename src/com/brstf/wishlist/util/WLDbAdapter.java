@@ -154,8 +154,8 @@ public class WLDbAdapter {
 	 *         a name, null if entry is not found
 	 */
 	public synchronized String containsUrl(String url) {
-		String[] columns = { WLDbAdapter.KEY_URL, WLDbAdapter.KEY_NAME };
-		String selection = WLDbAdapter.KEY_URL + " = ?";
+		String[] columns = { KEY_URL,KEY_NAME };
+		String selection = KEY_URL + " = ?";
 		String[] selectionArgs = { url };
 		Cursor c = mDb.query(true, DATABASE_TABLE, columns, selection,
 				selectionArgs, null, null, null, null);
