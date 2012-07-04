@@ -1,5 +1,6 @@
 package com.brstf.wishlist.ui;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,7 +72,8 @@ public class WLListFragment extends SherlockListFragment implements
 			// Try to read in the icon file
 			FileInputStream fis = null;
 			try {
-				fis = params[0].openFileInput(mIconPath);
+				Log.d("ICONPATH", mIconPath);
+				fis = params[0].getBaseContext().openFileInput(mIconPath);
 				// If successful, set the icon
 				final Bitmap bm = BitmapFactory.decodeStream(fis);
 				fis.close();
@@ -125,7 +128,7 @@ public class WLListFragment extends SherlockListFragment implements
 			return mDbHelper.query(true, columns, selection, selectionArgs,
 					null, null, null, null);
 		}
-		
+
 		public void closeDb() {
 			mDbHelper.close();
 		}
@@ -192,7 +195,7 @@ public class WLListFragment extends SherlockListFragment implements
 				// Otherwise, set the place holder and spin off an asynctask to
 				// load in the icon
 				new IconTask(iconPath, holder).executeOnExecutor(
-						AsyncTask.THREAD_POOL_EXECUTOR, getSherlockActivity());
+						AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
 
 				int typeindex = cursor.getColumnIndex(WLDbAdapter.KEY_TYPE);
 				WLEntryType type = WLEntryType.getTypeFromString(cursor
@@ -363,6 +366,7 @@ public class WLListFragment extends SherlockListFragment implements
 				int checkedCount = WLListFragment.this.getListView()
 						.getCheckedItemCount();
 				int[] ids = new int[checkedCount];
+				String[] paths = new String[checkedCount];
 
 				// Retrieve the database ids of all checked items
 				int position = 0;
@@ -372,17 +376,32 @@ public class WLListFragment extends SherlockListFragment implements
 					cursor.moveToPosition(position);
 					ids[i] = cursor.getInt(cursor
 							.getColumnIndex(WLDbAdapter.KEY_ROWID));
+
+					int pathindex = cursor
+							.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
+					paths[i] = cursor.getString(pathindex);
 				}
 
 				// Loop through each id, and remove it from the database
 				mDbHelper.open();
 				mDbHelper.beginTransaction();
-				for (int id : ids) {
-					mDbHelper.deleteEntry(id);
+				for (int i = 0; i < checkedCount; ++i) {
+					// Remove from the database and delete icon
+					mDbHelper.deleteEntry(ids[i]);
+					File f = new File(WLListFragment.this.getSherlockActivity()
+							.getBaseContext().getFilesDir().getAbsolutePath()
+							+ "/" + paths[i]);
+					if (f.exists()) {
+						f.delete();
+					}
 				}
 				mDbHelper.setTransactionSuccessful();
 				mDbHelper.endTransaction();
 				mDbHelper.close();
+
+				// Remove references
+				ids = null;
+				paths = null;
 
 				// Force reload the list
 				// TODO: Better way of doing this?
