@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -79,6 +80,14 @@ public class WLHomeFragment extends SherlockFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		mElements.clear();
+		WLEntries.getInstance().setContext(getSherlockActivity());
+
+		// Add one element per tag
+		for (String tag : WLEntries.getInstance().getTags()) {
+			mElements.add(WLEntries.getDisplayTag(tag));
+		}
 	}
 
 	@Override

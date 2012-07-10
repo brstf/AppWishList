@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.view.ActionMode;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
@@ -33,9 +34,10 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -44,7 +46,7 @@ import android.widget.TextView;
  * @author brstf
  */
 public class WLListFragment extends SherlockListFragment implements
-		WLChangedListener, LoaderCallbacks<Cursor> {
+		WLChangedListener {
 	// Hash map mapping icon name to already loaded icons
 	private static HashMap<String, Bitmap> icons = null;
 	public static final String EXTRA_TAG = "filter_tag";
@@ -129,7 +131,7 @@ public class WLListFragment extends SherlockListFragment implements
 	}
 
 	public class WLListAdapter extends CursorAdapter {
-		private SparseBooleanArray mSelected;
+		private SparseBooleanArray mSelected = new SparseBooleanArray();
 		private final LayoutInflater mInflater;
 
 		public WLListAdapter(Context context, Cursor c, int flags) {
@@ -143,14 +145,45 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 
 		/**
-		 * Sets the array of which entries are selected.
+		 * Toggles the selected state of the entry with the passed in id.
 		 * 
-		 * @param selected
-		 *            SparseBooleanArray of all selected entries of the list
+		 * @param id
+		 *            Integer id of the entry to toggle
 		 */
-		public void setSelected(SparseBooleanArray selected) {
-			mSelected = selected;
+		public void toggleSelected(int id) {
+			if (!mSelected.get(id, false)) {
+				mSelected.put(id, true);
+			} else {
+				mSelected.delete(id);
+			}
 			notifyDataSetChanged();
+		}
+
+		/**
+		 * Clears the list of selected items.
+		 */
+		public void clearSelected() {
+			mSelected.clear();
+		}
+
+		/**
+		 * Gets the number of selected items in the list.
+		 * 
+		 * @return Number of selected items in the list
+		 */
+		public int getSelectedCount() {
+			return mSelected.size();
+		}
+
+		/**
+		 * Gets the SparseBooleanArray holding information about which items in
+		 * the list are selected.
+		 * 
+		 * @return SparseBooleanArray with positions in the list mapped to true
+		 *         if the entry at that index is selected
+		 */
+		public SparseBooleanArray getSelected() {
+			return mSelected;
 		}
 
 		@Override
@@ -188,8 +221,10 @@ public class WLListFragment extends SherlockListFragment implements
 			} else {
 				// Otherwise, set the place holder and spin off an asynctask to
 				// load in the icon
-				new IconTask(iconPath, holder).executeOnExecutor(
-						AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+				new IconTask(iconPath, holder).execute(getActivity());
+
+				// TODO: enable this on compatible software
+				// .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, getActivity());
 
 				int typeindex = cursor.getColumnIndex(WLDbAdapter.KEY_TYPE);
 				WLEntryType type = WLEntryType.getTypeFromString(cursor
@@ -226,7 +261,7 @@ public class WLListFragment extends SherlockListFragment implements
 			}
 
 			// Set the selected background
-			if (mSelected != null && mSelected.get(cursor.getPosition())) {
+			if (mSelected.get(cursor.getPosition())) {
 				holder.background.setBackgroundColor(0x7820A1A4);
 			} else {
 				holder.background.setBackgroundColor(Color.TRANSPARENT);
@@ -253,6 +288,8 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 	}
 
+	private static final String TAG = "WLListFragment";
+	private static final int LOADER_CURSOR = 1;
 	private WLListAdapter mListAdapter = null;
 	private String filtertag = null;
 	private Drawable musicPh = null;
@@ -260,6 +297,7 @@ public class WLListFragment extends SherlockListFragment implements
 	private Drawable moviesPh = null;
 	private Drawable booksPh = null;
 	private WLDbAdapter mDbHelper = null;
+	private ActionMode lamode = null;
 
 	private WLDbAdapter getHelper() {
 		if (mDbHelper == null) {
@@ -297,7 +335,7 @@ public class WLListFragment extends SherlockListFragment implements
 		setListAdapter(mListAdapter);
 
 		this.getSherlockActivity().getSupportLoaderManager()
-				.initLoader(0, null, this);
+				.initLoader(LOADER_CURSOR, null, mLoaderCallbacks);
 	}
 
 	@Override
@@ -305,11 +343,22 @@ public class WLListFragment extends SherlockListFragment implements
 		super.onStart();
 		WLEntries.getInstance().setWLChangedListener(this);
 		if (mListAdapter.getCursor() != null) {
-			mListAdapter.getCursor().requery();
+			getLoaderManager().restartLoader(LOADER_CURSOR, null,
+					mLoaderCallbacks);
 		}
 
-		this.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-		getListView().setMultiChoiceModeListener(mStarredListener);
+		this.getListView().setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+		this.getListView().setOnItemLongClickListener(
+				new OnItemLongClickListener() {
+					@Override
+					public boolean onItemLongClick(AdapterView<?> parent,
+							View view, int position, long id) {
+						Log.d(TAG, "Long click");
+						lamode = WLListFragment.this.getSherlockActivity()
+								.startActionMode(new ListActionMode());
+						return false;
+					}
+				});
 	}
 
 	@Override
@@ -327,23 +376,35 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onListItemClick(android.widget.ListView l, View v,
 			int position, long id) {
-		// Create the url to open
-		Cursor cursor = mListAdapter.getCursor();
-		cursor.moveToPosition(position);
-		int urlindex = cursor.getColumnIndex(WLDbAdapter.KEY_URL);
+		if (lamode == null) {
+			// Create the url to open
+			Cursor cursor = mListAdapter.getCursor();
+			cursor.moveToPosition(position);
+			int urlindex = cursor.getColumnIndex(WLDbAdapter.KEY_URL);
 
-		Uri webpage = Uri.parse(cursor.getString(urlindex));
+			Uri webpage = Uri.parse(cursor.getString(urlindex));
 
-		// Create the intent and start it
-		// TODO: Should this only start the Play store?
-		// TODO: This shouldn't be able to Add to Wishlist
-		Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
-		startActivity(webIntent);
+			// Create the intent and start it
+			// TODO: Should this only start the Play store?
+			// TODO: This shouldn't be able to Add to Wishlist
+			Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
+			startActivity(webIntent);
+		} else {
+			// We're in our ActionMode, so check off the clicked item
+			WLListFragment.this.mListAdapter.toggleSelected(position);
+			final int count = WLListFragment.this.mListAdapter
+					.getSelectedCount();
+			lamode.setTitle(Integer.toString(count));
+			if (count == 0) {
+				lamode.finish();
+			}
+		}
 	}
 
 	@Override
 	public void onDataSetChanged() {
-		// TODO: UPDATE THE LIST
+		// Reload the list
+		getLoaderManager().restartLoader(LOADER_CURSOR, null, mLoaderCallbacks);
 	}
 
 	public void filter(String tag) {
@@ -361,17 +422,17 @@ public class WLListFragment extends SherlockListFragment implements
 		mDbHelper.close();
 	}
 
-	private MultiChoiceModeListener mStarredListener = new MultiChoiceModeListener() {
+	private final class ListActionMode implements ActionMode.Callback {
 
 		@Override
-		public boolean onActionItemClicked(android.view.ActionMode mode,
-				android.view.MenuItem item) {
+		public boolean onActionItemClicked(
+				com.actionbarsherlock.view.ActionMode mode,
+				com.actionbarsherlock.view.MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
-				SparseBooleanArray sba = WLListFragment.this.getListView()
-						.getCheckedItemPositions();
-				int checkedCount = WLListFragment.this.getListView()
-						.getCheckedItemCount();
+				final SparseBooleanArray sba = WLListFragment.this.mListAdapter
+						.getSelected();
+				final int checkedCount = sba.size();
 				int[] ids = new int[checkedCount];
 				String[] paths = new String[checkedCount];
 
@@ -409,38 +470,35 @@ public class WLListFragment extends SherlockListFragment implements
 				paths = null;
 
 				// Reload the list
-				mListAdapter.getCursor().requery();
+				getLoaderManager().restartLoader(LOADER_CURSOR, null,
+						mLoaderCallbacks);
 			}
 			mode.finish();
 			return true;
 		}
 
 		@Override
-		public boolean onCreateActionMode(android.view.ActionMode mode,
-				android.view.Menu menu) {
-			WLListFragment.this.getActivity().getMenuInflater()
+		public boolean onCreateActionMode(
+				com.actionbarsherlock.view.ActionMode mode,
+				com.actionbarsherlock.view.Menu menu) {
+			WLListFragment.this.getSherlockActivity().getSupportMenuInflater()
 					.inflate(R.menu.actionmenu, menu);
 			return true;
 		}
 
 		@Override
-		public void onDestroyActionMode(android.view.ActionMode mode) {
+		public void onDestroyActionMode(
+				com.actionbarsherlock.view.ActionMode mode) {
+			WLListFragment.this.mListAdapter.clearSelected();
+			WLListFragment.this.lamode = null;
+			WLListFragment.this.mListAdapter.notifyDataSetChanged();
 		}
 
 		@Override
-		public boolean onPrepareActionMode(android.view.ActionMode mode,
-				android.view.Menu menu) {
+		public boolean onPrepareActionMode(
+				com.actionbarsherlock.view.ActionMode mode,
+				com.actionbarsherlock.view.Menu menu) {
 			return false;
-		}
-
-		@Override
-		public void onItemCheckedStateChanged(android.view.ActionMode mode,
-				int position, long id, boolean checked) {
-			final int count = WLListFragment.this.getListView()
-					.getCheckedItemCount();
-			WLListFragment.this.mListAdapter.setSelected(WLListFragment.this
-					.getListView().getCheckedItemPositions());
-			mode.setTitle(Integer.toString(count));
 		}
 	};
 
@@ -448,18 +506,21 @@ public class WLListFragment extends SherlockListFragment implements
 	// Loader callbacks
 	//
 
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		return new WLCursorLoader(this.getSherlockActivity(), getHelper());
-	}
+	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			return new WLCursorLoader(
+					WLListFragment.this.getSherlockActivity(), getHelper());
+		}
 
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mListAdapter.swapCursor(data);
-	}
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			mListAdapter.swapCursor(data);
+		}
 
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-		mListAdapter.swapCursor(null);
-	}
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			mListAdapter.swapCursor(null);
+		}
+	};
 }
