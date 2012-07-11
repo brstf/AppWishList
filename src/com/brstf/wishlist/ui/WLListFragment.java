@@ -3,7 +3,6 @@ package com.brstf.wishlist.ui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
@@ -16,6 +15,7 @@ import com.brstf.wishlist.util.WLDbAdapter;
 import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -48,7 +49,7 @@ import android.widget.TextView;
 public class WLListFragment extends SherlockListFragment implements
 		WLChangedListener {
 	// Hash map mapping icon name to already loaded icons
-	private static HashMap<String, Bitmap> icons = null;
+	private static ThumbnailCache mIconCache = null;
 	public static final String EXTRA_TAG = "filter_tag";
 
 	private static class ViewHolder {
@@ -99,7 +100,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			icons.put(mIconPath, bitmap);
+			mIconCache.put(mIconPath, bitmap);
 			if (bitmap == null)
 				return;
 			if (mImageView.getTag() == this) {
@@ -216,8 +217,8 @@ public class WLListFragment extends SherlockListFragment implements
 			// If the icon is cached, simply retrieve the cached icon
 			int pathindex = cursor.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
 			String iconPath = cursor.getString(pathindex);
-			if (icons.containsKey(iconPath)) {
-				holder.icon.setImageBitmap(icons.get(iconPath));
+			if (mIconCache.get(iconPath) != null) {
+				holder.icon.setImageBitmap(mIconCache.get(iconPath));
 			} else {
 				// Otherwise, set the place holder and spin off an asynctask to
 				// load in the icon
@@ -320,7 +321,10 @@ public class WLListFragment extends SherlockListFragment implements
 		booksPh = getResources().getDrawable(R.drawable.booksph);
 
 		// On create, make a new hashmap for the icons that will be filled in
-		icons = new HashMap<String, Bitmap>();
+		final ActivityManager am = (ActivityManager) getActivity()
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		final int memoryClassBytes = am.getMemoryClass() * 1024 * 1024;
+		mIconCache = new ThumbnailCache(memoryClassBytes / 2);
 
 		// Get the arguments passed in
 		Bundle args = this.getArguments();
@@ -366,7 +370,7 @@ public class WLListFragment extends SherlockListFragment implements
 		super.onStop();
 
 		// Clear out the icon list, and clear the callback
-		icons.clear();
+		mIconCache.evictAll();
 		WLEntries.getInstance().setWLChangedListener(null);
 	}
 
@@ -529,4 +533,15 @@ public class WLListFragment extends SherlockListFragment implements
 			mListAdapter.swapCursor(null);
 		}
 	};
+
+	private static class ThumbnailCache extends LruCache<String, Bitmap> {
+		public ThumbnailCache(int maxSizeBytes) {
+			super(maxSizeBytes);
+		}
+
+		@Override
+		protected int sizeOf(String key, Bitmap value) {
+			return value.getRowBytes() * value.getHeight();
+		}
+	}
 }
