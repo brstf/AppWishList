@@ -22,6 +22,7 @@ public abstract class WLEntry {
 	private String mIconUrl; // URL link to the icon
 	private int mDbId; // ID of the entry in the database
 	private HashSet<String> mTags = null; // Set of tags "describing" this entry
+	private static final String idPattern = ".*?id=(.*?)(&|$)";
 
 	/**
 	 * Default constructor, initiates all parameters to default meaningless
@@ -150,18 +151,23 @@ public abstract class WLEntry {
 		// Set up the patterns and corresponding matchers
 		Pattern p_title = Pattern.compile(getTitlePattern());
 		Pattern p_icon = Pattern.compile(getIconPattern());
+		Pattern p_id = Pattern.compile(idPattern);
 
 		Matcher m_title = p_title.matcher(text);
 		Matcher m_icon = p_icon.matcher(text);
+		Matcher m_id = p_id.matcher(url);
 
 		// Find the patterns
 		m_title.find();
 		m_icon.find();
+		m_id.find();
 
 		// Set our variables with the retrieved information
 		setTitle(android.text.Html.fromHtml(m_title.group(1)).toString());
 		setIconUrl(android.text.Html.fromHtml(m_icon.group(1)).toString());
-		setIconPath((getTitle() + ".png").replaceAll("[/\\\\?\\<>$]", ""));
+		
+		String id = android.text.Html.fromHtml(m_id.group(1)).toString();
+		setIconPath(id + ".png");
 		addTag(WLEntryType.getTypeString(getType()));
 	}
 

@@ -419,9 +419,15 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		mListAdapter.swapCursor(null);
 		mDbHelper.close();
 	}
 
+	/**
+	 * Class to instantiate and create the custom action mode for the list.
+	 * 
+	 * @author brstf
+	 */
 	private final class ListActionMode implements ActionMode.Callback {
 
 		@Override
