@@ -23,8 +23,8 @@ import android.widget.Toast;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.entries.WLPricedEntry;
+import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.service.AddEntryService;
-import com.brstf.wishlist.util.WLDbAdapter;
 
 /**
  * WLEntries object is an object that loads in and manages all entries of the
@@ -182,10 +182,8 @@ public final class WLEntries {
 	 * Method to initialize and fill in all member collections
 	 */
 	private synchronized void fillEntries() {
-		// Open the database to obtain entries
-		mDbHelper.open();
-
 		// Fetch all entries from the database
+		mDbHelper.open();
 		Cursor c = mDbHelper.fetchAllEntries();
 		c.moveToFirst();
 
@@ -220,10 +218,9 @@ public final class WLEntries {
 			c.moveToNext();
 		}
 
-		// Close up the database
-		mDbHelper.close();
-
 		fillPendingEntres();
+		
+		mDbHelper.close();
 
 		if (mCallback != null) {
 			// Notify about the changed dataset
@@ -273,7 +270,6 @@ public final class WLEntries {
 	 *            Integer array of the ids of the entries to delete
 	 */
 	public synchronized void removeEntries(int[] ids) {
-		// Open the database
 		mDbHelper.open();
 		mDbHelper.beginTransaction();
 
@@ -295,6 +291,7 @@ public final class WLEntries {
 		mDbHelper.setTransactionSuccessful();
 		mDbHelper.endTransaction();
 		mDbHelper.close();
+
 		reload();
 		if (mCallback != null)
 			mCallback.onDataSetChanged();
@@ -320,10 +317,14 @@ public final class WLEntries {
 	 */
 	public void writeToDb() {
 		mDbHelper.open();
-		for (WLEntry ent : mEntries) {
-			mDbHelper.updateEntry(ent.getId(), ent);
+		try{
+			for (WLEntry ent : mEntries) {
+				mDbHelper.updateEntry(ent.getId(), ent);
+			}
+		} catch (Exception e) {
+		} finally {
+			mDbHelper.close();
 		}
-		mDbHelper.close();
 
 		// Write the pending list out to a file
 		String pending = getPendingString();

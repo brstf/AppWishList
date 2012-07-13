@@ -10,8 +10,8 @@ import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.util.SimpleCursorLoader;
-import com.brstf.wishlist.util.WLDbAdapter;
 import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.Activity;
@@ -26,6 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
@@ -119,7 +120,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		@Override
 		public Cursor loadInBackground() {
-			String[] columns = { WLDbAdapter.KEY_ROWID, WLDbAdapter.KEY_TYPE,
+			String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
 					WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
 					WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
 					WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
@@ -303,7 +304,6 @@ public class WLListFragment extends SherlockListFragment implements
 	private WLDbAdapter getHelper() {
 		if (mDbHelper == null) {
 			mDbHelper = new WLDbAdapter(this.getSherlockActivity());
-			mDbHelper.open();
 		}
 		return mDbHelper;
 	}
@@ -314,7 +314,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		mDbHelper = new WLDbAdapter(this.getSherlockActivity());
 		mDbHelper.open();
-
+		
 		musicPh = getResources().getDrawable(R.drawable.musicph);
 		appsPh = getResources().getDrawable(R.drawable.appsph);
 		moviesPh = getResources().getDrawable(R.drawable.moviesph);
@@ -345,6 +345,7 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onStart() {
 		super.onStart();
+		
 		WLEntries.getInstance().setWLChangedListener(this);
 		if (mListAdapter.getCursor() != null) {
 			getLoaderManager().restartLoader(LOADER_CURSOR, null,
@@ -423,10 +424,11 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mListAdapter.swapCursor(null);
 		mDbHelper.close();
+		mListAdapter.swapCursor(null);
 	}
 
+	
 	/**
 	 * Class to instantiate and create the custom action mode for the list.
 	 * 
@@ -453,7 +455,7 @@ public class WLListFragment extends SherlockListFragment implements
 					position = sba.keyAt(i);
 					cursor.moveToPosition(position);
 					ids[i] = cursor.getInt(cursor
-							.getColumnIndex(WLDbAdapter.KEY_ROWID));
+							.getColumnIndex(BaseColumns._ID));
 
 					int pathindex = cursor
 							.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
@@ -511,6 +513,10 @@ public class WLListFragment extends SherlockListFragment implements
 			return false;
 		}
 	};
+	
+	public void loadFromSearch(String query) {
+		mListAdapter.swapCursor(mDbHelper.getEntryMatches(query));
+	}
 
 	// //////////////////////////////
 	// Loader callbacks

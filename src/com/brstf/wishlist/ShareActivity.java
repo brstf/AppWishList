@@ -2,8 +2,8 @@ package com.brstf.wishlist;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.service.AddEntryService;
-import com.brstf.wishlist.util.WLDbAdapter;
 
 import android.content.ContentValues;
 import android.content.Context;

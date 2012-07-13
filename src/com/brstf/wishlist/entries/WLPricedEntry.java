@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import android.database.Cursor;
 
 import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.util.WLDbAdapter;
+import com.brstf.wishlist.provider.WLDbAdapter;
 
 public abstract class WLPricedEntry extends WLEntry {
 	private float cPrice = -1.0f;

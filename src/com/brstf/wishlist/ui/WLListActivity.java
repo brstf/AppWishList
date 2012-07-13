@@ -2,6 +2,7 @@ package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 
@@ -62,6 +63,10 @@ public class WLListActivity extends BaseActivity implements
 		getSupportActionBar().setSelectedNavigationItem(
 				mAdapter.getPosition(WLEntries.getDisplayTag(mFilter)));
 	}
+	
+	public void search(String query) {
+		mFrag.loadFromSearch(query);
+	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -79,6 +84,12 @@ public class WLListActivity extends BaseActivity implements
 
 		mFrag.filter(tag);
 		return true;
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		mFrag.onStop();
 	}
 
 	@Override

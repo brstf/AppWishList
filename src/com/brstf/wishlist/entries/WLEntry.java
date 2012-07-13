@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.brstf.wishlist.util.WLDbAdapter;
+import com.brstf.wishlist.provider.WLDbAdapter;
 
 import android.database.Cursor;
 

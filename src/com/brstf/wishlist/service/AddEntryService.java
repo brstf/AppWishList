@@ -11,7 +11,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
-import com.brstf.wishlist.util.WLDbAdapter;
+import com.brstf.wishlist.provider.WLDbAdapter;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -85,8 +85,6 @@ public class AddEntryService extends IntentService {
 				}
 			});
 		}
-
-		// Finally, close the db helper
 		mDbHelper.close();
 
 		// Remove this entry from the pending list
