@@ -42,10 +42,12 @@ public class SearchActivity extends BaseActivity {
 		String query = intent.getStringExtra(SearchManager.QUERY);
 
 		setTitle(Html.fromHtml(query));
+		Uri searchUri = buildSearchUri(query);
+		mFragment.loadFromSearch(searchUri);
 	}
 
 	private Uri buildSearchUri(String query) {
-		return WLProvider.BASE_CONTENT_URI.buildUpon().appendPath("search")
-				.appendPath(query).build();
+		return WLProvider.BASE_CONTENT_URI.buildUpon().appendPath("entries")
+				.appendPath("search").appendPath(query).build();
 	}
 }

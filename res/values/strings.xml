@@ -2,9 +2,15 @@
 <resources>
 
     <string name="description_search">Search</string>
-    <string name="hint_search">Search</string>
+    
+    <string name="hint_search">Search Wishlist</string>
+    
     <string name="menu_delete">Delete</string>
     <string name="menu_tag">Tag</string>
+    
+    <string name="label_searchactivity">Search</string>
+    <string name="label_search">Search</string>
+    
     <string name="app_name">Wishlist</string>
     <string name="add_name">Add to Wishlist</string>
     <string name="actionbar_name">Wishlist</string>

@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="4"
+        android:minSdkVersion="5"
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -51,13 +51,33 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="com.brstf.wishlist.ui.WLListActivity"
             android:label="@string/actionbar_name" />
-        
-        <service android:name=".service.IconService"/>
-        <service android:name=".service.AddEntryService"/>
+
+        <service android:name=".service.IconService" />
+        <service android:name=".service.AddEntryService" />
+
+        <provider
+            android:name="com.brstf.wishlist.provider.WLProvider"
+            android:authorities="com.brstf.wishlist" />
+
+        <activity
+            android:name=".ui.SearchActivity"
+            android:label="@string/label_searchactivity"
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".ui.SearchActivity" />
     </application>
 
 </manifest>

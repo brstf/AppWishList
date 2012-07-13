@@ -1,10 +1,6 @@
 package com.brstf.wishlist.util;
 
-import android.app.SearchManager;
 import android.content.Intent;
-import android.os.Bundle;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
@@ -17,7 +13,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-public class ActivityHelper implements OnQueryTextListener {
+public class ActivityHelper {
 	protected SherlockFragmentActivity mActivity;
 	private WLEntries mEntries;
 
@@ -48,13 +44,7 @@ public class ActivityHelper implements OnQueryTextListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		mActivity.getSupportMenuInflater().inflate(R.menu.default_menu_items,
 				menu);
-		SearchView sview = (SearchView) menu.findItem(R.id.menu_search)
-				.getActionView();
-		sview.setQueryHint("Search Wishlist");
-		//sview.setOnQueryTextListener(this);
-		SearchManager sm = (SearchManager) mActivity.getSystemService(SherlockActivity.SEARCH_SERVICE);
-		sview.setSearchableInfo(sm.getSearchableInfo(mActivity.getComponentName()));
-		return false;
+		return true;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -63,10 +53,8 @@ public class ActivityHelper implements OnQueryTextListener {
 			goHome();
 			return true;
 		case R.id.menu_search:
-			if( mActivity instanceof WLListActivity ) {
-				mActivity.onSearchRequested();
-				return true;
-			}
+			mActivity.onSearchRequested();
+			return true;
 		}
 		return false;
 	}
@@ -97,17 +85,5 @@ public class ActivityHelper implements OnQueryTextListener {
 
 	public WLEntries getEntries() {
 		return mEntries;
-	}
-
-	@Override
-	public boolean onQueryTextChange(String newText) {
-		// Do nothing
-		return true;
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		System.out.println("Search " + mActivity.toString());
-		return false;
 	}
 }

@@ -10,6 +10,30 @@ public class WLEntryContract {
 
 	// Column names for entries
 	public interface EntryColumns {
+		public final String KEY_TYPE = "type";
+		public final String KEY_NAME = "name";
+		public final String KEY_URL = "url";
+		public final String KEY_ICONPATH = "iconpath";
+		public final String KEY_ICONURL = "iconurl";
+		public final String KEY_CPRICE = "cprice";
+		public final String KEY_RPRICE = "rprice";
+		public final String KEY_RATING = "rating";
+		public final String KEY_CRATING = "crating"; // Content rating
+															// (ex: PG-13)
+		public final String KEY_MOVLENGTH = "movlength";
+		public final String KEY_CREATOR = "creator"; // App maker, movie,
+															// director, artist,
+															// author
+		public final String KEY_ALBLENGTH = "alblength";
+		public final String KEY_NUMTRACKS = "numtracks";
+		public final String KEY_DATE = "date"; // Publish date, release
+														// date
+		public final String KEY_PCOUNT = "pcount";
+		public final String KEY_TAGS = "tags";
+	}
+	
+	/*
+	 * public interface EntryColumns {
 		public final String KEY_TYPE = "entry_type";
 		public final String KEY_NAME = "entry_name";
 		public final String KEY_URL = "entry_url";
@@ -31,6 +55,7 @@ public class WLEntryContract {
 		public final String KEY_PCOUNT = "entry_pcount";
 		public final String KEY_TAGS = "entry_tags";
 	}
+	 */
 
 	public static final String AUTHORITY = "com.brstf.wishlist";
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://"

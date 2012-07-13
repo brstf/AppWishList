@@ -16,8 +16,11 @@ public class BaseActivity extends SherlockFragmentActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		return mActivityHelper.onCreateOptionsMenu(menu)
-				|| super.onCreateOptionsMenu(menu);
+		if( mActivityHelper.onCreateOptionsMenu(menu) ) {
+			return true;
+		} else {
+			return super.onCreateOptionsMenu(menu);
+		}
 	}
 
 	@Override

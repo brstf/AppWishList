@@ -28,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
 import android.support.v4.widget.CursorAdapter;
@@ -120,10 +121,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		@Override
 		public Cursor loadInBackground() {
-			String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
-					WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
-					WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
-					WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+			String[] columns = EntryQuery.columns;
 			String selection = WLDbAdapter.KEY_TYPE + " <> ?";
 			String[] selectionArgs = { WLEntryType
 					.getTypeString(WLEntryType.PENDING) };
@@ -314,7 +312,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		mDbHelper = new WLDbAdapter(this.getSherlockActivity());
 		mDbHelper.open();
-		
+
 		musicPh = getResources().getDrawable(R.drawable.musicph);
 		appsPh = getResources().getDrawable(R.drawable.appsph);
 		moviesPh = getResources().getDrawable(R.drawable.moviesph);
@@ -345,7 +343,7 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onStart() {
 		super.onStart();
-		
+
 		WLEntries.getInstance().setWLChangedListener(this);
 		if (mListAdapter.getCursor() != null) {
 			getLoaderManager().restartLoader(LOADER_CURSOR, null,
@@ -428,7 +426,6 @@ public class WLListFragment extends SherlockListFragment implements
 		mListAdapter.swapCursor(null);
 	}
 
-	
 	/**
 	 * Class to instantiate and create the custom action mode for the list.
 	 * 
@@ -513,9 +510,19 @@ public class WLListFragment extends SherlockListFragment implements
 			return false;
 		}
 	};
-	
-	public void loadFromSearch(String query) {
-		mListAdapter.swapCursor(mDbHelper.getEntryMatches(query));
+
+	/**
+	 * Sets the items loaded in this adapter to search results from the given
+	 * query {@link Uri}.
+	 * 
+	 * @param searchUri
+	 *            {@link Uri} containing the search query
+	 */
+	public void loadFromSearch(Uri searchUri) {
+		Bundle args = new Bundle();
+		args.putParcelable("_uri", searchUri);
+		getSherlockActivity().getSupportLoaderManager().restartLoader(
+				LOADER_CURSOR, args, mLoaderCallbacks);
 	}
 
 	// //////////////////////////////
@@ -525,6 +532,11 @@ public class WLListFragment extends SherlockListFragment implements
 	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			if( args != null) {
+				Uri searchUri = (Uri) args.getParcelable("_uri");
+				return new CursorLoader(getSherlockActivity(), searchUri, 
+						EntryQuery.columns, null, null, null);
+			}
 			return new WLCursorLoader(
 					WLListFragment.this.getSherlockActivity(), getHelper());
 		}
@@ -549,5 +561,12 @@ public class WLListFragment extends SherlockListFragment implements
 		protected int sizeOf(String key, Bitmap value) {
 			return value.getRowBytes() * value.getHeight();
 		}
+	}
+	
+	private interface EntryQuery {
+		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
+				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
+				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
+				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
 	}
 }

@@ -10,9 +10,9 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 
 public class WLProvider extends ContentProvider {
 	String TAG = "WLProvider";
@@ -57,15 +57,15 @@ public class WLProvider extends ContentProvider {
 		// db query accordingly
 		switch (sURIMatcher.match(uri)) {
 		case SEARCH_ENTRIES:
-			if (selectionArgs == null) {
+			/*if (selectionArgs == null) {
 				throw new IllegalArgumentException(
 						"selectionArgs must be provided for the Uri: " + uri);
-			}
+			}*/
 			SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 			qb.setProjectionMap(buildMap());
 			qb.setTables(Tables.SEARCH_JOIN_ENTRIES);
-			qb.appendWhere(WLDbAdapter.SEARCH_BODY + " MATCH ? "
-					+ WLEntryContract.Entries.getSearchQuery(uri));
+			qb.appendWhere(WLDbAdapter.SEARCH_BODY + " MATCH '"
+					+ WLEntryContract.Entries.getSearchQuery(uri) + "'");
 
 			return qb.query(mDbHelper.getDatabase(), projection, selection, selectionArgs, null,
 					null, sortOrder);
@@ -80,6 +80,7 @@ public class WLProvider extends ContentProvider {
 
 	private Map<String, String> buildMap() {
 		HashMap<String, String> colmap = new HashMap<String, String>();
+		colmap.put(BaseColumns._ID, Tables.ENTRIES + "." + BaseColumns._ID);
 		colmap.put(Entries.KEY_NAME, Tables.ENTRIES + "." + Entries.KEY_NAME);
 		colmap.put(Entries.KEY_URL, Tables.ENTRIES + "." + Entries.KEY_URL);
 		colmap.put(Entries.KEY_ALBLENGTH, Tables.ENTRIES + "."
