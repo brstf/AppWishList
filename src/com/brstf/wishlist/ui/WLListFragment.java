@@ -11,6 +11,7 @@ import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.util.SimpleCursorLoader;
 import com.brstf.wishlist.widgets.SquareImageView;
 
@@ -121,7 +122,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		@Override
 		public Cursor loadInBackground() {
-			String[] columns = EntryQuery.columns;
+			String[] columns = WLEntryContract.EntryQuery.columns;
 			String selection = WLDbAdapter.KEY_TYPE + " <> ?";
 			String[] selectionArgs = { WLEntryType
 					.getTypeString(WLEntryType.PENDING) };
@@ -532,10 +533,10 @@ public class WLListFragment extends SherlockListFragment implements
 	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-			if( args != null) {
+			if (args != null) {
 				Uri searchUri = (Uri) args.getParcelable("_uri");
-				return new CursorLoader(getSherlockActivity(), searchUri, 
-						EntryQuery.columns, null, null, null);
+				return new CursorLoader(getSherlockActivity(), searchUri,
+						WLEntryContract.EntryQuery.columns, null, null, null);
 			}
 			return new WLCursorLoader(
 					WLListFragment.this.getSherlockActivity(), getHelper());
@@ -561,12 +562,5 @@ public class WLListFragment extends SherlockListFragment implements
 		protected int sizeOf(String key, Bitmap value) {
 			return value.getRowBytes() * value.getHeight();
 		}
-	}
-	
-	private interface EntryQuery {
-		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
-				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
-				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
-				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
 	}
 }

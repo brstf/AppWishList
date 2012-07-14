@@ -38,7 +38,6 @@ public class AddEntryService extends IntentService {
 
 	public AddEntryService() {
 		super(TAG);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

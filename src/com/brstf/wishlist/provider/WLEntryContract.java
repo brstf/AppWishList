@@ -97,5 +97,17 @@ public class WLEntryContract {
 		}
 	}
 	
+	public interface EntryQuery {
+		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
+				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
+				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
+				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+	}
+	
+	public interface PendingQuery {
+		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
+				WLDbAdapter.KEY_URL };
+	}
+	
 	private WLEntryContract(){}
 }
