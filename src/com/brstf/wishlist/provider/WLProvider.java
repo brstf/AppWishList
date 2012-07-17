@@ -25,7 +25,7 @@ public class WLProvider extends ContentProvider {
 
 	// UriMatcher stuff
 	private static final int GET_ALL = 0;
-	private static final int GET_ENTRY = 1;
+	private static final int GET_TAG = 1;
 	private static final int SEARCH_ENTRIES = 2;
 
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
@@ -36,7 +36,7 @@ public class WLProvider extends ContentProvider {
 		// to get entries
 		matcher.addURI(AUTHORITY, "entries", GET_ALL);
 		matcher.addURI(AUTHORITY, "entries/search/*", SEARCH_ENTRIES);
-		matcher.addURI(AUTHORITY, "entries/*", GET_ENTRY);
+		matcher.addURI(AUTHORITY, "entries/*", GET_TAG);
 
 		return matcher;
 	}
@@ -57,20 +57,27 @@ public class WLProvider extends ContentProvider {
 		// db query accordingly
 		switch (sURIMatcher.match(uri)) {
 		case SEARCH_ENTRIES:
-			/*if (selectionArgs == null) {
-				throw new IllegalArgumentException(
-						"selectionArgs must be provided for the Uri: " + uri);
-			}*/
-			SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-			qb.setProjectionMap(buildMap());
-			qb.setTables(Tables.SEARCH_JOIN_ENTRIES);
-			qb.appendWhere(WLDbAdapter.SEARCH_BODY + " MATCH '"
+			/*
+			 * if (selectionArgs == null) { throw new IllegalArgumentException(
+			 * "selectionArgs must be provided for the Uri: " + uri); }
+			 */
+			SQLiteQueryBuilder searchqb = new SQLiteQueryBuilder();
+			searchqb.setProjectionMap(buildMap());
+			searchqb.setTables(Tables.SEARCH_JOIN_ENTRIES);
+			searchqb.appendWhere(WLDbAdapter.SEARCH_BODY + " MATCH '"
 					+ WLEntryContract.Entries.getSearchQuery(uri) + "'");
 
-			return qb.query(mDbHelper.getDatabase(), projection, selection, selectionArgs, null,
-					null, sortOrder);
-		case GET_ENTRY:
-			return getEntry(uri);
+			return searchqb.query(mDbHelper.getDatabase(), projection,
+					selection, selectionArgs, null, null, sortOrder);
+		case GET_TAG:
+			String tag = uri.getLastPathSegment();
+			SQLiteQueryBuilder tagqb = new SQLiteQueryBuilder();
+			tagqb.setProjectionMap(buildMap());
+			tagqb.setTables(Tables.ENTRIES);
+			tagqb.appendWhere(WLDbAdapter.KEY_TAGS + " LIKE '%" + tag + "%'");
+
+			return tagqb.query(mDbHelper.getDatabase(), projection, selection,
+					selectionArgs, null, null, null);
 		case GET_ALL:
 			return getAll();
 		default:
@@ -120,27 +127,13 @@ public class WLProvider extends ContentProvider {
 		return mDbHelper.fetchAllEntries();
 	}
 
-	/**
-	 * Gets a {@link Cursor} pointing to the wishlist entry specified by the
-	 * given {@link Uri}.
-	 * 
-	 * @param uri
-	 *            {@link Uri} indicating which entry to retrieve
-	 * @return {@link Cursor} pointing to the specified wishlist entry
-	 */
-	private Cursor getEntry(Uri uri) {
-		String rowId = uri.getLastPathSegment();
-		return mDbHelper.fetchEntry(Integer.valueOf(rowId));
-	}
-
 	@Override
 	public String getType(Uri uri) {
 		switch (sURIMatcher.match(uri)) {
 		case GET_ALL:
 		case SEARCH_ENTRIES:
+		case GET_TAG:
 			return Entries.CONTENT_TYPE;
-		case GET_ENTRY:
-			return Entries.CONTENT_ITEM_TYPE;
 		default:
 			throw new IllegalArgumentException("Unknown URL: " + uri);
 		}

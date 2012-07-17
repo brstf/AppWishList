@@ -97,7 +97,16 @@ public class WLEntryContract {
 		}
 	}
 	
-	public interface EntryQuery {
+	public interface EntriesQuery {
+		int _TOKEN = 0x1;
+		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
+				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
+				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
+				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+	}
+	
+	public interface SearchQuery {
+		int _TOKEN = 0x2;
 		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
 				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
 				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
@@ -105,6 +114,7 @@ public class WLEntryContract {
 	}
 	
 	public interface PendingQuery {
+		int _TOKEN = 0x3;
 		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
 				WLDbAdapter.KEY_URL };
 	}

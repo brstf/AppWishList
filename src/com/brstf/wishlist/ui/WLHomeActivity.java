@@ -1,6 +1,7 @@
 package com.brstf.wishlist.ui;
 
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.provider.WLEntryContract;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ public class WLHomeActivity extends BaseActivity implements
 		super.onStart();
 
 		// Every time the activity starts, check for updates!
-		//new WLPriceChecker().priceCheck();
+		// new WLPriceChecker().priceCheck();
 
 		// Reload all entries
 		getActivityHelper().getEntries().reload();
@@ -65,7 +66,12 @@ public class WLHomeActivity extends BaseActivity implements
 		// When a tag button is selected, we'll want to start an activity for
 		// the actual wish list
 		final Intent intent = new Intent(this, WLListActivity.class);
-		intent.putExtra(WLListFragment.EXTRA_TAG, tag);
+		if (tag == null) {
+			intent.setData(WLEntryContract.Entries.CONTENT_URI);
+		} else {
+			intent.setData(WLEntryContract.Entries.CONTENT_URI.buildUpon()
+					.appendPath(tag).build());
+		}
 		startActivity(intent);
 	}
 }

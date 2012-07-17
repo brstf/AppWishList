@@ -43,7 +43,10 @@ public class SearchActivity extends BaseActivity {
 
 		setTitle(Html.fromHtml(query));
 		Uri searchUri = buildSearchUri(query);
-		mFragment.loadFromSearch(searchUri);
+		
+		Bundle args = new Bundle();
+		args.putParcelable("_uri", searchUri);
+		mFragment.reloadFromArguments(args);
 	}
 
 	private Uri buildSearchUri(String query) {

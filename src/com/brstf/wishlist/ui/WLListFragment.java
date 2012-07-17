@@ -12,7 +12,6 @@ import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
-import com.brstf.wishlist.util.SimpleCursorLoader;
 import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.Activity;
@@ -112,31 +111,12 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 	}
 
-	public static final class WLCursorLoader extends SimpleCursorLoader {
-		private WLDbAdapter mDbHelper;
-
-		public WLCursorLoader(Context context, WLDbAdapter dbhelper) {
-			super(context);
-			mDbHelper = dbhelper;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			String[] columns = WLEntryContract.EntryQuery.columns;
-			String selection = WLDbAdapter.KEY_TYPE + " <> ?";
-			String[] selectionArgs = { WLEntryType
-					.getTypeString(WLEntryType.PENDING) };
-			return mDbHelper.query(true, columns, selection, selectionArgs,
-					null, null, null, null);
-		}
-	}
-
 	public class WLListAdapter extends CursorAdapter {
 		private SparseBooleanArray mSelected = new SparseBooleanArray();
 		private final LayoutInflater mInflater;
 
-		public WLListAdapter(Context context, Cursor c, int flags) {
-			super(context, c, flags);
+		public WLListAdapter(Context context) {
+			super(context, null, false);
 			mInflater = LayoutInflater.from(context);
 		}
 
@@ -299,13 +279,7 @@ public class WLListFragment extends SherlockListFragment implements
 	private Drawable booksPh = null;
 	private WLDbAdapter mDbHelper = null;
 	private ActionMode lamode = null;
-
-	private WLDbAdapter getHelper() {
-		if (mDbHelper == null) {
-			mDbHelper = new WLDbAdapter(this.getSherlockActivity());
-		}
-		return mDbHelper;
-	}
+	private int mQueryToken;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -325,31 +299,37 @@ public class WLListFragment extends SherlockListFragment implements
 		final int memoryClassBytes = am.getMemoryClass() * 1024 * 1024;
 		mIconCache = new ThumbnailCache(memoryClassBytes / 2);
 
-		// Get the arguments passed in
-		Bundle args = this.getArguments();
-		if (args != null) {
-			// If there were arguments, grab the filter tag to filter the list
-			// by
-			filtertag = args.getString(EXTRA_TAG);
+		reloadFromArguments(this.getArguments());
+	}
+
+	protected void reloadFromArguments(Bundle arguments) {
+		// Remove the previous adapter (if any)
+		this.setListAdapter(null);
+
+		final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
+		final Uri uri = intent.getData();
+
+		if (uri == null) {
+			return;
 		}
 
-		// Instantiate the adapter and use it
-		mListAdapter = new WLListAdapter(this.getSherlockActivity(), null, true);
+		mListAdapter = new WLListAdapter(this.getSherlockActivity()
+				.getApplicationContext());
+
+		if (!WLEntryContract.Entries.isSearchUri(uri)) {
+			mQueryToken = WLEntryContract.EntriesQuery._TOKEN;
+		} else {
+			mQueryToken = WLEntryContract.SearchQuery._TOKEN;
+		}
 		setListAdapter(mListAdapter);
 
-		this.getSherlockActivity().getSupportLoaderManager()
-				.initLoader(LOADER_CURSOR, null, mLoaderCallbacks);
+		getLoaderManager().restartLoader(mQueryToken, arguments,
+				mLoaderCallbacks);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		WLEntries.getInstance().setWLChangedListener(this);
-		if (mListAdapter.getCursor() != null) {
-			getLoaderManager().restartLoader(LOADER_CURSOR, null,
-					mLoaderCallbacks);
-		}
 
 		this.getListView().setChoiceMode(AbsListView.CHOICE_MODE_NONE);
 		this.getListView().setOnItemLongClickListener(
@@ -408,7 +388,8 @@ public class WLListFragment extends SherlockListFragment implements
 	@Override
 	public void onDataSetChanged() {
 		// Reload the list
-		getLoaderManager().restartLoader(LOADER_CURSOR, null, mLoaderCallbacks);
+		// getLoaderManager().restartLoader(LOADER_CURSOR, null,
+		// mLoaderCallbacks);
 	}
 
 	public void filter(String tag) {
@@ -512,20 +493,6 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 	};
 
-	/**
-	 * Sets the items loaded in this adapter to search results from the given
-	 * query {@link Uri}.
-	 * 
-	 * @param searchUri
-	 *            {@link Uri} containing the search query
-	 */
-	public void loadFromSearch(Uri searchUri) {
-		Bundle args = new Bundle();
-		args.putParcelable("_uri", searchUri);
-		getSherlockActivity().getSupportLoaderManager().restartLoader(
-				LOADER_CURSOR, args, mLoaderCallbacks);
-	}
-
 	// //////////////////////////////
 	// Loader callbacks
 	//
@@ -533,13 +500,18 @@ public class WLListFragment extends SherlockListFragment implements
 	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			final Intent intent = BaseActivity.fragmentArgumentsToIntent(args);
+			final Uri uri = intent.getData();
+			Loader<Cursor> loader = null;
+
 			if (args != null) {
-				Uri searchUri = (Uri) args.getParcelable("_uri");
-				return new CursorLoader(getSherlockActivity(), searchUri,
-						WLEntryContract.EntryQuery.columns, null, null, null);
+				loader = new CursorLoader(getSherlockActivity(), uri,
+						WLEntryContract.EntriesQuery.columns, null, null, null);
+			} else {
+				loader = new CursorLoader(getSherlockActivity(), uri,
+						WLEntryContract.SearchQuery.columns, null, null, null);
 			}
-			return new WLCursorLoader(
-					WLListFragment.this.getSherlockActivity(), getHelper());
+			return loader;
 		}
 
 		@Override
@@ -563,4 +535,5 @@ public class WLListFragment extends SherlockListFragment implements
 			return value.getRowBytes() * value.getHeight();
 		}
 	}
+
 }

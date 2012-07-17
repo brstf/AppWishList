@@ -1,6 +1,8 @@
 package com.brstf.wishlist.ui;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -38,5 +40,41 @@ public class BaseActivity extends SherlockFragmentActivity {
 
 	protected ActivityHelper getActivityHelper() {
 		return mActivityHelper;
+	}
+	
+	public static Bundle intentToFragmentArguments(Intent intent) {
+		Bundle arguments = new Bundle();
+		if( intent == null ) {
+			return arguments;
+		}
+		
+		final Uri uri = intent.getData();
+		if( uri != null ) {
+			arguments.putParcelable("_uri", uri);
+		}
+		
+		final Bundle extras = intent.getExtras();
+		if( extras != null ) {
+			arguments.putAll(extras);
+		}
+		
+		return arguments;
+	}
+	
+	public static Intent fragmentArgumentsToIntent(Bundle arguments) {
+		final Intent intent = new Intent();
+		
+		if( arguments == null ) {
+			return intent;
+		}
+		
+		final Uri uri = arguments.getParcelable("_uri");
+		if( uri != null ) {
+			intent.setData(uri);
+		}
+		
+		intent.putExtras(arguments);
+		intent.removeExtra("_uri");
+		return intent;
 	}
 }

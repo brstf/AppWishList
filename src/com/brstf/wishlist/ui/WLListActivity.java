@@ -33,7 +33,8 @@ public class WLListActivity extends BaseActivity implements
 			}
 
 			mFrag = new WLListFragment();
-			mFrag.setArguments(getIntent().getExtras());
+			mFrag.setArguments(BaseActivity
+					.intentToFragmentArguments(getIntent()));
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.fragment_container, mFrag).commit();
 		}
@@ -80,7 +81,7 @@ public class WLListActivity extends BaseActivity implements
 		mFrag.filter(tag);
 		return true;
 	}
-	
+
 	@Override
 	public void onStop() {
 		super.onStop();
