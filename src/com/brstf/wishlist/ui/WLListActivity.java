@@ -4,6 +4,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
+import com.brstf.wishlist.provider.WLEntryContract;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -74,12 +75,22 @@ public class WLListActivity extends BaseActivity implements
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		String tag = mAdapter.getItem(itemPosition);
 		tag = tag.toLowerCase();
-		if (tag.equals("all")) {
-			tag = null;
-		}
 
-		mFrag.filter(tag);
+		onTagSelected(tag);
+
 		return true;
+	}
+
+	public void onTagSelected(String tag) {
+		// Construct a bundle with an entries/tag URI
+		final Bundle args = new Bundle();
+		if (tag.equals("all")) {
+			args.putParcelable("_uri", WLEntryContract.Entries.CONTENT_URI);
+		} else {
+			args.putParcelable("_uri", WLEntryContract.Entries.CONTENT_URI
+					.buildUpon().appendPath(tag).build());
+		}
+		mFrag.reloadFromArguments(args);
 	}
 
 	@Override

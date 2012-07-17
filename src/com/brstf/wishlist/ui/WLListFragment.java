@@ -318,6 +318,7 @@ public class WLListFragment extends SherlockListFragment implements
 
 		if (!WLEntryContract.Entries.isSearchUri(uri)) {
 			mQueryToken = WLEntryContract.EntriesQuery._TOKEN;
+			filtertag = uri.getLastPathSegment();
 		} else {
 			mQueryToken = WLEntryContract.SearchQuery._TOKEN;
 		}
