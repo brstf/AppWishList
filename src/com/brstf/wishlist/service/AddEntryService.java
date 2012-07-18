@@ -64,8 +64,8 @@ public class AddEntryService extends IntentService {
 
 		// Download the icon
 		try {
-			FileOutputStream fos = getBaseContext().openFileOutput(
-					ent.getIconPath(), Context.MODE_PRIVATE);
+			FileOutputStream fos = getBaseContext().openFileOutput(ent.getIconPath(),
+					Context.MODE_PRIVATE);
 			Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(
 					ent.getIconUrl()).getContent());
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
