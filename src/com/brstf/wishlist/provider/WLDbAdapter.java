@@ -187,7 +187,7 @@ public class WLDbAdapter {
 	public void open() {
 		mDb = mDbHelper.getWritableDatabase();
 	}
-	
+
 	public SQLiteDatabase getDatabase() {
 		return mDb;
 	}
@@ -360,6 +360,11 @@ public class WLDbAdapter {
 				+ "=" + rowId, null) > 0;
 	}
 
+	public int updateEntry(int rowId, ContentValues values) {
+		return mDb.update(DATABASE_TABLE, values,
+				BaseColumns._ID + "=" + rowId, null);
+	}
+
 	/**
 	 * Creates a ContentValues object for the given entry
 	 * 
@@ -367,7 +372,7 @@ public class WLDbAdapter {
 	 *            The entry to create the ContentValues object for
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createValues(WLEntry ent) {
+	public static ContentValues createValues(WLEntry ent) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_TYPE, WLEntryType.getTypeString(ent.getType()));
 		values.put(KEY_NAME, ent.getTitle());
@@ -400,7 +405,7 @@ public class WLDbAdapter {
 	 *            Array of String tags to use
 	 * @return List of tags as a single, comma separated String
 	 */
-	private String buildTags(String[] tags) {
+	private static String buildTags(String[] tags) {
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < tags.length; ++i) {
@@ -420,7 +425,7 @@ public class WLDbAdapter {
 	 *            The content values to add the values to
 	 * @return The content values object with price/rating information added
 	 */
-	private ContentValues createPricedValues(WLPricedEntry ent,
+	private static ContentValues createPricedValues(WLPricedEntry ent,
 			ContentValues values) {
 		values.put(KEY_CPRICE, ent.getCurrentPrice());
 		values.put(KEY_RPRICE, ent.getRegularPrice());
@@ -438,7 +443,8 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createAppValues(WLAppEntry ent, ContentValues values) {
+	private static ContentValues createAppValues(WLAppEntry ent,
+			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(KEY_CREATOR, ent.getDeveloper());
 
@@ -454,7 +460,8 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createBookValues(WLBookEntry ent, ContentValues values) {
+	private static ContentValues createBookValues(WLBookEntry ent,
+			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(KEY_CREATOR, ent.getAuthor());
 		values.put(KEY_PCOUNT, ent.getPageCount());
@@ -472,7 +479,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createMovieValues(WLMovieEntry ent,
+	private static ContentValues createMovieValues(WLMovieEntry ent,
 			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(KEY_CRATING, ent.getContentRating());
@@ -491,7 +498,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createArtistValues(WLArtistEntry ent,
+	private static ContentValues createArtistValues(WLArtistEntry ent,
 			ContentValues values) {
 		// Sort of an oddity, creator here is set to genres
 		values.put(KEY_CREATOR, ent.getGenres());
@@ -508,7 +515,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private ContentValues createAlbumValues(WLAlbumEntry ent,
+	private static ContentValues createAlbumValues(WLAlbumEntry ent,
 			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(KEY_CREATOR, ent.getArtist());

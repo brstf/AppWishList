@@ -5,7 +5,6 @@ import android.content.Intent;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.ui.WLHomeActivity;
-import com.brstf.wishlist.ui.WLListActivity;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;

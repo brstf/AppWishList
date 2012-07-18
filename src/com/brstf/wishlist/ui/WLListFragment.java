@@ -19,6 +19,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -270,7 +272,6 @@ public class WLListFragment extends SherlockListFragment implements
 	}
 
 	private static final String TAG = "WLListFragment";
-	private static final int LOADER_CURSOR = 1;
 	private WLListAdapter mListAdapter = null;
 	private String filtertag = null;
 	private Drawable musicPh = null;
@@ -347,6 +348,21 @@ public class WLListFragment extends SherlockListFragment implements
 	}
 
 	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		activity.getContentResolver().registerContentObserver(
+				WLEntryContract.Entries.CONTENT_URI, true, mObserver);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+
+		getActivity().getContentResolver().unregisterContentObserver(mObserver);
+	}
+
+	@Override
 	public void onStop() {
 		super.onStop();
 
@@ -392,6 +408,20 @@ public class WLListFragment extends SherlockListFragment implements
 		// getLoaderManager().restartLoader(LOADER_CURSOR, null,
 		// mLoaderCallbacks);
 	}
+
+	private final ContentObserver mObserver = new ContentObserver(new Handler()) {
+		@Override
+		public void onChange(boolean selfChange) {
+			if (getSherlockActivity() == null) {
+				return;
+			}
+
+			Loader<Cursor> loader = getLoaderManager().getLoader(mQueryToken);
+			if (loader != null) {
+				loader.forceLoad();
+			}
+		}
+	};
 
 	public void filter(String tag) {
 		filtertag = tag;
@@ -443,6 +473,8 @@ public class WLListFragment extends SherlockListFragment implements
 				}
 
 				// Loop through each id, and remove it from the database
+				// TODO: Use ContentProvider for deletion? Seems like a better
+				// idea
 				mDbHelper.beginTransaction();
 				for (int i = 0; i < checkedCount; ++i) {
 					// Remove from the database and delete icon
@@ -462,8 +494,11 @@ public class WLListFragment extends SherlockListFragment implements
 				paths = null;
 
 				// Reload the list
-				getLoaderManager().restartLoader(LOADER_CURSOR, null,
-						mLoaderCallbacks);
+				Loader<Cursor> loader = getLoaderManager().getLoader(
+						mQueryToken);
+				if (loader != null) {
+					loader.forceLoad();
+				}
 			}
 			mode.finish();
 			return true;

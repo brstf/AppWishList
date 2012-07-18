@@ -3,6 +3,7 @@ package com.brstf.wishlist.provider;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter.Tables;
 import com.brstf.wishlist.provider.WLEntryContract.Entries;
 
@@ -10,6 +11,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -27,6 +29,7 @@ public class WLProvider extends ContentProvider {
 	private static final int GET_ALL = 0;
 	private static final int GET_TAG = 1;
 	private static final int SEARCH_ENTRIES = 2;
+	private static final int GET_ENTRY = 3;
 
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
 
@@ -36,7 +39,8 @@ public class WLProvider extends ContentProvider {
 		// to get entries
 		matcher.addURI(AUTHORITY, "entries", GET_ALL);
 		matcher.addURI(AUTHORITY, "entries/search/*", SEARCH_ENTRIES);
-		matcher.addURI(AUTHORITY, "entries/*", GET_TAG);
+		matcher.addURI(AUTHORITY, "entries/tag/*", GET_TAG);
+		matcher.addURI(AUTHORITY, "entries/entry/*", GET_ENTRY);
 
 		return matcher;
 	}
@@ -76,10 +80,14 @@ public class WLProvider extends ContentProvider {
 			tagqb.setTables(Tables.ENTRIES);
 			tagqb.appendWhere(WLDbAdapter.KEY_TAGS + " LIKE '%" + tag + "%'");
 
-			return tagqb.query(mDbHelper.getDatabase(), projection, selection,
-					selectionArgs, null, null, null);
+			return tagqb.query(mDbHelper.getDatabase(), projection,
+					WLDbAdapter.KEY_TYPE + " <> ?", new String[] { WLEntryType
+							.getTypeString(WLEntryType.PENDING) }, null, null,
+					null);
 		case GET_ALL:
 			return getAll();
+		case GET_ENTRY:
+
 		default:
 			throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
@@ -124,7 +132,12 @@ public class WLProvider extends ContentProvider {
 	 * @return Cursor pointing to all entries of the database
 	 */
 	private Cursor getAll() {
-		return mDbHelper.fetchAllEntries();
+		return mDbHelper
+				.query(true, WLEntryContract.EntriesQuery.columns,
+						WLDbAdapter.KEY_TYPE + " <> ? ",
+						new String[] { WLEntryType
+								.getTypeString(WLEntryType.PENDING) }, null,
+						null, null, null);
 	}
 
 	@Override
@@ -139,21 +152,52 @@ public class WLProvider extends ContentProvider {
 		}
 	}
 
-	// TODO: Use these ?
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		throw new UnsupportedOperationException();
+		final SQLiteDatabase db = mDbHelper.getDatabase();
+		db.insertOrThrow(WLDbAdapter.Tables.ENTRIES, null, values);
+		getContext().getContentResolver().notifyChange(
+				WLEntryContract.Entries.CONTENT_URI, null);
+
+		return uri;
 	}
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		throw new UnsupportedOperationException();
+		switch (sURIMatcher.match(uri)) {
+		case GET_ENTRY:
+			final String url = uri.getLastPathSegment();
+			final int id = mDbHelper.fetchId(url);
+
+			// Update the entry
+			final int rval = mDbHelper.updateEntry(id, values);
+
+			// Notify that a change happened
+			getContext().getContentResolver().notifyChange(uri, null);
+			return rval;
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
-		throw new UnsupportedOperationException();
+	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		switch (sURIMatcher.match(uri)) {
+		case GET_ENTRY:
+			final String url = uri.getLastPathSegment();
+			final int id = mDbHelper.fetchId(url);
+
+			// Delete the entry
+			mDbHelper.deleteEntry(id);
+			getContext().getContentResolver().notifyChange(
+					WLEntryContract.Entries.CONTENT_URI, null);
+			return 1;
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 }

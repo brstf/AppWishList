@@ -1,6 +1,9 @@
 package com.brstf.wishlist.service;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -11,10 +14,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.util.ProviderUtils;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,8 +39,6 @@ public class AddEntryService extends IntentService {
 	private static final String TAG = "AddEntryService";
 	public static final String EXTRA_URL = "ENTRYURL";
 	private Handler mHandler = null;
-
-	private WLEntries mEntries = WLEntries.getInstance();
 
 	public AddEntryService() {
 		super(TAG);
@@ -58,36 +62,32 @@ public class AddEntryService extends IntentService {
 				WLEntryType.getTypeFromURL(url), -1);
 		ent.setFromURLText(url, result);
 
-		// Start up the IconService to download the icon
-		final Intent iconIntent = new Intent(this, IconService.class);
-		iconIntent.putExtra(IconService.EXTRA_FILENAME, ent.getIconPath());
-		iconIntent.putExtra(IconService.EXTRA_URL, ent.getIconUrl());
-		startService(iconIntent);
+		// Download the icon
+		try {
+			FileOutputStream fos = getBaseContext().openFileOutput(
+					ent.getIconPath(), Context.MODE_PRIVATE);
+			Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(
+					ent.getIconUrl()).getContent());
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+			fos.close();
+			Log.d(TAG, "Successfully downloaded icon for: " + ent.getIconPath());
+		} catch (IOException e) {
+			Log.d(TAG, "Failed to download icon for: " + ent.getIconPath());
+		}
 
 		// Add this entry to the database
-		WLDbAdapter mDbHelper = new WLDbAdapter(this.getBaseContext());
-		mDbHelper.open();
-		int rowid = mDbHelper.fetchId(url);
-		if (rowid == -1) {
-			Log.e(TAG, "Did not find pending entry!");
-		} else {
-			mDbHelper.updateEntry(rowid, ent);
+		ProviderUtils.update(getContentResolver(), ent);
 
-			// Show that the app was successfully added to the wishlist
-			mHandler.post(new Runnable() {
+		// Show that the app was successfully added to the wishlist
+		mHandler.post(new Runnable() {
 
-				@Override
-				public void run() {
-					Toast.makeText(AddEntryService.this,
-							"Added " + ent.getTitle() + " to wishlist!",
-							Toast.LENGTH_SHORT).show();
-				}
-			});
-		}
-		mDbHelper.close();
-
-		// Remove this entry from the pending list
-		mEntries.reload();
+			@Override
+			public void run() {
+				Toast.makeText(AddEntryService.this,
+						"Added " + ent.getTitle() + " to wishlist!",
+						Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
 	/**

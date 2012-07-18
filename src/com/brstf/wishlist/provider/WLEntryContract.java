@@ -63,6 +63,7 @@ public class WLEntryContract {
 
 	private static final String PATH_ENTRIES = "entries";
 	private static final String PATH_SEARCH = "search";
+	private static final String PATH_ENTRY = "entry";
 
 	public static class Entries implements EntryColumns, BaseColumns {
 		public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -76,7 +77,7 @@ public class WLEntryContract {
 		public static final String DEFAULT_SORT = EntryColumns.KEY_NAME + " DESC";
 		
 		public static Uri buildEntryUri(String entry_url) {
-			return CONTENT_URI.buildUpon().appendPath(entry_url).build();
+			return CONTENT_URI.buildUpon().appendPath(PATH_ENTRY).appendPath(entry_url).build();
 		}
 		
 		public static Uri buildSearchUri(String query) {
