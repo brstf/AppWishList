@@ -30,6 +30,7 @@ public class WLProvider extends ContentProvider {
 	private static final int GET_TAG = 1;
 	private static final int SEARCH_ENTRIES = 2;
 	private static final int GET_ENTRY = 3;
+	private static final int GET_TAGS = 4;
 
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
 
@@ -41,6 +42,7 @@ public class WLProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, "entries/search/*", SEARCH_ENTRIES);
 		matcher.addURI(AUTHORITY, "entries/tag/*", GET_TAG);
 		matcher.addURI(AUTHORITY, "entries/entry/*", GET_ENTRY);
+		matcher.addURI(AUTHORITY, "tags", GET_TAGS);
 
 		return matcher;
 	}
@@ -86,11 +88,20 @@ public class WLProvider extends ContentProvider {
 					null);
 		case GET_ALL:
 			return getAll();
+		case GET_TAGS:
+			return getTags();
 		case GET_ENTRY:
 
 		default:
 			throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
+	}
+
+	private Cursor getTags() {
+		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		qb.setTables(Tables.ENTRIES_TAGS);
+		return qb.query(mDbHelper.getDatabase(),
+				WLEntryContract.TagQuery.columns, null, null, null, null, null);
 	}
 
 	private Map<String, String> buildMap() {

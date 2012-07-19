@@ -7,8 +7,6 @@ import java.io.IOException;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
 import com.brstf.wishlist.R;
-import com.brstf.wishlist.WLEntries;
-import com.brstf.wishlist.WLEntries.WLChangedListener;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
@@ -50,8 +48,7 @@ import android.widget.TextView;
  * 
  * @author brstf
  */
-public class WLListFragment extends SherlockListFragment implements
-		WLChangedListener {
+public class WLListFragment extends SherlockListFragment {
 	// Hash map mapping icon name to already loaded icons
 	private static ThumbnailCache mIconCache = null;
 	public static final String EXTRA_TAG = "filter_tag";
@@ -368,7 +365,6 @@ public class WLListFragment extends SherlockListFragment implements
 
 		// Clear out the icon list, and clear the callback
 		mIconCache.evictAll();
-		WLEntries.getInstance().setWLChangedListener(null);
 	}
 
 	/**
@@ -402,13 +398,6 @@ public class WLListFragment extends SherlockListFragment implements
 		}
 	}
 
-	@Override
-	public void onDataSetChanged() {
-		// Reload the list
-		// getLoaderManager().restartLoader(LOADER_CURSOR, null,
-		// mLoaderCallbacks);
-	}
-
 	private final ContentObserver mObserver = new ContentObserver(new Handler()) {
 		@Override
 		public void onChange(boolean selfChange) {
@@ -425,7 +414,6 @@ public class WLListFragment extends SherlockListFragment implements
 
 	public void filter(String tag) {
 		filtertag = tag;
-		onDataSetChanged();
 	}
 
 	public String getFilter() {

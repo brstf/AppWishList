@@ -168,7 +168,6 @@ public abstract class WLEntry {
 		
 		String id = android.text.Html.fromHtml(m_id.group(1)).toString();
 		setIconPath(id + ".png");
-		addTag(WLEntryType.getTypeString(getType()));
 	}
 
 	/**

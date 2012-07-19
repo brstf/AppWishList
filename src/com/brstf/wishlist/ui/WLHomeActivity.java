@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 public class WLHomeActivity extends BaseActivity implements
-		WLHomeFragment.OnTileSelectedListener {
+		HomeFragment.OnTileSelectedListener {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class WLHomeActivity extends BaseActivity implements
 			}
 
 			// Create an instance of ExampleFragment
-			WLHomeFragment firstFragment = new WLHomeFragment();
+			HomeFragment firstFragment = new HomeFragment();
 
 			// In case this activity was started with special instructions from
 			// an Intent, pass the Intent's extras to the fragment as arguments

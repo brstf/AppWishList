@@ -14,6 +14,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.util.ProviderUtils;
 
 import android.app.IntentService;
@@ -64,8 +65,8 @@ public class AddEntryService extends IntentService {
 
 		// Download the icon
 		try {
-			FileOutputStream fos = getBaseContext().openFileOutput(ent.getIconPath(),
-					Context.MODE_PRIVATE);
+			FileOutputStream fos = getBaseContext().openFileOutput(
+					ent.getIconPath(), Context.MODE_PRIVATE);
 			Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(
 					ent.getIconUrl()).getContent());
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
@@ -77,6 +78,16 @@ public class AddEntryService extends IntentService {
 
 		// Add this entry to the database
 		ProviderUtils.update(getContentResolver(), ent);
+
+		WLDbAdapter dbhelper = new WLDbAdapter(getBaseContext());
+		dbhelper.open();
+		dbhelper.addTag(url, WLEntryType.getTypeString(ent.getType())
+				.toLowerCase());
+		if (ent.getType() == WLEntryType.MUSIC_ALBUM
+				|| ent.getType() == WLEntryType.MUSIC_ARTIST) {
+			dbhelper.addTag(url, "music");
+		}
+		dbhelper.close();
 
 		// Show that the app was successfully added to the wishlist
 		mHandler.post(new Runnable() {

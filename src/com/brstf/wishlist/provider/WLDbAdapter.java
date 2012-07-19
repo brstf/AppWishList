@@ -46,17 +46,22 @@ public class WLDbAdapter {
 
 	public static final String SEARCH_BODY = "body";
 
+	public static final String KEY_TAG = "tag";
+
 	interface Tables {
 		String ENTRIES = "wlentries";
 		String ENTRIES_SEARCH = "wlentries_search";
 		String SEARCH_JOIN_ENTRIES = "wlentries_search "
 				+ "LEFT OUTER JOIN wlentries ON wlentries_search.url=wlentries.url";
+		String ENTRIES_TAGS = "wlentries_tags";
 	}
 
 	private interface Triggers {
 		String ENTRIES_SEARCH_INSERT = "wlentries_search_insert";
 		String ENTRIES_SEARCH_DELETE = "wlentries_search_delete";
 		String ENTRIES_SEARCH_UPDATE = "wlentries_search_update";
+
+		String ENTRIES_TAGS_INSERT = "wlentries_tags_insert";
 	}
 
 	private interface Subquery {
@@ -88,7 +93,6 @@ public class WLDbAdapter {
 			+ "(url) ON CONFLICT IGNORE)";
 
 	private static final String DATABASE_NAME = "wldata";
-	private static final String DATABASE_TABLE = "wlentries";
 	private static final int DATABASE_VERSION = 2;
 
 	private SQLiteDatabase mDb = null;
@@ -115,8 +119,8 @@ public class WLDbAdapter {
 
 			// Create the search virtual table
 			db.execSQL("CREATE VIRTUAL TABLE " + Tables.ENTRIES_SEARCH
-					+ " USING fts3(" + BaseColumns._ID
-					+ "INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_URL
+					+ " USING fts3( " + BaseColumns._ID
+					+ " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_URL
 					+ " TEXT NOT NULL, " + SEARCH_BODY + " TEXT NOT NULL, "
 					+ References.URL_ID + "," + "UNIQUE (" + KEY_URL
 					+ ") ON CONFLICT REPLACE,tokenize=porter)");
@@ -139,6 +143,23 @@ public class WLDbAdapter {
 					+ Tables.ENTRIES_SEARCH + " SET " + SEARCH_BODY + " = "
 					+ Subquery.ENTRIES_BODY + " WHERE " + KEY_URL + " = old."
 					+ KEY_URL + "; END;");
+
+			// Create the table to store tag / tag count information
+			db.execSQL("CREATE TABLE " + Tables.ENTRIES_TAGS + " ("
+					+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+					+ KEY_TAG + " TEXT NOT NULL, " + BaseColumns._COUNT
+					+ " INTEGER, UNIQUE (" + KEY_TAG + ") ON CONFLICT IGNORE)");
+
+			ContentValues cv = new ContentValues();
+			cv.put(KEY_TAG, "all");
+			cv.put(BaseColumns._COUNT, 0);
+			db.insert(Tables.ENTRIES_TAGS, null, cv);
+
+			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_INSERT
+					+ " AFTER INSERT ON " + Tables.ENTRIES + " BEGIN UPDATE "
+					+ Tables.ENTRIES_TAGS + " SET " + BaseColumns._COUNT
+					+ " = " + BaseColumns._COUNT + " + 1 WHERE " + KEY_TAG
+					+ " == 'all'; END;");
 		}
 
 		@Override
@@ -154,6 +175,9 @@ public class WLDbAdapter {
 					+ Triggers.ENTRIES_SEARCH_UPDATE);
 			db.execSQL("DROP TRIGGER IF EXISTS "
 					+ Triggers.ENTRIES_SEARCH_INSERT);
+
+			db.execSQL("DROP TABLE IF EXISTS " + Tables.ENTRIES_TAGS);
+			db.execSQL("DROP TRIGGER IF EXISTS " + Triggers.ENTRIES_TAGS_INSERT);
 
 			onCreate(db);
 		}
@@ -204,6 +228,51 @@ public class WLDbAdapter {
 	}
 
 	/**
+	 * Adds a tag to the entry with the given URL.
+	 * 
+	 * @param url
+	 * @param tag
+	 */
+	public void addTag(String url, String tag) {
+		Cursor c = mDb.query(Tables.ENTRIES_TAGS, new String[] { KEY_TAG },
+				KEY_TAG + " = ?", new String[] { tag }, null, null, null);
+
+		// If the tag table didn't have this tag, add it
+		if (!c.moveToFirst()) {
+			ContentValues cv = new ContentValues();
+			cv.put(KEY_TAG, tag);
+			cv.put(BaseColumns._COUNT, 0);
+			mDb.insert(Tables.ENTRIES_TAGS, null, cv);
+		}
+
+		// Now update the count and add the tag
+		c = mDb.query(true, Tables.ENTRIES, new String[] { KEY_TAGS }, KEY_URL
+				+ " = ?", new String[] { url }, null, null, null, null);
+		c.moveToFirst();
+		String tags = c.getString(c.getColumnIndex(KEY_TAGS));
+		if (tags == null) {
+			tags = tag;
+		} else {
+			tags += "," + tag;
+		}
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_TAGS, tags);
+		mDb.update(Tables.ENTRIES, values, KEY_URL + " = ?",
+				new String[] { url });
+
+		c = mDb.query(true, Tables.ENTRIES_TAGS,
+				new String[] { BaseColumns._COUNT }, KEY_TAG + " = ?",
+				new String[] { tag }, null, null, null, null);
+		c.moveToFirst();
+		int count = c.getInt(c.getColumnIndex(BaseColumns._COUNT));
+		values.clear();
+		values.put(BaseColumns._COUNT, count + 1);
+		mDb.update(Tables.ENTRIES_TAGS, values, KEY_TAG + " = ?",
+				new String[] { tag });
+	}
+
+	/**
 	 * Checks if an entry with the given url exists in the database.
 	 * 
 	 * @param url
@@ -215,7 +284,7 @@ public class WLDbAdapter {
 		String[] columns = { KEY_URL, KEY_NAME };
 		String selection = KEY_URL + " = ?";
 		String[] selectionArgs = { url };
-		Cursor c = mDb.query(true, DATABASE_TABLE, columns, selection,
+		Cursor c = mDb.query(true, Tables.ENTRIES, columns, selection,
 				selectionArgs, null, null, null, null);
 
 		// If no row was found, return null
@@ -243,7 +312,7 @@ public class WLDbAdapter {
 		String[] columns = { BaseColumns._ID };
 		String selection = KEY_URL + " = ?";
 		String[] selectionArgs = { url };
-		Cursor c = mDb.query(true, DATABASE_TABLE, columns, selection,
+		Cursor c = mDb.query(true, Tables.ENTRIES, columns, selection,
 				selectionArgs, null, null, null, null);
 
 		// If no row was found, return -1
@@ -258,7 +327,7 @@ public class WLDbAdapter {
 	public Cursor query(boolean distinct, String[] columns, String selection,
 			String[] selectionArgs, String groupBy, String having,
 			String orderBy, String limit) {
-		return mDb.query(distinct, DATABASE_TABLE, columns, selection,
+		return mDb.query(distinct, Tables.ENTRIES, columns, selection,
 				selectionArgs, groupBy, having, orderBy, limit);
 	}
 
@@ -271,11 +340,11 @@ public class WLDbAdapter {
 	 * @return The long id of the new entry in the database
 	 */
 	public long createEntry(WLEntry ent) {
-		return mDb.insert(DATABASE_TABLE, null, createValues(ent));
+		return mDb.insert(Tables.ENTRIES, null, createValues(ent));
 	}
 
 	public long insert(ContentValues values) {
-		return mDb.insert(DATABASE_TABLE, null, values);
+		return mDb.insert(Tables.ENTRIES, null, values);
 	}
 
 	/**
@@ -286,7 +355,7 @@ public class WLDbAdapter {
 	 * @return True on successful deletion, false if deletion failed
 	 */
 	public boolean deleteEntry(int rowId) {
-		return mDb.delete(DATABASE_TABLE, BaseColumns._ID + "=" + rowId, null) > 0;
+		return mDb.delete(Tables.ENTRIES, BaseColumns._ID + "=" + rowId, null) > 0;
 	}
 
 	/**
@@ -295,7 +364,7 @@ public class WLDbAdapter {
 	 * @return Cursor pointing at the first entry in the list of entries
 	 */
 	public Cursor fetchAllEntries() {
-		return mDb.query(DATABASE_TABLE, new String[] { BaseColumns._ID,
+		return mDb.query(Tables.ENTRIES, new String[] { BaseColumns._ID,
 				KEY_TYPE, KEY_NAME, KEY_URL, KEY_ICONPATH, KEY_ICONURL,
 				KEY_CPRICE, KEY_RPRICE, KEY_RATING, KEY_CRATING, KEY_MOVLENGTH,
 				KEY_CREATOR, KEY_ALBLENGTH, KEY_NUMTRACKS, KEY_DATE,
@@ -333,7 +402,7 @@ public class WLDbAdapter {
 	 *             If the query to the database fails
 	 */
 	public Cursor fetchEntry(int rowId) throws SQLException {
-		Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] {
+		Cursor mCursor = mDb.query(true, Tables.ENTRIES, new String[] {
 				BaseColumns._ID, KEY_TYPE, KEY_NAME, KEY_URL, KEY_ICONPATH,
 				KEY_ICONURL, KEY_CPRICE, KEY_RPRICE, KEY_RATING, KEY_CRATING,
 				KEY_MOVLENGTH, KEY_CREATOR, KEY_ALBLENGTH, KEY_NUMTRACKS,
@@ -356,12 +425,12 @@ public class WLDbAdapter {
 	 * @return True if the entry was successfully updated, false otherwise
 	 */
 	public boolean updateEntry(int rowId, WLEntry ent) {
-		return mDb.update(DATABASE_TABLE, createValues(ent), BaseColumns._ID
+		return mDb.update(Tables.ENTRIES, createValues(ent), BaseColumns._ID
 				+ "=" + rowId, null) > 0;
 	}
 
 	public int updateEntry(int rowId, ContentValues values) {
-		return mDb.update(DATABASE_TABLE, values,
+		return mDb.update(Tables.ENTRIES, values,
 				BaseColumns._ID + "=" + rowId, null);
 	}
 
