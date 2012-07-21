@@ -11,15 +11,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.util.ProviderUtils;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -29,9 +31,8 @@ import android.widget.Toast;
 /**
  * {@link IntentService} that can be started to add entries to the wishlist. The
  * service accepts intents with extras of the form key=AddEntryService.EXTRA_URL
- * value=<url of the entry to add>. After each entry is added to the list, it
- * informs the {@link WLEntries} instance that it has been updated, and reloads
- * the list.
+ * value=<url of the entry to add>. After each entry is added to the list, the
+ * list is reloaded.
  * 
  * @author brstf
  * 
@@ -55,6 +56,19 @@ public class AddEntryService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		String url = (String) intent.getCharSequenceExtra(EXTRA_URL);
+
+		// On slow connections, multiple intents for the same entry can get
+		// added multiple times, so check to see if this entry is still pending
+		WLDbAdapter dbhelper = new WLDbAdapter(getBaseContext());
+		dbhelper.open();
+		Cursor c = dbhelper.fetchEntry(dbhelper.fetchId(url));
+		if (!WLEntryType.getTypeString(WLEntryType.PENDING).equals(
+				c.getString(c.getColumnIndex(EntryColumns.KEY_TYPE)))) {
+			// If it's no longer pending, exit this function
+			dbhelper.close();
+			return;
+		}
+
 		Log.d(TAG, "Adding: " + url);
 		// TODO: should the addservice add this to pending?
 		String result = downloadURL(url);
@@ -79,8 +93,6 @@ public class AddEntryService extends IntentService {
 		// Add this entry to the database
 		ProviderUtils.update(getContentResolver(), ent);
 
-		WLDbAdapter dbhelper = new WLDbAdapter(getBaseContext());
-		dbhelper.open();
 		dbhelper.addTag(url, WLEntryType.getTypeString(ent.getType())
 				.toLowerCase());
 		if (ent.getType() == WLEntryType.MUSIC_ALBUM
@@ -88,10 +100,13 @@ public class AddEntryService extends IntentService {
 			dbhelper.addTag(url, "music");
 		}
 		dbhelper.close();
-
+		
+		// After adding the tag, notify a change in the database
+		getContentResolver().notifyChange(WLEntryContract.Tags.CONTENT_URI,
+				null);
+		
 		// Show that the app was successfully added to the wishlist
 		mHandler.post(new Runnable() {
-
 			@Override
 			public void run() {
 				Toast.makeText(AddEntryService.this,

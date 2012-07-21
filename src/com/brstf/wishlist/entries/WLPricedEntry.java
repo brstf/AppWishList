@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import android.database.Cursor;
 
 import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 public abstract class WLPricedEntry extends WLEntry {
 	private float cPrice = -1.0f;
@@ -60,9 +60,9 @@ public abstract class WLPricedEntry extends WLEntry {
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
-		setCurrentPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_CPRICE)));
-		setRegularPrice(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RPRICE)));
-		setRating(c.getFloat(c.getColumnIndex(WLDbAdapter.KEY_RATING)));
+		setCurrentPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_CPRICE)));
+		setRegularPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_RPRICE)));
+		setRating(c.getFloat(c.getColumnIndex(EntryColumns.KEY_RATING)));
 	}
 
 	/**

@@ -48,21 +48,10 @@ public class WLHomeActivity extends BaseActivity implements
 
 		// Every time the activity starts, check for updates!
 		// new WLPriceChecker().priceCheck();
-
-		// Reload all entries
-		getActivityHelper().getEntries().reload();
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		// When stopping write all entries from the entries list to the database
-		getActivityHelper().getEntries().writeToDb();
-	}
-
-	@Override
-	public void onTagSelected(String tag) {
+	public void onTagSelected(String tag, int pos) {
 		// When a tag button is selected, we'll want to start an activity for
 		// the actual wish list
 		final Intent intent = new Intent(this, WLListActivity.class);
@@ -70,8 +59,9 @@ public class WLHomeActivity extends BaseActivity implements
 			intent.setData(WLEntryContract.Entries.CONTENT_URI);
 		} else {
 			intent.setData(WLEntryContract.Entries.CONTENT_URI.buildUpon()
-					.appendPath(tag).build());
+					.appendPath("tag").appendPath(tag).build());
 		}
+		intent.putExtra(WLListActivity.KEY_TAGID, pos);
 		startActivity(intent);
 	}
 }

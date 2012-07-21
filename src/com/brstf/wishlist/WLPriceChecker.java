@@ -19,7 +19,7 @@ public class WLPriceChecker {
 	ArrayList<WLEntry> mEntries = null;
 
 	public WLPriceChecker() {
-		mEntries = WLEntries.getInstance().getEntries();
+		mEntries = null;
 	}
 
 	/**
@@ -27,9 +27,7 @@ public class WLPriceChecker {
 	 * information has changed
 	 */
 	public void priceCheck() {
-		if( WLEntries.getInstance().isNetworkAvailable() ) {
-			new WLPriceCheck().execute("");
-		}
+		new WLPriceCheck().execute("");
 	}
 
 	/**
@@ -85,8 +83,6 @@ public class WLPriceChecker {
 		protected void onProgressUpdate(Object... values) {
 			// Update the updated item (progress update is only called if an
 			// entry's information is changed)
-			WLEntries.getInstance().updateEntry((Integer) values[0],
-					(WLEntry) values[1]);
 		}
 	}
 }

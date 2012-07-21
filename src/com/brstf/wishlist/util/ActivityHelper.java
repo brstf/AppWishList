@@ -3,7 +3,6 @@ package com.brstf.wishlist.util;
 import android.content.Intent;
 
 import com.brstf.wishlist.R;
-import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.ui.WLHomeActivity;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -14,7 +13,6 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class ActivityHelper {
 	protected SherlockFragmentActivity mActivity;
-	private WLEntries mEntries;
 
 	/**
 	 * Factory method for creating {@link ActivityHelper} objects for a given
@@ -33,11 +31,6 @@ public class ActivityHelper {
 
 	protected ActivityHelper(SherlockFragmentActivity activity) {
 		mActivity = activity;
-		mEntries = WLEntries.getInstance();
-	}
-
-	public void onStart() {
-		mEntries.setContext(mActivity.getApplicationContext());
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,9 +73,5 @@ public class ActivityHelper {
 		final Intent intent = new Intent(mActivity, WLHomeActivity.class);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		mActivity.startActivity(intent);
-	}
-
-	public WLEntries getEntries() {
-		return mEntries;
 	}
 }

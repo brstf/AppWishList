@@ -3,7 +3,7 @@ package com.brstf.wishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 import android.database.Cursor;
 
@@ -98,7 +98,7 @@ public class WLArtistEntry extends WLEntry {
 		super.setFromDb(c);
 
 		// Again, an oddity genres are stored in KEY_CREATOR
-		setGenre(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+		setGenre(c.getString(c.getColumnIndex(EntryColumns.KEY_CREATOR)));
 	}
 
 	/**

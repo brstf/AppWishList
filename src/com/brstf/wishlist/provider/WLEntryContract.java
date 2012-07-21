@@ -2,6 +2,8 @@ package com.brstf.wishlist.provider;
 
 import java.util.List;
 
+import com.brstf.wishlist.entries.WLEntryType;
+
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -32,22 +34,17 @@ public class WLEntryContract {
 		public final String KEY_TAGS = "tags";
 	}
 
-	/*
-	 * public interface EntryColumns { public final String KEY_TYPE =
-	 * "entry_type"; public final String KEY_NAME = "entry_name"; public final
-	 * String KEY_URL = "entry_url"; public final String KEY_ICONPATH =
-	 * "entry_iconpath"; public final String KEY_ICONURL = "entry_iconurl";
-	 * public final String KEY_CPRICE = "entry_cprice"; public final String
-	 * KEY_RPRICE = "entry_rprice"; public final String KEY_RATING =
-	 * "entry_rating"; public final String KEY_CRATING = "entry_crating"; //
-	 * Content rating // (ex: PG-13) public final String KEY_MOVLENGTH =
-	 * "entry_movlength"; public final String KEY_CREATOR = "entry_creator"; //
-	 * App maker, movie, // director, artist, // author public final String
-	 * KEY_ALBLENGTH = "entry_alblength"; public final String KEY_NUMTRACKS =
-	 * "entry_numtracks"; public final String KEY_DATE = "entry_date"; //
-	 * Publish date, release // date public final String KEY_PCOUNT =
-	 * "entry_pcount"; public final String KEY_TAGS = "entry_tags"; }
-	 */
+	public interface TagColumns {
+		public static final String KEY_TAG = "tag";
+
+		public static final String KEY_APP_COUNT = WLEntryType
+				.getTypeString(WLEntryType.APP);
+		public static final String KEY_MUSIC_COUNT = "music";
+		public static final String KEY_MOVIE_COUNT = WLEntryType
+				.getTypeString(WLEntryType.MOVIE);
+		public static final String KEY_BOOK_COUNT = WLEntryType
+				.getTypeString(WLEntryType.BOOK);
+	}
 
 	public static final String AUTHORITY = "com.brstf.wishlist";
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://"
@@ -102,30 +99,32 @@ public class WLEntryContract {
 
 	public interface EntriesQuery {
 		int _TOKEN = 0x1;
-		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
-				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
-				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
-				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
+				EntryColumns.KEY_NAME, EntryColumns.KEY_CREATOR,
+				EntryColumns.KEY_CPRICE, EntryColumns.KEY_ICONPATH,
+				EntryColumns.KEY_ICONURL, EntryColumns.KEY_URL };
 	}
 
 	public interface SearchQuery {
 		int _TOKEN = 0x2;
-		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
-				WLDbAdapter.KEY_NAME, WLDbAdapter.KEY_CREATOR,
-				WLDbAdapter.KEY_CPRICE, WLDbAdapter.KEY_ICONPATH,
-				WLDbAdapter.KEY_ICONURL, WLDbAdapter.KEY_URL };
+		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
+				EntryColumns.KEY_NAME, EntryColumns.KEY_CREATOR,
+				EntryColumns.KEY_CPRICE, EntryColumns.KEY_ICONPATH,
+				EntryColumns.KEY_ICONURL, EntryColumns.KEY_URL };
 	}
 
 	public interface PendingQuery {
 		int _TOKEN = 0x3;
-		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TYPE,
-				WLDbAdapter.KEY_URL };
+		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
+				EntryColumns.KEY_URL };
 	}
 
 	public interface TagQuery {
 		int _TOKEN = 0x4;
-		final String[] columns = { BaseColumns._ID, WLDbAdapter.KEY_TAG,
-				BaseColumns._COUNT };
+		final String[] columns = { BaseColumns._ID, TagColumns.KEY_TAG,
+				BaseColumns._COUNT, TagColumns.KEY_APP_COUNT,
+				TagColumns.KEY_MUSIC_COUNT, TagColumns.KEY_MOVIE_COUNT,
+				TagColumns.KEY_BOOK_COUNT };
 	}
 
 	private WLEntryContract() {

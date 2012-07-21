@@ -10,6 +10,7 @@ import com.brstf.wishlist.R;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.widgets.SquareImageView;
 
 import android.app.Activity;
@@ -194,7 +195,7 @@ public class WLListFragment extends SherlockListFragment {
 
 		private void fillViewHolder(ViewHolder holder, Cursor cursor) {
 			// If the icon is cached, simply retrieve the cached icon
-			int pathindex = cursor.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
+			int pathindex = cursor.getColumnIndex(EntryColumns.KEY_ICONPATH);
 			String iconPath = cursor.getString(pathindex);
 			if (mIconCache.get(iconPath) != null) {
 				holder.icon.setImageBitmap(mIconCache.get(iconPath));
@@ -206,7 +207,7 @@ public class WLListFragment extends SherlockListFragment {
 				// TODO: enable this on compatible software
 				// .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, getActivity());
 
-				int typeindex = cursor.getColumnIndex(WLDbAdapter.KEY_TYPE);
+				int typeindex = cursor.getColumnIndex(EntryColumns.KEY_TYPE);
 				WLEntryType type = WLEntryType.getTypeFromString(cursor
 						.getString(typeindex));
 				switch (type) {
@@ -228,14 +229,15 @@ public class WLListFragment extends SherlockListFragment {
 
 			// Set the title and creator
 			holder.title.setText(cursor.getString(cursor
-					.getColumnIndex(WLDbAdapter.KEY_NAME)));
+					.getColumnIndex(EntryColumns.KEY_NAME)));
 			holder.creator.setText(cursor.getString(cursor
-					.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+					.getColumnIndex(EntryColumns.KEY_CREATOR)));
 
 			// Set the price if it exists
-			if (cursor.getString(cursor.getColumnIndex(WLDbAdapter.KEY_CPRICE)) != null) {
+			if (cursor
+					.getString(cursor.getColumnIndex(EntryColumns.KEY_CPRICE)) != null) {
 				holder.price.setText(getPriceText(cursor.getFloat(cursor
-						.getColumnIndex(WLDbAdapter.KEY_CPRICE))));
+						.getColumnIndex(EntryColumns.KEY_CPRICE))));
 			} else {
 				holder.price.setText(null);
 			}
@@ -377,7 +379,7 @@ public class WLListFragment extends SherlockListFragment {
 			// Create the url to open
 			Cursor cursor = mListAdapter.getCursor();
 			cursor.moveToPosition(position);
-			int urlindex = cursor.getColumnIndex(WLDbAdapter.KEY_URL);
+			int urlindex = cursor.getColumnIndex(EntryColumns.KEY_URL);
 
 			Uri webpage = Uri.parse(cursor.getString(urlindex));
 
@@ -456,7 +458,7 @@ public class WLListFragment extends SherlockListFragment {
 							.getColumnIndex(BaseColumns._ID));
 
 					int pathindex = cursor
-							.getColumnIndex(WLDbAdapter.KEY_ICONPATH);
+							.getColumnIndex(EntryColumns.KEY_ICONPATH);
 					paths[i] = cursor.getString(pathindex);
 				}
 

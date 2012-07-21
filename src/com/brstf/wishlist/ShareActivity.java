@@ -4,6 +4,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.service.AddEntryService;
 
 import android.content.ContentValues;
@@ -78,10 +79,9 @@ public class ShareActivity extends SherlockActivity {
 		// database
 		if (rc == null) {
 			ContentValues values = new ContentValues();
-			values.put(WLDbAdapter.KEY_URL, url);
-			values.put(WLDbAdapter.KEY_TYPE,
+			values.put(EntryColumns.KEY_URL, url);
+			values.put(EntryColumns.KEY_TYPE,
 					WLEntryType.getTypeString(WLEntryType.PENDING));
-			//dbhelper.insert(values);
 			getContentResolver().insert(
 					WLEntryContract.Entries.buildEntryUri(url), values);
 		}

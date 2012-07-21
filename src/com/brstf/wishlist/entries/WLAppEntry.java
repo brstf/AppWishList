@@ -3,7 +3,7 @@ package com.brstf.wishlist.entries;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 import android.database.Cursor;
 
@@ -78,6 +78,6 @@ public class WLAppEntry extends WLPricedEntry {
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
 
-		setDeveloper(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
+		setDeveloper(c.getString(c.getColumnIndex(EntryColumns.KEY_CREATOR)));
 	}
 }

@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 public class WLBookEntry extends WLPricedEntry {
 	private int mPageCount;
@@ -74,9 +74,9 @@ public class WLBookEntry extends WLPricedEntry {
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
-		setPageCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_PCOUNT)));
-		setAuthor(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
-		setPublishDate(c.getString(c.getColumnIndex(WLDbAdapter.KEY_DATE)));
+		setPageCount(c.getInt(c.getColumnIndex(EntryColumns.KEY_PCOUNT)));
+		setAuthor(c.getString(c.getColumnIndex(EntryColumns.KEY_CREATOR)));
+		setPublishDate(c.getString(c.getColumnIndex(EntryColumns.KEY_DATE)));
 	}
 
 	/**

@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 import android.database.Cursor;
 
@@ -194,13 +194,13 @@ public abstract class WLEntry {
 	 *            The cursor pointing to the database entry to set the data from
 	 */
 	public void setFromDb(Cursor c) {
-		setTitle(c.getString(c.getColumnIndex(WLDbAdapter.KEY_NAME)));
-		setURL(c.getString(c.getColumnIndex(WLDbAdapter.KEY_URL)));
-		setIconPath(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICONPATH)));
-		setIconUrl(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ICONURL)));
+		setTitle(c.getString(c.getColumnIndex(EntryColumns.KEY_NAME)));
+		setURL(c.getString(c.getColumnIndex(EntryColumns.KEY_URL)));
+		setIconPath(c.getString(c.getColumnIndex(EntryColumns.KEY_ICONPATH)));
+		setIconUrl(c.getString(c.getColumnIndex(EntryColumns.KEY_ICONURL)));
 
 		// Add all tags
-		String cseptags = c.getString(c.getColumnIndex(WLDbAdapter.KEY_TAGS));
+		String cseptags = c.getString(c.getColumnIndex(EntryColumns.KEY_TAGS));
 		String[] tags = cseptags.split(",");
 		for (String tag : tags) {
 			addTag(tag);

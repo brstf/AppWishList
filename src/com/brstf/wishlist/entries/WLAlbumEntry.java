@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.wishlist.provider.WLDbAdapter;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 public class WLAlbumEntry extends WLPricedEntry {
 	private String mArtist = null;
@@ -48,20 +48,20 @@ public class WLAlbumEntry extends WLPricedEntry {
 
 		// Set our variables with the retrieved information
 		setArtist(android.text.Html.fromHtml(m_artist.group(1)).toString());
-		
+
 		if (m_length.find()) {
 			setLength(android.text.Html.fromHtml(m_length.group(1)).toString());
 		} else {
 			setLength("");
 		}
-		
+
 		setTrackCount(Integer.valueOf(m_tracks.group(1)));
 		setReleaseDate(android.text.Html.fromHtml(m_release.group(1))
 				.toString());
 
 		addTag("Music");
 	}
-	
+
 	@Override
 	protected String getPricePattern() {
 		return "<span itemprop=\"price\" content=\"(.*?)\"";
@@ -80,10 +80,10 @@ public class WLAlbumEntry extends WLPricedEntry {
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
-		setArtist(c.getString(c.getColumnIndex(WLDbAdapter.KEY_CREATOR)));
-		setLength(c.getString(c.getColumnIndex(WLDbAdapter.KEY_ALBLENGTH)));
-		setTrackCount(c.getInt(c.getColumnIndex(WLDbAdapter.KEY_NUMTRACKS)));
-		setReleaseDate(c.getString(c.getColumnIndex(WLDbAdapter.KEY_DATE)));
+		setArtist(c.getString(c.getColumnIndex(EntryColumns.KEY_CREATOR)));
+		setLength(c.getString(c.getColumnIndex(EntryColumns.KEY_ALBLENGTH)));
+		setTrackCount(c.getInt(c.getColumnIndex(EntryColumns.KEY_NUMTRACKS)));
+		setReleaseDate(c.getString(c.getColumnIndex(EntryColumns.KEY_DATE)));
 	}
 
 	/**

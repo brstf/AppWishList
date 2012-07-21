@@ -3,17 +3,15 @@ package com.brstf.wishlist.service;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Handler;
-import android.widget.Toast;
 
 public class PendingService extends IntentService {
 	private static final String TAG = "PendingService";
 	private WLDbAdapter mDbHelper = null;
-	private Handler mHandler = null;
 
 	public PendingService() {
 		super(TAG);
@@ -24,13 +22,12 @@ public class PendingService extends IntentService {
 
 		// Create the database adapter that this service will use
 		mDbHelper = new WLDbAdapter(this);
-		mHandler = new Handler();
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		String[] columns = WLEntryContract.PendingQuery.columns;
-		String selection = WLDbAdapter.KEY_TYPE + " == ?";
+		String selection = EntryColumns.KEY_TYPE + " == ?";
 		String[] selectionArgs = { WLEntryType
 				.getTypeString(WLEntryType.PENDING) };
 
@@ -47,7 +44,7 @@ public class PendingService extends IntentService {
 				while (!c.isAfterLast()) {
 					// Get the url of the entry
 					String url = c.getString(c
-							.getColumnIndex(WLDbAdapter.KEY_URL));
+							.getColumnIndex(EntryColumns.KEY_URL));
 
 					final Intent addIntent = new Intent(this,
 							AddEntryService.class);
@@ -56,15 +53,7 @@ public class PendingService extends IntentService {
 
 					c.moveToNext();
 				}
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						Toast.makeText(PendingService.this,
-								"Finished adding pending entries.",
-								Toast.LENGTH_SHORT).show();
-					}
-				});
-			} 
+			}
 		} catch (Exception e) {
 		} finally {
 			mDbHelper.close();

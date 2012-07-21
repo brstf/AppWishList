@@ -20,7 +20,6 @@ public class BaseActivity extends SherlockFragmentActivity {
 		// Startup the pending intent service when the app is opened
 		final Intent pendingIntent = new Intent(this, PendingService.class);
 		startService(pendingIntent);
-		mActivityHelper.onStart();
 	}
 
 	@Override

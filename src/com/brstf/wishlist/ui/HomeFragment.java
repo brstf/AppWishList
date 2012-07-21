@@ -1,10 +1,9 @@
 package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.brstf.wishlist.WLEntries.WLChangedListener;
-import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLProvider;
+import com.brstf.wishlist.provider.WLEntryContract.TagColumns;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,8 +25,7 @@ import android.widget.TextView;
  * Fragment for the Home screen: The logo, an all button, and buttons for each
  * category
  */
-public class HomeFragment extends SherlockListFragment implements
-		WLChangedListener {
+public class HomeFragment extends SherlockListFragment {
 	private OnTileSelectedListener mCallback;
 
 	public interface OnTileSelectedListener {
@@ -37,7 +35,7 @@ public class HomeFragment extends SherlockListFragment implements
 		 * @param tag
 		 *            Tag on the tile selected
 		 */
-		public void onTagSelected(String tag);
+		public void onTagSelected(String tag, int pos);
 	}
 
 	public class HomeAdapter extends CursorAdapter {
@@ -50,13 +48,25 @@ public class HomeFragment extends SherlockListFragment implements
 
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			view.setTag(cursor.getString(cursor
-					.getColumnIndex(WLDbAdapter.KEY_TAG)));
-			((TextView) view).setText(cursor.getString(cursor
-					.getColumnIndex(WLDbAdapter.KEY_TAG))
-					+ " ("
+			String tag = cursor.getString(cursor
+					.getColumnIndex(TagColumns.KEY_TAG));
+			view.setTag(tag);
+			((TextView) view).setText(tag
+					+ " (T:"
 					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(BaseColumns._COUNT))) + ")");
+							.getColumnIndex(BaseColumns._COUNT)))
+					+ " A:"
+					+ Integer.valueOf(cursor.getInt(cursor
+							.getColumnIndex(TagColumns.KEY_APP_COUNT)))
+					+ " Mu:"
+					+ Integer.valueOf(cursor.getInt(cursor
+							.getColumnIndex(TagColumns.KEY_MUSIC_COUNT)))
+					+ " Mo:"
+					+ Integer.valueOf(cursor.getInt(cursor
+							.getColumnIndex(TagColumns.KEY_MOVIE_COUNT)))
+					+ " B:"
+					+ Integer.valueOf(cursor.getInt(cursor
+							.getColumnIndex(TagColumns.KEY_BOOK_COUNT))) + ")");
 		}
 
 		@Override
@@ -117,6 +127,16 @@ public class HomeFragment extends SherlockListFragment implements
 	}
 
 	@Override
+	public void onListItemClick(android.widget.ListView l, View v,
+			int position, long id) {
+		String tag = ((String) v.getTag()).toLowerCase();
+		if (tag.equals("all")) {
+			tag = null;
+		}
+		mCallback.onTagSelected(tag, position);
+	}
+
+	@Override
 	public void onDetach() {
 		super.onDetach();
 
@@ -157,10 +177,4 @@ public class HomeFragment extends SherlockListFragment implements
 			mAdapter.swapCursor(null);
 		}
 	};
-
-	@Override
-	public void onDataSetChanged() {
-		getActivity().getSupportLoaderManager().restartLoader(mLoader, null,
-				mLoaderCallbacks);
-	}
 }

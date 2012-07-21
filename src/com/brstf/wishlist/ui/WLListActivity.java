@@ -3,34 +3,45 @@ package com.brstf.wishlist.ui;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.brstf.wishlist.R;
-import com.brstf.wishlist.WLEntries;
 import com.brstf.wishlist.provider.WLEntryContract;
+import com.brstf.wishlist.provider.WLProvider;
+import com.brstf.wishlist.provider.WLEntryContract.TagColumns;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class WLListActivity extends BaseActivity implements
 		OnNavigationListener {
-	private ArrayAdapter<String> mAdapter = null;
+	private TagAdapter mAdapter = null;
 	private WLListFragment mFrag = null;
-	private static final String KEY_FILTER = "FILTER";
-	private String mFilter = null;
+	public static final String KEY_TAGID = "TAGID";
+	private int mTagId = 0;
+	private final int mLoader = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		mAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_dropdown_item);
+		mAdapter = new TagAdapter(getApplicationContext());
+		getSupportLoaderManager()
+				.restartLoader(mLoader, null, mLoaderCallbacks);
 
 		if (findViewById(R.id.fragment_container) != null) {
-			mFilter = null;
+			mTagId = getIntent().getIntExtra(KEY_TAGID, 0);
 
 			// If we have a saved state, restore the previous filter tag
 			if (savedInstanceState != null) {
-				mFilter = savedInstanceState.getString(KEY_FILTER);
-				mFilter = mFilter == null ? "all" : mFilter;
+				mTagId = savedInstanceState.getInt(KEY_TAGID);
 			}
 
 			mFrag = new WLListFragment();
@@ -45,24 +56,10 @@ public class WLListActivity extends BaseActivity implements
 	public void onStart() {
 		super.onStart();
 
-		// Fill in adapter entries
-		mAdapter.clear();
-		mAdapter.add("All");
-		for (String t : getActivityHelper().getEntries().getTags()) {
-			mAdapter.add(WLEntries.getDisplayTag(t));
-		}
-
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
-
-		// If we have a fragment initialized, grab the filter, and set it as the
-		// filter tag
-		if (mFilter == null) {
-			mFilter = mFrag.getFilter();
-			mFilter = mFilter == null ? "all" : mFilter;
-		}
-		getSupportActionBar().setSelectedNavigationItem(
-				mAdapter.getPosition(WLEntries.getDisplayTag(mFilter)));
+		
+		getSupportActionBar().setSelectedNavigationItem(mTagId);
 	}
 
 	@Override
@@ -73,8 +70,12 @@ public class WLListActivity extends BaseActivity implements
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		String tag = mAdapter.getItem(itemPosition);
+		mAdapter.getCursor().moveToPosition(itemPosition);
+		String tag = mAdapter.getCursor().getString(
+				mAdapter.getCursor().getColumnIndex(TagColumns.KEY_TAG));
 		tag = tag.toLowerCase();
+
+		mTagId = itemPosition;
 
 		onTagSelected(tag);
 
@@ -88,7 +89,7 @@ public class WLListActivity extends BaseActivity implements
 			args.putParcelable("_uri", WLEntryContract.Entries.CONTENT_URI);
 		} else {
 			args.putParcelable("_uri", WLEntryContract.Entries.CONTENT_URI
-					.buildUpon().appendPath(tag).build());
+					.buildUpon().appendPath("tag").appendPath(tag).build());
 		}
 		mFrag.reloadFromArguments(args);
 	}
@@ -103,9 +104,52 @@ public class WLListActivity extends BaseActivity implements
 	public void onSaveInstanceState(Bundle outState) {
 		// If the app is exiting and we have to save state, save the current
 		// filter tag so we can restore it
-		mFilter = mFrag.getFilter();
-		outState.putString(KEY_FILTER, mFilter);
+		outState.putInt(KEY_TAGID, mTagId);
 
 		super.onSaveInstanceState(outState);
 	}
+
+	private class TagAdapter extends CursorAdapter {
+		private final LayoutInflater mInflater;
+
+		public TagAdapter(Context context) {
+			super(context, null, false);
+			mInflater = LayoutInflater.from(context);
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			String tag = cursor.getString(cursor
+					.getColumnIndex(TagColumns.KEY_TAG));
+			view.setTag(tag);
+			((TextView) view).setText(tag);
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return mInflater.inflate(android.R.layout.simple_list_item_1,
+					parent, false);
+		}
+	}
+
+	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			return new CursorLoader(WLListActivity.this,
+					WLProvider.BASE_CONTENT_URI.buildUpon().appendPath("tags")
+							.build(), WLEntryContract.TagQuery.columns, null,
+					null, null);
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+			mAdapter.swapCursor(arg1);
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> arg0) {
+			mAdapter.swapCursor(null);
+		}
+	};
 }

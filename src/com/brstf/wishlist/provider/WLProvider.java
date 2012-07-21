@@ -6,6 +6,7 @@ import java.util.Map;
 import com.brstf.wishlist.entries.WLEntryType;
 import com.brstf.wishlist.provider.WLDbAdapter.Tables;
 import com.brstf.wishlist.provider.WLEntryContract.Entries;
+import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -80,10 +81,10 @@ public class WLProvider extends ContentProvider {
 			SQLiteQueryBuilder tagqb = new SQLiteQueryBuilder();
 			tagqb.setProjectionMap(buildMap());
 			tagqb.setTables(Tables.ENTRIES);
-			tagqb.appendWhere(WLDbAdapter.KEY_TAGS + " LIKE '%" + tag + "%'");
+			tagqb.appendWhere(EntryColumns.KEY_TAGS + " LIKE '%" + tag + "%'");
 
 			return tagqb.query(mDbHelper.getDatabase(), projection,
-					WLDbAdapter.KEY_TYPE + " <> ?", new String[] { WLEntryType
+					EntryColumns.KEY_TYPE + " <> ?", new String[] { WLEntryType
 							.getTypeString(WLEntryType.PENDING) }, null, null,
 					null);
 		case GET_ALL:
@@ -145,7 +146,7 @@ public class WLProvider extends ContentProvider {
 	private Cursor getAll() {
 		return mDbHelper
 				.query(true, WLEntryContract.EntriesQuery.columns,
-						WLDbAdapter.KEY_TYPE + " <> ? ",
+						EntryColumns.KEY_TYPE + " <> ? ",
 						new String[] { WLEntryType
 								.getTypeString(WLEntryType.PENDING) }, null,
 						null, null, null);
