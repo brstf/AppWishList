@@ -227,6 +227,8 @@ public class WLListFragment extends SherlockListFragment {
 				case MOVIE:
 					holder.icon.setImageDrawable(moviesPh);
 					break;
+				case MAGAZINE:
+					holder.icon.setImageDrawable(moviesPh);
 				}
 			}
 
@@ -268,6 +270,8 @@ public class WLListFragment extends SherlockListFragment {
 			case BOOK:
 				holder.typeidentifier.setBackgroundColor(0xFF689CD2);
 				break;
+			case MAGAZINE:
+				holder.typeidentifier.setBackgroundColor(0xFF912470);
 			}
 		}
 

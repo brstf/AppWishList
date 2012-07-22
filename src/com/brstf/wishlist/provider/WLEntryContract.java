@@ -17,9 +17,9 @@ public class WLEntryContract {
 		public final String KEY_URL = "url";
 		public final String KEY_ICONPATH = "iconpath";
 		public final String KEY_ICONURL = "iconurl";
-		
-		//Price Keys
-		public final String KEY_CUR_PRICE_1 = "cur_price_1"; 
+
+		// Price Keys
+		public final String KEY_CUR_PRICE_1 = "cur_price_1";
 		public final String KEY_REG_PRICE_1 = "reg_price_1";
 		public final String KEY_CUR_PRICE_2 = "cur_price_2";
 		public final String KEY_REG_PRICE_2 = "reg_price_2";
@@ -27,26 +27,22 @@ public class WLEntryContract {
 		public final String KEY_REG_PRICE_3 = "reg_price_3";
 		public final String KEY_CUR_PRICE_4 = "cur_price_4";
 		public final String KEY_REG_PRICE_4 = "reg_price_4";
-		/* Prices:
+		/*
+		 * Prices:
 		 * 
-		 * 1 - Normal Price (Apps, Music, Books)
-		 *     Movie Price - Rental SD
-		 *     TV Price - Season Price SD
-		 *     Magazine Price - Issue Price
-		 *     
-		 * 2 - Movie Price - Rental HD
-		 *     TV Price - Season Price HD
-		 *     Magazine Price - Subscription Monthly 
-		 *     
-		 * 3 - Movie Price - Buy SD
-		 *     Magazine Price - Subscription Annual
-		 *     
+		 * 1 - Normal Price (Apps, Music, Books) Movie Price - Rental SD TV
+		 * Price - Season Price SD Magazine Price - Issue Price
+		 * 
+		 * 2 - Movie Price - Rental HD TV Price - Season Price HD Magazine Price
+		 * - Subscription Monthly
+		 * 
+		 * 3 - Movie Price - Buy SD Magazine Price - Subscription Annual
+		 * 
 		 * 4 - Movie Price - Buy HD
 		 * 
 		 * All of these are necessary, not sure of a better solution
 		 */
-		
-		
+
 		public final String KEY_RATING = "rating";
 		public final String KEY_CRATING = "crating"; // Content rating
 														// (ex: PG-13)
@@ -72,6 +68,8 @@ public class WLEntryContract {
 				.getTypeString(EntryType.MOVIE);
 		public static final String KEY_BOOK_COUNT = EntryType
 				.getTypeString(EntryType.BOOK);
+		public static final String KEY_MAGAZINE_COUNT = EntryType
+				.getTypeString(EntryType.MAGAZINE);
 	}
 
 	public static final String AUTHORITY = "com.brstf.wishlist";
@@ -152,7 +150,7 @@ public class WLEntryContract {
 		final String[] columns = { BaseColumns._ID, TagColumns.KEY_TAG,
 				BaseColumns._COUNT, TagColumns.KEY_APP_COUNT,
 				TagColumns.KEY_MUSIC_COUNT, TagColumns.KEY_MOVIE_COUNT,
-				TagColumns.KEY_BOOK_COUNT };
+				TagColumns.KEY_BOOK_COUNT, TagColumns.KEY_MAGAZINE_COUNT };
 	}
 
 	private WLEntryContract() {

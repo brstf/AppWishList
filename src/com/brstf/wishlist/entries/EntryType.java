@@ -2,7 +2,7 @@ package com.brstf.wishlist.entries;
 
 public enum EntryType {
 
-	NONE, APP, BOOK, MOVIE, MUSIC_ARTIST, MUSIC_ALBUM, PENDING;
+	NONE, APP, BOOK, MOVIE, MUSIC_ARTIST, MUSIC_ALBUM, MAGAZINE, PENDING;
 
 	/**
 	 * Constructs a new WLEntry based on the given type
@@ -26,6 +26,8 @@ public enum EntryType {
 			return new ArtistEntry(id);
 		case MUSIC_ALBUM:
 			return new AlbumEntry(id);
+		case MAGAZINE:
+			return new MagazineEntry(id);
 		default:
 			return null;
 		}
@@ -50,6 +52,8 @@ public enum EntryType {
 			return "ARTIST";
 		case MUSIC_ALBUM:
 			return "ALBUM";
+		case MAGAZINE:
+			return "MAGAZINE";
 		case PENDING:
 			return "PENDING";
 		default:
@@ -76,6 +80,8 @@ public enum EntryType {
 			return MUSIC_ARTIST;
 		} else if (type.equals("ALBUM")) {
 			return MUSIC_ALBUM;
+		} else if (type.equals("MAGAZINE")) {
+			return MAGAZINE;
 		} else if (type.equals("PENDING")) {
 			return PENDING;
 		} else {
@@ -102,6 +108,8 @@ public enum EntryType {
 			return MUSIC_ARTIST;
 		} else if (url.contains("/store/music/album")) {
 			return MUSIC_ALBUM;
+		} else if (url.contains("/store/magazines/")) {
+			return MAGAZINE;
 		} else {
 			return NONE;
 		}

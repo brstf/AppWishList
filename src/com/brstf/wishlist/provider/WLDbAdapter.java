@@ -6,6 +6,7 @@ import com.brstf.wishlist.entries.ArtistEntry;
 import com.brstf.wishlist.entries.BookEntry;
 import com.brstf.wishlist.entries.Entry;
 import com.brstf.wishlist.entries.EntryType;
+import com.brstf.wishlist.entries.MagazineEntry;
 import com.brstf.wishlist.entries.MovieEntry;
 import com.brstf.wishlist.entries.MultiPricedEntry;
 import com.brstf.wishlist.entries.RatedEntry;
@@ -51,6 +52,7 @@ public class WLDbAdapter {
 		String ENTRIES_TAGS_UPDATE_MUSIC = "wlentries_tags_update_music";
 		String ENTRIES_TAGS_UPDATE_MOVIE = "wlentries_tags_update_movie";
 		String ENTRIES_TAGS_UPDATE_BOOK = "wlentries_tags_update_book";
+		String ENTRIES_TAGS_UPDATE_MAGAZINE = "wlentries_tags_update_magazine";
 	}
 
 	private interface Subquery {
@@ -146,7 +148,8 @@ public class WLDbAdapter {
 					+ TagColumns.KEY_APP_COUNT + " INTEGER, "
 					+ TagColumns.KEY_MUSIC_COUNT + " INTEGER, "
 					+ TagColumns.KEY_MOVIE_COUNT + " INTEGER, "
-					+ TagColumns.KEY_BOOK_COUNT + " INTEGER, UNIQUE ("
+					+ TagColumns.KEY_BOOK_COUNT + " INTEGER, "
+					+ TagColumns.KEY_MAGAZINE_COUNT + " INTEGER, UNIQUE ("
 					+ TagColumns.KEY_TAG + ") ON CONFLICT IGNORE)");
 
 			ContentValues cv = new ContentValues();
@@ -156,6 +159,7 @@ public class WLDbAdapter {
 			cv.put(TagColumns.KEY_MUSIC_COUNT, 0);
 			cv.put(TagColumns.KEY_MOVIE_COUNT, 0);
 			cv.put(TagColumns.KEY_BOOK_COUNT, 0);
+			cv.put(TagColumns.KEY_MAGAZINE_COUNT, 0);
 			db.insert(Tables.ENTRIES_TAGS, null, cv);
 
 			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_INSERT
@@ -202,6 +206,15 @@ public class WLDbAdapter {
 					+ " SET " + TagColumns.KEY_BOOK_COUNT + " = "
 					+ TagColumns.KEY_BOOK_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");
+
+			db.execSQL("CREATE TRIGGER "
+					+ Triggers.ENTRIES_TAGS_UPDATE_MAGAZINE
+					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
+					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
+					+ " == 'MAGAZINE' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " SET " + TagColumns.KEY_MAGAZINE_COUNT + " = "
+					+ TagColumns.KEY_MAGAZINE_COUNT + " + 1 WHERE "
+					+ TagColumns.KEY_TAG + " == 'all'; END;");
 		}
 
 		@Override
@@ -230,6 +243,8 @@ public class WLDbAdapter {
 					+ Triggers.ENTRIES_TAGS_UPDATE_MOVIE);
 			db.execSQL("DROP TRIGGER IF EXISTS "
 					+ Triggers.ENTRIES_TAGS_UPDATE_BOOK);
+			db.execSQL("DROP TRIGGER IF EXISTS "
+					+ Triggers.ENTRIES_TAGS_UPDATE_MAGAZINE);
 
 			onCreate(db);
 		}
@@ -299,6 +314,7 @@ public class WLDbAdapter {
 			cv.put(TagColumns.KEY_MUSIC_COUNT, 0);
 			cv.put(TagColumns.KEY_MOVIE_COUNT, 0);
 			cv.put(TagColumns.KEY_BOOK_COUNT, 0);
+			cv.put(TagColumns.KEY_MAGAZINE_COUNT, 0);
 			mDb.insert(Tables.ENTRIES_TAGS, null, cv);
 		}
 
@@ -347,6 +363,11 @@ public class WLDbAdapter {
 			int bookcount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_BOOK_COUNT));
 			values.put(TagColumns.KEY_BOOK_COUNT, bookcount + 1);
+			break;
+		case MAGAZINE:
+			int magcount = tagc.getInt(tagc
+					.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT));
+			values.put(TagColumns.KEY_MAGAZINE_COUNT, magcount + 1);
 			break;
 		}
 
@@ -574,6 +595,8 @@ public class WLDbAdapter {
 			return createArtistValues((ArtistEntry) ent, values);
 		case MUSIC_ALBUM:
 			return createAlbumValues((AlbumEntry) ent, values);
+		case MAGAZINE:
+			return createMagazineValues((MagazineEntry) ent, values);
 		}
 
 		// This is bad. But should never happen *Crosses fingers*
@@ -598,7 +621,7 @@ public class WLDbAdapter {
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Creates a contentValues object for the given RatedEntry
 	 * 
@@ -632,14 +655,14 @@ public class WLDbAdapter {
 
 		return values;
 	}
-	
+
 	/**
 	 * Creates a contentValues object for the given MultiPricedEntry
 	 * 
 	 * @param ent
 	 *            The priced entry to get the price values from
-	 * @param values/rating
-	 *            The content values to add the values to
+	 * @param values
+	 *            /rating The content values to add the values to
 	 * @return The content values object with price information added
 	 */
 	private static ContentValues createMultiPricedValues(MultiPricedEntry ent,
@@ -656,7 +679,6 @@ public class WLDbAdapter {
 
 		return values;
 	}
-	
 
 	/**
 	 * Creates a ContentValues object for the given APP entry
@@ -709,6 +731,23 @@ public class WLDbAdapter {
 		values.put(EntryColumns.KEY_CRATING, ent.getContentRating());
 		values.put(EntryColumns.KEY_CREATOR, ent.getDirector());
 		values.put(EntryColumns.KEY_MOVLENGTH, ent.getMovieLength());
+
+		return values;
+	}
+
+	/**
+	 * Creates a ContentValues object for the given MAGAZINE entry
+	 * 
+	 * @param ent
+	 *            The entry to create the ContentValues object for
+	 * @param values
+	 *            The base values context passed from createValues()
+	 * @return The final ContentValues object
+	 */
+	private static ContentValues createMagazineValues(MagazineEntry ent,
+			ContentValues values) {
+		values = createMultiPricedValues(ent, values);
+		values.put(EntryColumns.KEY_CREATOR, ent.getCategory());
 
 		return values;
 	}

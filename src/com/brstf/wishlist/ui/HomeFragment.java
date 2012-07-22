@@ -66,7 +66,11 @@ public class HomeFragment extends SherlockListFragment {
 							.getColumnIndex(TagColumns.KEY_MOVIE_COUNT)))
 					+ " B:"
 					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_BOOK_COUNT))) + ")");
+							.getColumnIndex(TagColumns.KEY_BOOK_COUNT)))
+					+ " Ma:"
+					+ Integer.valueOf(cursor.getInt(cursor
+							.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT)))
+					+ ")");
 		}
 
 		@Override
