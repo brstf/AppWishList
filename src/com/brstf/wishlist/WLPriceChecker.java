@@ -9,14 +9,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.Entry;
+import com.brstf.wishlist.entries.EntryType;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class WLPriceChecker {
-	ArrayList<WLEntry> mEntries = null;
+	ArrayList<Entry> mEntries = null;
 
 	public WLPriceChecker() {
 		mEntries = null;
@@ -61,14 +61,14 @@ public class WLPriceChecker {
 			// Loop through each entry in the list, scrape the data and update
 			// the price if necessary
 			for (int i = 0; i < mEntries.size(); ++i) {
-				WLEntry ent = mEntries.get(i);
+				Entry ent = mEntries.get(i);
 
 				// Grab the text from the url
 				String url = ent.getURL();
 				String result = downloadURL(url);
 
 				// The up-to-date entry
-				WLEntry uEnt = (WLEntry) WLEntryType.getTypeEntry(
+				Entry uEnt = (Entry) EntryType.getTypeEntry(
 						ent.getType(), -1);
 				uEnt.setFromURLText(url, result);
 

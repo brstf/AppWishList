@@ -7,19 +7,19 @@ import android.database.Cursor;
 
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
-public class WLAlbumEntry extends WLPricedEntry {
+public class AlbumEntry extends SinglePricedEntry {
 	private String mArtist = null;
 	private String mLength = null;
 	private int mTracks;
 	private String mReleaseDate = null;
 
-	public WLAlbumEntry(int id) {
+	public AlbumEntry(int id) {
 		super(id);
 	}
 
 	@Override
-	public WLEntryType getType() {
-		return WLEntryType.MUSIC_ALBUM;
+	public EntryType getType() {
+		return EntryType.MUSIC_ALBUM;
 	}
 
 	@Override

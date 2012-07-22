@@ -11,12 +11,12 @@ import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
  * Class for storing information about a movie entry in the wishlist
  */
 
-public class WLMovieEntry extends WLPricedEntry {
+public class MovieEntry extends MultiPricedEntry {
 	private String mContentRating = null;
 	private String mDirector = null;
 	private int mLength;
 
-	public WLMovieEntry(int id) {
+	public MovieEntry(int id) {
 		super(id);
 
 		mContentRating = "";
@@ -25,8 +25,8 @@ public class WLMovieEntry extends WLPricedEntry {
 	}
 
 	@Override
-	public WLEntryType getType() {
-		return WLEntryType.MOVIE;
+	public EntryType getType() {
+		return EntryType.MOVIE;
 	}
 
 	@Override
@@ -56,8 +56,40 @@ public class WLMovieEntry extends WLPricedEntry {
 	}
 
 	@Override
-	protected String getPricePattern() {
-		return "data-docPrice=\"(.*?)\"";
+	protected String getPricePattern1() {
+		// RENT SD
+		return getBasePricePattern() + "Rent SD\".*?<div class=\"clear\"";
+	}
+
+	@Override
+	protected String getPricePattern2() {
+		// RENT HD
+		return getBasePricePattern() + "Rent HD\".*?<div class=\"clear\"";
+	}
+
+	@Override
+	protected String getPricePattern3() {
+		// BUY SD
+		return getBasePricePattern() + "Buy SD\".*?<div class=\"clear\"";
+	}
+
+	@Override
+	protected String getPricePattern4() {
+		// BUY HD
+		return getBasePricePattern() + "Buy HD\".*?<div class=\"clear\"";
+
+	}
+
+	/**
+	 * Gets the base pattern for prices. Matches up to the offerTitle (rent hd,
+	 * rent sd, buy hd, buy sd).
+	 * 
+	 * @return Base pattern for prices
+	 */
+	private String getBasePricePattern() {
+		return "data-docPrice=\"(.{1,10})\" data-docPriceMicros=\".{1,14}\" data-isFree=\".{0,10}\" "
+				+ "data-isPurchased=\".{0,10}\" data-offerType=\".{0,10}\" data-rentalGrantPeriodDays=\".{0,10}\" "
+				+ "data-rentalactivePeriodHours=\".{0,10}\" data-offerTitle=\"";
 	}
 
 	@Override
@@ -73,7 +105,8 @@ public class WLMovieEntry extends WLPricedEntry {
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
-		setContentRating(c.getString(c.getColumnIndex(EntryColumns.KEY_CRATING)));
+		setContentRating(c
+				.getString(c.getColumnIndex(EntryColumns.KEY_CRATING)));
 		setDirector(c.getString(c.getColumnIndex(EntryColumns.KEY_CREATOR)));
 		setMovieLength(c.getInt(c.getColumnIndex(EntryColumns.KEY_MOVLENGTH)));
 	}

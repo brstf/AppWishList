@@ -1,6 +1,6 @@
 package com.brstf.wishlist.service;
 
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
@@ -28,8 +28,8 @@ public class PendingService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		String[] columns = WLEntryContract.PendingQuery.columns;
 		String selection = EntryColumns.KEY_TYPE + " == ?";
-		String[] selectionArgs = { WLEntryType
-				.getTypeString(WLEntryType.PENDING) };
+		String[] selectionArgs = { EntryType
+				.getTypeString(EntryType.PENDING) };
 
 		// Query the database for all pending entries
 		mDbHelper.open();

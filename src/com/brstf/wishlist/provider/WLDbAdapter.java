@@ -1,13 +1,15 @@
 package com.brstf.wishlist.provider;
 
-import com.brstf.wishlist.entries.WLAlbumEntry;
-import com.brstf.wishlist.entries.WLAppEntry;
-import com.brstf.wishlist.entries.WLArtistEntry;
-import com.brstf.wishlist.entries.WLBookEntry;
-import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.entries.WLEntryType;
-import com.brstf.wishlist.entries.WLMovieEntry;
-import com.brstf.wishlist.entries.WLPricedEntry;
+import com.brstf.wishlist.entries.AlbumEntry;
+import com.brstf.wishlist.entries.AppEntry;
+import com.brstf.wishlist.entries.ArtistEntry;
+import com.brstf.wishlist.entries.BookEntry;
+import com.brstf.wishlist.entries.Entry;
+import com.brstf.wishlist.entries.EntryType;
+import com.brstf.wishlist.entries.MovieEntry;
+import com.brstf.wishlist.entries.MultiPricedEntry;
+import com.brstf.wishlist.entries.RatedEntry;
+import com.brstf.wishlist.entries.SinglePricedEntry;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.provider.WLEntryContract.TagColumns;
 import com.brstf.wishlist.provider.WLEntryContract.TagQuery;
@@ -77,10 +79,11 @@ public class WLDbAdapter {
 	private static final String DATABASE_CREATE = "CREATE TABLE "
 			+ Tables.ENTRIES
 			+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT NOT NULL, name TEXT, url "
-			+ "TEXT NOT NULL, iconpath TEXT, iconurl TEXT, cprice FLOAT, "
-			+ "rprice FLOAT, rating FLOAT, crating TEXT, movlength INTEGER, creator TEXT, "
-			+ "alblength TEXT, numtracks INTEGER, date TEXT, pcount INTEGER, tags TEXT, UNIQUE "
-			+ "(url) ON CONFLICT IGNORE)";
+			+ "TEXT NOT NULL, iconpath TEXT, iconurl TEXT, cur_price_1 FLOAT, "
+			+ "reg_price_1 FLOAT, cur_price_2 FLOAT, reg_price_2 FLOAT, cur_price_3 FLOAT, reg_price_3 "
+			+ "FLOAT, cur_price_4 FLOAT, reg_price_4 FLOAT, rating FLOAT, crating TEXT, movlength "
+			+ "INTEGER, creator TEXT, alblength TEXT, numtracks INTEGER, date TEXT, pcount INTEGER, "
+			+ "tags TEXT, UNIQUE (url) ON CONFLICT IGNORE)";
 
 	private static final String DATABASE_NAME = "wldata";
 	private static final int DATABASE_VERSION = 2;
@@ -322,7 +325,7 @@ public class WLDbAdapter {
 		values.put(BaseColumns._COUNT, count + 1);
 
 		// Increment the appropriate type count as well
-		switch (WLEntryType.getTypeFromString(c.getString(c
+		switch (EntryType.getTypeFromString(c.getString(c
 				.getColumnIndex(EntryColumns.KEY_TYPE)))) {
 		case APP:
 			int appcount = tagc.getInt(tagc
@@ -418,7 +421,7 @@ public class WLDbAdapter {
 	 *            The WLEntry to add to the database
 	 * @return The long id of the new entry in the database
 	 */
-	public long createEntry(WLEntry ent) {
+	public long createEntry(Entry ent) {
 		return mDb.insert(Tables.ENTRIES, null, createValues(ent));
 	}
 
@@ -464,8 +467,8 @@ public class WLDbAdapter {
 		return mDb.query(Tables.ENTRIES, new String[] { BaseColumns._ID,
 				EntryColumns.KEY_TYPE, EntryColumns.KEY_NAME,
 				EntryColumns.KEY_URL, EntryColumns.KEY_ICONPATH,
-				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CPRICE,
-				EntryColumns.KEY_RPRICE, EntryColumns.KEY_RATING,
+				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CUR_PRICE_1,
+				EntryColumns.KEY_REG_PRICE_1, EntryColumns.KEY_RATING,
 				EntryColumns.KEY_CRATING, EntryColumns.KEY_MOVLENGTH,
 				EntryColumns.KEY_CREATOR, EntryColumns.KEY_ALBLENGTH,
 				EntryColumns.KEY_NUMTRACKS, EntryColumns.KEY_DATE,
@@ -486,8 +489,8 @@ public class WLDbAdapter {
 		String[] columns = new String[] { BaseColumns._ID,
 				EntryColumns.KEY_TYPE, EntryColumns.KEY_NAME,
 				"wlentries." + EntryColumns.KEY_URL, EntryColumns.KEY_ICONPATH,
-				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CPRICE,
-				EntryColumns.KEY_RPRICE, EntryColumns.KEY_RATING,
+				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CUR_PRICE_1,
+				EntryColumns.KEY_REG_PRICE_1, EntryColumns.KEY_RATING,
 				EntryColumns.KEY_CRATING, EntryColumns.KEY_MOVLENGTH,
 				EntryColumns.KEY_CREATOR, EntryColumns.KEY_ALBLENGTH,
 				EntryColumns.KEY_NUMTRACKS, EntryColumns.KEY_DATE,
@@ -511,8 +514,8 @@ public class WLDbAdapter {
 		Cursor mCursor = mDb.query(true, Tables.ENTRIES, new String[] {
 				BaseColumns._ID, EntryColumns.KEY_TYPE, EntryColumns.KEY_NAME,
 				EntryColumns.KEY_URL, EntryColumns.KEY_ICONPATH,
-				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CPRICE,
-				EntryColumns.KEY_RPRICE, EntryColumns.KEY_RATING,
+				EntryColumns.KEY_ICONURL, EntryColumns.KEY_CUR_PRICE_1,
+				EntryColumns.KEY_REG_PRICE_1, EntryColumns.KEY_RATING,
 				EntryColumns.KEY_CRATING, EntryColumns.KEY_MOVLENGTH,
 				EntryColumns.KEY_CREATOR, EntryColumns.KEY_ALBLENGTH,
 				EntryColumns.KEY_NUMTRACKS, EntryColumns.KEY_DATE,
@@ -534,7 +537,7 @@ public class WLDbAdapter {
 	 *            The entry whose values to use for updating
 	 * @return True if the entry was successfully updated, false otherwise
 	 */
-	public boolean updateEntry(int rowId, WLEntry ent) {
+	public boolean updateEntry(int rowId, Entry ent) {
 		return mDb.update(Tables.ENTRIES, createValues(ent), BaseColumns._ID
 				+ "=" + rowId, null) > 0;
 	}
@@ -551,10 +554,10 @@ public class WLDbAdapter {
 	 *            The entry to create the ContentValues object for
 	 * @return The final ContentValues object
 	 */
-	public static ContentValues createValues(WLEntry ent) {
+	public static ContentValues createValues(Entry ent) {
 		ContentValues values = new ContentValues();
 		values.put(EntryColumns.KEY_TYPE,
-				WLEntryType.getTypeString(ent.getType()));
+				EntryType.getTypeString(ent.getType()));
 		values.put(EntryColumns.KEY_NAME, ent.getTitle());
 		values.put(EntryColumns.KEY_URL, ent.getURL());
 		values.put(EntryColumns.KEY_ICONPATH, ent.getIconPath());
@@ -562,15 +565,15 @@ public class WLDbAdapter {
 		values.put(EntryColumns.KEY_TAGS, buildTags(ent.getTags()));
 		switch (ent.getType()) {
 		case APP:
-			return createAppValues((WLAppEntry) ent, values);
+			return createAppValues((AppEntry) ent, values);
 		case BOOK:
-			return createBookValues((WLBookEntry) ent, values);
+			return createBookValues((BookEntry) ent, values);
 		case MOVIE:
-			return createMovieValues((WLMovieEntry) ent, values);
+			return createMovieValues((MovieEntry) ent, values);
 		case MUSIC_ARTIST:
-			return createArtistValues((WLArtistEntry) ent, values);
+			return createArtistValues((ArtistEntry) ent, values);
 		case MUSIC_ALBUM:
-			return createAlbumValues((WLAlbumEntry) ent, values);
+			return createAlbumValues((AlbumEntry) ent, values);
 		}
 
 		// This is bad. But should never happen *Crosses fingers*
@@ -595,6 +598,22 @@ public class WLDbAdapter {
 
 		return sb.toString();
 	}
+	
+	/**
+	 * Creates a contentValues object for the given RatedEntry
+	 * 
+	 * @param ent
+	 *            The rated entry to get the rating values from
+	 * @param values
+	 *            The content values to add the values to
+	 * @return The content values object with rating information added
+	 */
+	private static ContentValues createRatedValues(RatedEntry ent,
+			ContentValues values) {
+		values.put(EntryColumns.KEY_RATING, ent.getRating());
+
+		return values;
+	}
 
 	/**
 	 * Creates a contentValues object for the given PricedEntry
@@ -603,16 +622,41 @@ public class WLDbAdapter {
 	 *            The priced entry to get the price values from
 	 * @param values
 	 *            The content values to add the values to
-	 * @return The content values object with price/rating information added
+	 * @return The content values object with price information added
 	 */
-	private static ContentValues createPricedValues(WLPricedEntry ent,
+	private static ContentValues createPricedValues(SinglePricedEntry ent,
 			ContentValues values) {
-		values.put(EntryColumns.KEY_CPRICE, ent.getCurrentPrice());
-		values.put(EntryColumns.KEY_RPRICE, ent.getRegularPrice());
-		values.put(EntryColumns.KEY_RATING, ent.getRating());
+		values = createRatedValues(ent, values);
+		values.put(EntryColumns.KEY_CUR_PRICE_1, ent.getCurrentPrice());
+		values.put(EntryColumns.KEY_REG_PRICE_1, ent.getRegularPrice());
 
 		return values;
 	}
+	
+	/**
+	 * Creates a contentValues object for the given MultiPricedEntry
+	 * 
+	 * @param ent
+	 *            The priced entry to get the price values from
+	 * @param values/rating
+	 *            The content values to add the values to
+	 * @return The content values object with price information added
+	 */
+	private static ContentValues createMultiPricedValues(MultiPricedEntry ent,
+			ContentValues values) {
+		values = createRatedValues(ent, values);
+		values.put(EntryColumns.KEY_CUR_PRICE_1, ent.getCurrentPrice1());
+		values.put(EntryColumns.KEY_CUR_PRICE_2, ent.getCurrentPrice2());
+		values.put(EntryColumns.KEY_CUR_PRICE_3, ent.getCurrentPrice3());
+		values.put(EntryColumns.KEY_CUR_PRICE_4, ent.getCurrentPrice4());
+		values.put(EntryColumns.KEY_REG_PRICE_1, ent.getRegularPrice1());
+		values.put(EntryColumns.KEY_REG_PRICE_2, ent.getRegularPrice2());
+		values.put(EntryColumns.KEY_REG_PRICE_3, ent.getRegularPrice3());
+		values.put(EntryColumns.KEY_REG_PRICE_4, ent.getRegularPrice4());
+
+		return values;
+	}
+	
 
 	/**
 	 * Creates a ContentValues object for the given APP entry
@@ -623,7 +667,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private static ContentValues createAppValues(WLAppEntry ent,
+	private static ContentValues createAppValues(AppEntry ent,
 			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(EntryColumns.KEY_CREATOR, ent.getDeveloper());
@@ -640,7 +684,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private static ContentValues createBookValues(WLBookEntry ent,
+	private static ContentValues createBookValues(BookEntry ent,
 			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(EntryColumns.KEY_CREATOR, ent.getAuthor());
@@ -659,9 +703,9 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private static ContentValues createMovieValues(WLMovieEntry ent,
+	private static ContentValues createMovieValues(MovieEntry ent,
 			ContentValues values) {
-		values = createPricedValues(ent, values);
+		values = createMultiPricedValues(ent, values);
 		values.put(EntryColumns.KEY_CRATING, ent.getContentRating());
 		values.put(EntryColumns.KEY_CREATOR, ent.getDirector());
 		values.put(EntryColumns.KEY_MOVLENGTH, ent.getMovieLength());
@@ -678,7 +722,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private static ContentValues createArtistValues(WLArtistEntry ent,
+	private static ContentValues createArtistValues(ArtistEntry ent,
 			ContentValues values) {
 		// Sort of an oddity, creator here is set to genres
 		values.put(EntryColumns.KEY_CREATOR, ent.getGenres());
@@ -695,7 +739,7 @@ public class WLDbAdapter {
 	 *            The base values context passed from createValues()
 	 * @return The final ContentValues object
 	 */
-	private static ContentValues createAlbumValues(WLAlbumEntry ent,
+	private static ContentValues createAlbumValues(AlbumEntry ent,
 			ContentValues values) {
 		values = createPricedValues(ent, values);
 		values.put(EntryColumns.KEY_CREATOR, ent.getArtist());

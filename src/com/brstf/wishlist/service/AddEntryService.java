@@ -11,8 +11,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.brstf.wishlist.entries.WLEntry;
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.Entry;
+import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
@@ -62,7 +62,7 @@ public class AddEntryService extends IntentService {
 		WLDbAdapter dbhelper = new WLDbAdapter(getBaseContext());
 		dbhelper.open();
 		Cursor c = dbhelper.fetchEntry(dbhelper.fetchId(url));
-		if (!WLEntryType.getTypeString(WLEntryType.PENDING).equals(
+		if (!EntryType.getTypeString(EntryType.PENDING).equals(
 				c.getString(c.getColumnIndex(EntryColumns.KEY_TYPE)))) {
 			// If it's no longer pending, exit this function
 			dbhelper.close();
@@ -73,8 +73,8 @@ public class AddEntryService extends IntentService {
 		// TODO: should the addservice add this to pending?
 		String result = downloadURL(url);
 
-		final WLEntry ent = WLEntryType.getTypeEntry(
-				WLEntryType.getTypeFromURL(url), -1);
+		final Entry ent = EntryType.getTypeEntry(
+				EntryType.getTypeFromURL(url), -1);
 		ent.setFromURLText(url, result);
 
 		// Download the icon
@@ -93,10 +93,10 @@ public class AddEntryService extends IntentService {
 		// Add this entry to the database
 		ProviderUtils.update(getContentResolver(), ent);
 
-		dbhelper.addTag(url, WLEntryType.getTypeString(ent.getType())
+		dbhelper.addTag(url, EntryType.getTypeString(ent.getType())
 				.toLowerCase());
-		if (ent.getType() == WLEntryType.MUSIC_ALBUM
-				|| ent.getType() == WLEntryType.MUSIC_ARTIST) {
+		if (ent.getType() == EntryType.MUSIC_ALBUM
+				|| ent.getType() == EntryType.MUSIC_ARTIST) {
 			dbhelper.addTag(url, "music");
 		}
 		dbhelper.close();
@@ -136,6 +136,7 @@ public class AddEntryService extends IntentService {
 			// finished using it.
 		} catch (IOException e) {
 			Log.d("WL", "Error");
+			e.printStackTrace();
 			return "Error";
 		}
 	}

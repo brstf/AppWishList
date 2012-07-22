@@ -5,31 +5,25 @@ import java.util.regex.Pattern;
 
 import android.database.Cursor;
 
-import com.brstf.wishlist.entries.WLEntry;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
-public abstract class WLPricedEntry extends WLEntry {
+public abstract class SinglePricedEntry extends RatedEntry {
 	private float cPrice = -1.0f;
 	private float rPrice = -1.0f;
-	private float rating = 0.0f;
 
-	public WLPricedEntry(int id) {
+	public SinglePricedEntry(int id) {
 		super(id);
 	}
 
 	public void setFromURLText(String url, String text) {
 		super.setFromURLText(url, text);
 
-		// Set up the patterns and corresponding matchers
+		// Set up the pattern and corresponding matcher
 		Pattern p_price = Pattern.compile(getPricePattern());
-		Pattern p_rating = Pattern.compile(getRatingPattern());
-
 		Matcher m_price = p_price.matcher(text);
-		Matcher m_rating = p_rating.matcher(text);
 
-		// Find the patterns
+		// Find the pattern
 		m_price.find();
-		m_rating.find();
 
 		// Set our variables with the retrieved information
 		if (m_price.group(1).equals("Free")) {
@@ -37,32 +31,15 @@ public abstract class WLPricedEntry extends WLEntry {
 		} else {
 			setRegularPrice(Float.valueOf(m_price.group(1).substring(1)));
 		}
-		
-		if (m_rating.find()) {
-			setRating(Float.parseFloat(m_rating.group(1)));
-		} else {
-			setRating(0.0f);
-		}
 	}
 
 	protected abstract String getPricePattern();
 
-	/**
-	 * Class method to retrieve the regular expression pattern to find the
-	 * rating of this entry
-	 * 
-	 * @return Regular expression pattern that finds the rating of this entry
-	 */
-	protected String getRatingPattern() {
-		return "class=\"doc-details-ratings-price\".*?Rating: (.*?) stars";
-	}
-
 	@Override
 	public void setFromDb(Cursor c) {
 		super.setFromDb(c);
-		setCurrentPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_CPRICE)));
-		setRegularPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_RPRICE)));
-		setRating(c.getFloat(c.getColumnIndex(EntryColumns.KEY_RATING)));
+		setCurrentPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1)));
+		setRegularPrice(c.getFloat(c.getColumnIndex(EntryColumns.KEY_REG_PRICE_1)));
 	}
 
 	/**
@@ -81,15 +58,6 @@ public abstract class WLPricedEntry extends WLEntry {
 	 */
 	public float getRegularPrice() {
 		return rPrice;
-	}
-
-	/**
-	 * Retrieves the rating of the entry
-	 * 
-	 * @return The current rating of the entry
-	 */
-	public float getRating() {
-		return rating;
 	}
 
 	/**
@@ -141,21 +109,4 @@ public abstract class WLPricedEntry extends WLEntry {
 			setCurrentPrice(price);
 		}
 	}
-
-	/**
-	 * Sets the new rating of the entry
-	 * 
-	 * @param nRating
-	 *            The new rating of the entry
-	 */
-	public void setRating(float nRating) {
-		// Ensure a valid price
-		if (nRating < 0.0f || nRating > 5.0f) {
-			System.err.println("Invalid Rating: " + nRating);
-			return;
-		}
-
-		rating = nRating;
-	}
-
 }

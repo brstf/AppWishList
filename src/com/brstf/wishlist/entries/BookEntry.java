@@ -7,12 +7,12 @@ import android.database.Cursor;
 
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 
-public class WLBookEntry extends WLPricedEntry {
+public class BookEntry extends SinglePricedEntry {
 	private int mPageCount;
 	private String mAuthor = null;
 	private String mPublishDate = null;
 
-	public WLBookEntry(int id) {
+	public BookEntry(int id) {
 		super(id);
 
 		mPageCount = 0;
@@ -21,8 +21,8 @@ public class WLBookEntry extends WLPricedEntry {
 	}
 
 	@Override
-	public WLEntryType getType() {
-		return WLEntryType.BOOK;
+	public EntryType getType() {
+		return EntryType.BOOK;
 	}
 
 	@Override

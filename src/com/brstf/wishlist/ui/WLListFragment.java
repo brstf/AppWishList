@@ -7,7 +7,7 @@ import java.io.IOException;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
 import com.brstf.wishlist.R;
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
@@ -60,6 +60,7 @@ public class WLListFragment extends SherlockListFragment {
 		public TextView title;
 		public TextView creator;
 		public TextView price;
+		public LinearLayout typeidentifier;
 	}
 
 	private static class IconTask extends AsyncTask<Activity, Void, Bitmap> {
@@ -188,6 +189,8 @@ public class WLListFragment extends SherlockListFragment {
 			holder.title = (TextView) row.findViewById(R.id.title);
 			holder.creator = (TextView) row.findViewById(R.id.creator);
 			holder.price = (TextView) row.findViewById(R.id.price);
+			holder.typeidentifier = (LinearLayout) row
+					.findViewById(R.id.typeindicator);
 
 			row.setTag(holder);
 			return row;
@@ -208,7 +211,7 @@ public class WLListFragment extends SherlockListFragment {
 				// .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, getActivity());
 
 				int typeindex = cursor.getColumnIndex(EntryColumns.KEY_TYPE);
-				WLEntryType type = WLEntryType.getTypeFromString(cursor
+				EntryType type = EntryType.getTypeFromString(cursor
 						.getString(typeindex));
 				switch (type) {
 				case APP:
@@ -235,9 +238,9 @@ public class WLListFragment extends SherlockListFragment {
 
 			// Set the price if it exists
 			if (cursor
-					.getString(cursor.getColumnIndex(EntryColumns.KEY_CPRICE)) != null) {
+					.getString(cursor.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1)) != null) {
 				holder.price.setText(getPriceText(cursor.getFloat(cursor
-						.getColumnIndex(EntryColumns.KEY_CPRICE))));
+						.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1))));
 			} else {
 				holder.price.setText(null);
 			}
@@ -247,6 +250,24 @@ public class WLListFragment extends SherlockListFragment {
 				holder.background.setBackgroundColor(0x7820A1A4);
 			} else {
 				holder.background.setBackgroundColor(Color.TRANSPARENT);
+			}
+
+			// Set the type indicator background
+			switch (EntryType.getTypeFromString(cursor.getString(cursor
+					.getColumnIndex(EntryColumns.KEY_TYPE)))) {
+			case APP:
+				holder.typeidentifier.setBackgroundColor(0xFFCDF93E);
+				break;
+			case MUSIC_ALBUM:
+			case MUSIC_ARTIST:
+				holder.typeidentifier.setBackgroundColor(0xFFFF9200);
+				break;
+			case MOVIE:
+				holder.typeidentifier.setBackgroundColor(0xFFBF3A30);
+				break;
+			case BOOK:
+				holder.typeidentifier.setBackgroundColor(0xFF689CD2);
+				break;
 			}
 		}
 

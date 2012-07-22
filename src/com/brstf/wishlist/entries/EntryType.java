@@ -1,6 +1,6 @@
 package com.brstf.wishlist.entries;
 
-public enum WLEntryType {
+public enum EntryType {
 
 	NONE, APP, BOOK, MOVIE, MUSIC_ARTIST, MUSIC_ALBUM, PENDING;
 
@@ -14,18 +14,18 @@ public enum WLEntryType {
 	 *            the constructor)
 	 * @return A new entry of the given type
 	 */
-	public static WLEntry getTypeEntry(WLEntryType type, int id) {
+	public static Entry getTypeEntry(EntryType type, int id) {
 		switch (type) {
 		case APP:
-			return new WLAppEntry(id);
+			return new AppEntry(id);
 		case BOOK:
-			return new WLBookEntry(id);
+			return new BookEntry(id);
 		case MOVIE:
-			return new WLMovieEntry(id);
+			return new MovieEntry(id);
 		case MUSIC_ARTIST:
-			return new WLArtistEntry(id);
+			return new ArtistEntry(id);
 		case MUSIC_ALBUM:
-			return new WLAlbumEntry(id);
+			return new AlbumEntry(id);
 		default:
 			return null;
 		}
@@ -38,7 +38,7 @@ public enum WLEntryType {
 	 *            The type whose string representation to retrieve
 	 * @return The string representation for the given type
 	 */
-	public static String getTypeString(WLEntryType type) {
+	public static String getTypeString(EntryType type) {
 		switch (type) {
 		case APP:
 			return "APP";
@@ -65,7 +65,7 @@ public enum WLEntryType {
 	 *            The string representation of a type
 	 * @return The type corresponding to the given string
 	 */
-	public static WLEntryType getTypeFromString(String type) {
+	public static EntryType getTypeFromString(String type) {
 		if (type.equals("APP")) {
 			return APP;
 		} else if (type.equals("BOOK")) {
@@ -91,7 +91,7 @@ public enum WLEntryType {
 	 *            The Google Play URL to retrieve type from
 	 * @return The entry type of the given Google Play URL
 	 */
-	public static WLEntryType getTypeFromURL(String url) {
+	public static EntryType getTypeFromURL(String url) {
 		if (url.contains("/store/apps/")) {
 			return APP;
 		} else if (url.contains("/store/movies/")) {

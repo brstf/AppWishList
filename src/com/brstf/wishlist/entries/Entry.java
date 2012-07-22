@@ -15,7 +15,7 @@ import android.database.Cursor;
  * @author brstf
  */
 
-public abstract class WLEntry {
+public abstract class Entry {
 	private String mTitle; // Name of the app
 	private String mURL; // URL link to Google Play Listing
 	private String mIconPath; // path to the icon file
@@ -28,7 +28,7 @@ public abstract class WLEntry {
 	 * Default constructor, initiates all parameters to default meaningless
 	 * values
 	 */
-	public WLEntry(int id) {
+	public Entry(int id) {
 		// Initiate to default parameters
 		mTitle = "";
 		mURL = "";
@@ -133,7 +133,7 @@ public abstract class WLEntry {
 	 * 
 	 * @return The WLEntryType enum corresponding to the type
 	 */
-	public abstract WLEntryType getType();
+	public abstract EntryType getType();
 
 	/**
 	 * Sets the member variables of this entry based on the web page text

@@ -3,7 +3,7 @@ package com.brstf.wishlist.provider;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLDbAdapter.Tables;
 import com.brstf.wishlist.provider.WLEntryContract.Entries;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
@@ -84,8 +84,8 @@ public class WLProvider extends ContentProvider {
 			tagqb.appendWhere(EntryColumns.KEY_TAGS + " LIKE '%" + tag + "%'");
 
 			return tagqb.query(mDbHelper.getDatabase(), projection,
-					EntryColumns.KEY_TYPE + " <> ?", new String[] { WLEntryType
-							.getTypeString(WLEntryType.PENDING) }, null, null,
+					EntryColumns.KEY_TYPE + " <> ?", new String[] { EntryType
+							.getTypeString(EntryType.PENDING) }, null, null,
 					null);
 		case GET_ALL:
 			return getAll();
@@ -112,8 +112,8 @@ public class WLProvider extends ContentProvider {
 		colmap.put(Entries.KEY_URL, Tables.ENTRIES + "." + Entries.KEY_URL);
 		colmap.put(Entries.KEY_ALBLENGTH, Tables.ENTRIES + "."
 				+ Entries.KEY_ALBLENGTH);
-		colmap.put(Entries.KEY_CPRICE, Tables.ENTRIES + "."
-				+ Entries.KEY_CPRICE);
+		colmap.put(Entries.KEY_CUR_PRICE_1, Tables.ENTRIES + "."
+				+ Entries.KEY_CUR_PRICE_1);
 		colmap.put(Entries.KEY_CRATING, Tables.ENTRIES + "."
 				+ Entries.KEY_CRATING);
 		colmap.put(Entries.KEY_CREATOR, Tables.ENTRIES + "."
@@ -131,8 +131,8 @@ public class WLProvider extends ContentProvider {
 				+ Entries.KEY_PCOUNT);
 		colmap.put(Entries.KEY_RATING, Tables.ENTRIES + "."
 				+ Entries.KEY_RATING);
-		colmap.put(Entries.KEY_RPRICE, Tables.ENTRIES + "."
-				+ Entries.KEY_RPRICE);
+		colmap.put(Entries.KEY_REG_PRICE_1, Tables.ENTRIES + "."
+				+ Entries.KEY_REG_PRICE_1);
 		colmap.put(Entries.KEY_TAGS, Tables.ENTRIES + "." + Entries.KEY_TAGS);
 		colmap.put(Entries.KEY_TYPE, Tables.ENTRIES + "." + Entries.KEY_TYPE);
 		return colmap;
@@ -147,8 +147,8 @@ public class WLProvider extends ContentProvider {
 		return mDbHelper
 				.query(true, WLEntryContract.EntriesQuery.columns,
 						EntryColumns.KEY_TYPE + " <> ? ",
-						new String[] { WLEntryType
-								.getTypeString(WLEntryType.PENDING) }, null,
+						new String[] { EntryType
+								.getTypeString(EntryType.PENDING) }, null,
 						null, null, null);
 	}
 

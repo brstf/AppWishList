@@ -11,19 +11,19 @@ import android.database.Cursor;
  * Class for storing information about an app entry in the wishlist
  */
 
-public class WLAppEntry extends WLPricedEntry {
+public class AppEntry extends SinglePricedEntry {
 	private String mDeveloper = null;
 	private static final String DEV_PATTERN = "class=\"doc-header-link\">(.*?)<";
 
-	public WLAppEntry(int id) {
+	public AppEntry(int id) {
 		super(id);
 
 		mDeveloper = "";
 	}
 
 	@Override
-	public WLEntryType getType() {
-		return WLEntryType.APP;
+	public EntryType getType() {
+		return EntryType.APP;
 	}
 
 	@Override

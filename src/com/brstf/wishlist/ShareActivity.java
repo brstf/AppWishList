@@ -1,7 +1,7 @@
 package com.brstf.wishlist;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
@@ -36,7 +36,7 @@ public class ShareActivity extends SherlockActivity {
 		// there
 		String rc = addPending(url);
 		if (rc != null) {
-			if (rc == WLEntryType.getTypeString(WLEntryType.PENDING)) {
+			if (rc == EntryType.getTypeString(EntryType.PENDING)) {
 				Toast.makeText(getBaseContext(),
 						"This entry is pending attition to your wishlist!",
 						Toast.LENGTH_SHORT).show();
@@ -81,7 +81,7 @@ public class ShareActivity extends SherlockActivity {
 			ContentValues values = new ContentValues();
 			values.put(EntryColumns.KEY_URL, url);
 			values.put(EntryColumns.KEY_TYPE,
-					WLEntryType.getTypeString(WLEntryType.PENDING));
+					EntryType.getTypeString(EntryType.PENDING));
 			getContentResolver().insert(
 					WLEntryContract.Entries.buildEntryUri(url), values);
 		}

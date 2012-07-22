@@ -2,7 +2,7 @@ package com.brstf.wishlist.provider;
 
 import java.util.List;
 
-import com.brstf.wishlist.entries.WLEntryType;
+import com.brstf.wishlist.entries.EntryType;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -17,8 +17,36 @@ public class WLEntryContract {
 		public final String KEY_URL = "url";
 		public final String KEY_ICONPATH = "iconpath";
 		public final String KEY_ICONURL = "iconurl";
-		public final String KEY_CPRICE = "cprice";
-		public final String KEY_RPRICE = "rprice";
+		
+		//Price Keys
+		public final String KEY_CUR_PRICE_1 = "cur_price_1"; 
+		public final String KEY_REG_PRICE_1 = "reg_price_1";
+		public final String KEY_CUR_PRICE_2 = "cur_price_2";
+		public final String KEY_REG_PRICE_2 = "reg_price_2";
+		public final String KEY_CUR_PRICE_3 = "cur_price_3";
+		public final String KEY_REG_PRICE_3 = "reg_price_3";
+		public final String KEY_CUR_PRICE_4 = "cur_price_4";
+		public final String KEY_REG_PRICE_4 = "reg_price_4";
+		/* Prices:
+		 * 
+		 * 1 - Normal Price (Apps, Music, Books)
+		 *     Movie Price - Rental SD
+		 *     TV Price - Season Price SD
+		 *     Magazine Price - Issue Price
+		 *     
+		 * 2 - Movie Price - Rental HD
+		 *     TV Price - Season Price HD
+		 *     Magazine Price - Subscription Monthly 
+		 *     
+		 * 3 - Movie Price - Buy SD
+		 *     Magazine Price - Subscription Annual
+		 *     
+		 * 4 - Movie Price - Buy HD
+		 * 
+		 * All of these are necessary, not sure of a better solution
+		 */
+		
+		
 		public final String KEY_RATING = "rating";
 		public final String KEY_CRATING = "crating"; // Content rating
 														// (ex: PG-13)
@@ -37,13 +65,13 @@ public class WLEntryContract {
 	public interface TagColumns {
 		public static final String KEY_TAG = "tag";
 
-		public static final String KEY_APP_COUNT = WLEntryType
-				.getTypeString(WLEntryType.APP);
+		public static final String KEY_APP_COUNT = EntryType
+				.getTypeString(EntryType.APP);
 		public static final String KEY_MUSIC_COUNT = "music";
-		public static final String KEY_MOVIE_COUNT = WLEntryType
-				.getTypeString(WLEntryType.MOVIE);
-		public static final String KEY_BOOK_COUNT = WLEntryType
-				.getTypeString(WLEntryType.BOOK);
+		public static final String KEY_MOVIE_COUNT = EntryType
+				.getTypeString(EntryType.MOVIE);
+		public static final String KEY_BOOK_COUNT = EntryType
+				.getTypeString(EntryType.BOOK);
 	}
 
 	public static final String AUTHORITY = "com.brstf.wishlist";
@@ -101,7 +129,7 @@ public class WLEntryContract {
 		int _TOKEN = 0x1;
 		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
 				EntryColumns.KEY_NAME, EntryColumns.KEY_CREATOR,
-				EntryColumns.KEY_CPRICE, EntryColumns.KEY_ICONPATH,
+				EntryColumns.KEY_CUR_PRICE_1, EntryColumns.KEY_ICONPATH,
 				EntryColumns.KEY_ICONURL, EntryColumns.KEY_URL };
 	}
 
@@ -109,7 +137,7 @@ public class WLEntryContract {
 		int _TOKEN = 0x2;
 		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
 				EntryColumns.KEY_NAME, EntryColumns.KEY_CREATOR,
-				EntryColumns.KEY_CPRICE, EntryColumns.KEY_ICONPATH,
+				EntryColumns.KEY_CUR_PRICE_1, EntryColumns.KEY_ICONPATH,
 				EntryColumns.KEY_ICONURL, EntryColumns.KEY_URL };
 	}
 

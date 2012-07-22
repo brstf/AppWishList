@@ -15,7 +15,7 @@ import android.database.Cursor;
  * @author brstf
  * 
  */
-public class WLArtistEntry extends WLEntry {
+public class ArtistEntry extends Entry {
 	private String mGenres = null;
 
 	/**
@@ -24,7 +24,7 @@ public class WLArtistEntry extends WLEntry {
 	 * @param id
 	 *            The id in the database corresponding to this entry
 	 */
-	public WLArtistEntry(int id) {
+	public ArtistEntry(int id) {
 		super(id);
 
 		mGenres = "";
@@ -34,8 +34,8 @@ public class WLArtistEntry extends WLEntry {
 	 * Return the type of MUSIC_ARTIST
 	 */
 	@Override
-	public WLEntryType getType() {
-		return WLEntryType.MUSIC_ARTIST;
+	public EntryType getType() {
+		return EntryType.MUSIC_ARTIST;
 	}
 
 	/**
