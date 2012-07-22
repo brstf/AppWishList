@@ -45,12 +45,13 @@ public class MovieEntry extends MultiPricedEntry {
 		Matcher m_length = p_length.matcher(text);
 
 		// Find the patterns
-		m_cr.find();
 		m_dir.find();
 		m_length.find();
 
 		// Set our variables with the retrieved information
-		setContentRating(android.text.Html.fromHtml(m_cr.group(1)).toString());
+		String cr = m_cr.find() ? android.text.Html.fromHtml(m_cr.group(1))
+				.toString() : "Not rated";
+		setContentRating(cr);
 		setDirector(android.text.Html.fromHtml(m_dir.group(1)).toString());
 		setMovieLength(Integer.valueOf(m_length.group(1)));
 	}
