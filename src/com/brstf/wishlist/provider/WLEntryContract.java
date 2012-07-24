@@ -127,8 +127,12 @@ public class WLEntryContract {
 		int _TOKEN = 0x1;
 		final String[] columns = { BaseColumns._ID, EntryColumns.KEY_TYPE,
 				EntryColumns.KEY_NAME, EntryColumns.KEY_CREATOR,
-				EntryColumns.KEY_CUR_PRICE_1, EntryColumns.KEY_ICONPATH,
-				EntryColumns.KEY_ICONURL, EntryColumns.KEY_URL };
+				EntryColumns.KEY_CUR_PRICE_1, EntryColumns.KEY_CUR_PRICE_2,
+				EntryColumns.KEY_CUR_PRICE_3, EntryColumns.KEY_CUR_PRICE_4,
+				EntryColumns.KEY_REG_PRICE_1, EntryColumns.KEY_REG_PRICE_2,
+				EntryColumns.KEY_REG_PRICE_3, EntryColumns.KEY_REG_PRICE_4,
+				EntryColumns.KEY_ICONPATH, EntryColumns.KEY_ICONURL,
+				EntryColumns.KEY_URL };
 	}
 
 	public interface SearchQuery {

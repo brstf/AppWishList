@@ -3,6 +3,7 @@ package com.brstf.wishlist.ui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
@@ -239,8 +240,8 @@ public class WLListFragment extends SherlockListFragment {
 					.getColumnIndex(EntryColumns.KEY_CREATOR)));
 
 			// Set the price if it exists
-			if (cursor
-					.getString(cursor.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1)) != null) {
+			if (cursor.getString(cursor
+					.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1)) != null) {
 				holder.price.setText(getPriceText(cursor.getFloat(cursor
 						.getColumnIndex(EntryColumns.KEY_CUR_PRICE_1))));
 			} else {
@@ -514,6 +515,26 @@ public class WLListFragment extends SherlockListFragment {
 				if (loader != null) {
 					loader.forceLoad();
 				}
+			case R.id.menu_tag:
+				final SparseBooleanArray sel = WLListFragment.this.mListAdapter
+						.getSelected();
+				int numselected = sel.size();
+				ArrayList<String> urls = new ArrayList<String>();
+				Cursor c = mListAdapter.getCursor();
+				for (int i = 0; i < numselected; ++i) {
+					int pos = sel.keyAt(i);
+					c.moveToPosition(pos);
+					urls.add(c
+							.getString(c
+									.getColumnIndex(WLEntryContract.EntryColumns.KEY_URL)));
+				}
+
+				final Intent intent = new Intent(
+						WLListFragment.this.getSherlockActivity(),
+						AddTags.class);
+				intent.putStringArrayListExtra(AddTagsFragment.KEY_URLSID, urls);
+				WLListFragment.this.getSherlockActivity().startActivity(intent);
+				return true;
 			}
 			mode.finish();
 			return true;

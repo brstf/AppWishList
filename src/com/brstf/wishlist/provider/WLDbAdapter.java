@@ -325,7 +325,7 @@ public class WLDbAdapter {
 				null, null, null);
 		c.moveToFirst();
 		String tags = c.getString(c.getColumnIndex(EntryColumns.KEY_TAGS));
-		tags = tags == null ? tag : tags + "," + tag;
+		tags = (tags == null || tags.equals("")) ? tag : tags + "," + tag;
 
 		ContentValues values = new ContentValues();
 		values.put(EntryColumns.KEY_TAGS, tags);

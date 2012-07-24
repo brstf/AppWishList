@@ -92,10 +92,14 @@ public class WLProvider extends ContentProvider {
 		case GET_TAGS:
 			return getTags();
 		case GET_ENTRY:
-
+			return getEntry(uri.getLastPathSegment());
 		default:
 			throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
+	}
+
+	private Cursor getEntry(String url) {
+		return mDbHelper.fetchEntry(mDbHelper.fetchId(url));
 	}
 
 	private Cursor getTags() {
