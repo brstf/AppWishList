@@ -51,21 +51,30 @@ public class WLListActivity extends BaseActivity implements
 					.replace(R.id.fragment_container, mFrag).commit();
 		}
 
+		// Adapter is initialiezd here so that it is guaranteed that we have
+		// obtained mTagId before the Loader finishes loading
 		mAdapter = new TagAdapter(getApplicationContext());
 		loaderFinished = false;
 		getSupportLoaderManager()
 				.restartLoader(mLoader, null, mLoaderCallbacks);
 
+		// Set list navigation mode, but don't set the adapter or callbacks yet
 		getActivityHelper().setupSubActivity();
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// If the loader is not finished, this means that this navigation is
+		// actually caused by setup, not actual user navigation. So if we
+		// navigated now, it'd either reload the same list, or load 'all' (when
+		// the adapter is first set, list index 0 is passed into this function)
 		if (!loaderFinished) {
 			return true;
 		}
 
+		// If the loader was finished, this is a real user navigation, reload
+		// the list
 		mAdapter.getCursor().moveToPosition(itemPosition);
 		String tag = mAdapter.getCursor().getString(
 				mAdapter.getCursor().getColumnIndex(TagColumns.KEY_TAG));
@@ -142,10 +151,14 @@ public class WLListActivity extends BaseActivity implements
 		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 			mAdapter.changeCursor(cursor);
 
+			// Set the list navigator adapter, then select the mTagId passed
+			// into this activity
 			getSupportActionBar().setListNavigationCallbacks(mAdapter,
 					WLListActivity.this);
 			getSupportActionBar().setSelectedNavigationItem(mTagId);
 
+			// Finally, set the loader as finished so we can respond to actual
+			// list navigation
 			loaderFinished = true;
 		}
 
