@@ -8,6 +8,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_tag">Tag</string>
     
+    <string name="label_add_tags">Modify Tags</string>
     <string name="label_searchactivity">Search</string>
     <string name="label_search">Search</string>
     

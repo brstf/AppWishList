@@ -325,13 +325,15 @@ public class WLListFragment extends SherlockListFragment {
 		final int memoryClassBytes = am.getMemoryClass() * 1024 * 1024;
 		mIconCache = new ThumbnailCache(memoryClassBytes / 2);
 
+		mListAdapter = new WLListAdapter(this.getSherlockActivity()
+				.getApplicationContext());
+		
+		setListAdapter(mListAdapter);
 		reloadFromArguments(this.getArguments());
 	}
 
 	protected void reloadFromArguments(Bundle arguments) {
 		// Remove the previous adapter (if any)
-		this.setListAdapter(null);
-
 		final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
 		final Uri uri = intent.getData();
 
@@ -339,16 +341,12 @@ public class WLListFragment extends SherlockListFragment {
 			return;
 		}
 
-		mListAdapter = new WLListAdapter(this.getSherlockActivity()
-				.getApplicationContext());
-
 		if (!WLEntryContract.Entries.isSearchUri(uri)) {
 			mQueryToken = WLEntryContract.EntriesQuery._TOKEN;
 			filtertag = uri.getLastPathSegment();
 		} else {
 			mQueryToken = WLEntryContract.SearchQuery._TOKEN;
 		}
-		setListAdapter(mListAdapter);
 
 		getLoaderManager().restartLoader(mQueryToken, arguments,
 				mLoaderCallbacks);
@@ -531,7 +529,7 @@ public class WLListFragment extends SherlockListFragment {
 
 				final Intent intent = new Intent(
 						WLListFragment.this.getSherlockActivity(),
-						AddTags.class);
+						AddTagsActivity.class);
 				intent.putStringArrayListExtra(AddTagsFragment.KEY_URLSID, urls);
 				WLListFragment.this.getSherlockActivity().startActivity(intent);
 				return true;
@@ -588,12 +586,12 @@ public class WLListFragment extends SherlockListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-			mListAdapter.swapCursor(data);
+			mListAdapter.changeCursor(data);
 		}
 
 		@Override
 		public void onLoaderReset(Loader<Cursor> loader) {
-			mListAdapter.swapCursor(null);
+			//mListAdapter.swapCursor(null);
 		}
 	};
 

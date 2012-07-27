@@ -1,7 +1,5 @@
 package com.brstf.wishlist.util;
 
-import android.content.Intent;
-
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.ui.WLHomeActivity;
 
@@ -70,8 +68,11 @@ public class ActivityHelper {
 		if (mActivity instanceof WLHomeActivity) {
 			return;
 		}
-		final Intent intent = new Intent(mActivity, WLHomeActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		mActivity.startActivity(intent);
+
+		// Finishing this activity simulates the behavior of pressing the back
+		// button. As of right now, this behavior is desired from every sub
+		// activity, though this may be necessary to change later
+		// TODO: Does any sub-activity need this changed??
+		mActivity.finish();
 	}
 }
