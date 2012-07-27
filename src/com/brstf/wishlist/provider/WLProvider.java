@@ -118,6 +118,12 @@ public class WLProvider extends ContentProvider {
 				+ Entries.KEY_ALBLENGTH);
 		colmap.put(Entries.KEY_CUR_PRICE_1, Tables.ENTRIES + "."
 				+ Entries.KEY_CUR_PRICE_1);
+		colmap.put(Entries.KEY_CUR_PRICE_2, Tables.ENTRIES + "."
+				+ Entries.KEY_CUR_PRICE_2);
+		colmap.put(Entries.KEY_CUR_PRICE_3, Tables.ENTRIES + "."
+				+ Entries.KEY_CUR_PRICE_3);
+		colmap.put(Entries.KEY_CUR_PRICE_4, Tables.ENTRIES + "."
+				+ Entries.KEY_CUR_PRICE_4);
 		colmap.put(Entries.KEY_CRATING, Tables.ENTRIES + "."
 				+ Entries.KEY_CRATING);
 		colmap.put(Entries.KEY_CREATOR, Tables.ENTRIES + "."
@@ -137,6 +143,12 @@ public class WLProvider extends ContentProvider {
 				+ Entries.KEY_RATING);
 		colmap.put(Entries.KEY_REG_PRICE_1, Tables.ENTRIES + "."
 				+ Entries.KEY_REG_PRICE_1);
+		colmap.put(Entries.KEY_REG_PRICE_2, Tables.ENTRIES + "."
+				+ Entries.KEY_REG_PRICE_2);
+		colmap.put(Entries.KEY_REG_PRICE_3, Tables.ENTRIES + "."
+				+ Entries.KEY_REG_PRICE_3);
+		colmap.put(Entries.KEY_REG_PRICE_4, Tables.ENTRIES + "."
+				+ Entries.KEY_REG_PRICE_4);
 		colmap.put(Entries.KEY_TAGS, Tables.ENTRIES + "." + Entries.KEY_TAGS);
 		colmap.put(Entries.KEY_TYPE, Tables.ENTRIES + "." + Entries.KEY_TYPE);
 		return colmap;

@@ -61,7 +61,9 @@ public class WLHomeActivity extends BaseActivity implements
 			intent.setData(WLEntryContract.Entries.CONTENT_URI.buildUpon()
 					.appendPath("tag").appendPath(tag).build());
 		}
+		
 		intent.putExtra(WLListActivity.KEY_TAGID, pos);
+		
 		startActivity(intent);
 	}
 }

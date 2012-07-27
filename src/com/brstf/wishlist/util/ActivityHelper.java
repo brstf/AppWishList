@@ -71,7 +71,7 @@ public class ActivityHelper {
 			return;
 		}
 		final Intent intent = new Intent(mActivity, WLHomeActivity.class);
-		// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		mActivity.startActivity(intent);
 	}
 }

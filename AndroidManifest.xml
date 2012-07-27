@@ -51,6 +51,11 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="com.brstf.wishlist.ui.AddTags"
+            android:label="@string/actionbar_name" />
+        
         <activity
             android:name="com.brstf.wishlist.ui.WLListActivity"
             android:label="@string/actionbar_name" />

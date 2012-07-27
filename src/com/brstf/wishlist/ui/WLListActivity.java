@@ -14,6 +14,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,23 +22,22 @@ import android.widget.TextView;
 
 public class WLListActivity extends BaseActivity implements
 		OnNavigationListener {
+	private static final String KEY = "WLListActivity";
 	private TagAdapter mAdapter = null;
 	private WLListFragment mFrag = null;
 	public static final String KEY_TAGID = "TAGID";
 	private int mTagId = 0;
 	private final int mLoader = 1;
+	private boolean loaderFinished;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		mAdapter = new TagAdapter(getApplicationContext());
-		getSupportLoaderManager()
-				.restartLoader(mLoader, null, mLoaderCallbacks);
-
 		if (findViewById(R.id.fragment_container) != null) {
 			mTagId = getIntent().getIntExtra(KEY_TAGID, 0);
+			Log.d(KEY, "Get extra: " + String.valueOf(mTagId));
 
 			// If we have a saved state, restore the previous filter tag
 			if (savedInstanceState != null) {
@@ -50,26 +50,22 @@ public class WLListActivity extends BaseActivity implements
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.fragment_container, mFrag).commit();
 		}
-	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
+		mAdapter = new TagAdapter(getApplicationContext());
+		loaderFinished = false;
+		getSupportLoaderManager()
+				.restartLoader(mLoader, null, mLoaderCallbacks);
 
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
-		
-		getSupportActionBar().setSelectedNavigationItem(mTagId);
-	}
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
 		getActivityHelper().setupSubActivity();
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if (!loaderFinished) {
+			return true;
+		}
+
 		mAdapter.getCursor().moveToPosition(itemPosition);
 		String tag = mAdapter.getCursor().getString(
 				mAdapter.getCursor().getColumnIndex(TagColumns.KEY_TAG));
@@ -143,8 +139,14 @@ public class WLListActivity extends BaseActivity implements
 		}
 
 		@Override
-		public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
-			mAdapter.swapCursor(arg1);
+		public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+			mAdapter.changeCursor(cursor);
+
+			getSupportActionBar().setListNavigationCallbacks(mAdapter,
+					WLListActivity.this);
+			getSupportActionBar().setSelectedNavigationItem(mTagId);
+
+			loaderFinished = true;
 		}
 
 		@Override
