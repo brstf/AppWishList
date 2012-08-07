@@ -167,4 +167,6 @@ public class WLListActivity extends BaseActivity implements
 			mAdapter.swapCursor(null);
 		}
 	};
+	
+	
 }

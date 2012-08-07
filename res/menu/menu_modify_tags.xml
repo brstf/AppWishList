@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <!-- Add Tag Menu Button -->
+    <item android:id="@+id/menu_add_tag"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/description_add_tag"
+        android:showAsAction="always"/>
+    
+    <!-- Cancel Menu Button -->
+	<item android:id="@+id/menu_cancel_tag_transaction"
+	    android:icon="@android:drawable/ic_menu_close_clear_cancel"
+	    android:title="@string/description_cancel_tag_transaction"
+	    android:showAsAction="always"/>
+
+	<!-- Commit Menu Button -->
+	<item android:id="@+id/menu_commit_tag_transaction"
+	    android:icon="@android:drawable/ic_menu_send"
+	    android:title="@string/description_commit_tag_transaction"
+	    android:showAsAction="always"/>
+</menu>

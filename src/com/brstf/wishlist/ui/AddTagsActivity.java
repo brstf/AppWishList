@@ -1,8 +1,10 @@
 package com.brstf.wishlist.ui;
 
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 
 public class AddTagsActivity extends BaseActivity {
@@ -31,6 +33,22 @@ public class AddTagsActivity extends BaseActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.getSupportMenuInflater().inflate(R.menu.menu_modify_tags,
+				menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch( item.getItemId()) {
+		case R.id.menu_cancel_tag_transaction:
+			this.finish();
+			break;
+		case R.id.menu_commit_tag_transaction:
+			//mFrag.commitTransaction();
+			//NavUtils.navigateUpFromSameTask(this);
+			break;
+		}
 		return true;
 	}
 	

@@ -2,4 +2,13 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="CustomTheme" parent="Theme.Sherlock">
     </style>
+    
+    <style name="DialogTheme" parent="@android:style/Theme.Dialog" >
+		<item name="android:windowBackground">@color/transparent_white</item>
+		<item name="android:windowIsFloating">false</item>
+		<item name="android:windowNoTitle">true</item>
+	</style>
+	
+    <color name="transparent_white">#00FFFFFF</color>
+    
 </resources>

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
 import com.brstf.wishlist.R;
@@ -327,7 +328,7 @@ public class WLListFragment extends SherlockListFragment {
 
 		mListAdapter = new WLListAdapter(this.getSherlockActivity()
 				.getApplicationContext());
-		
+
 		setListAdapter(mListAdapter);
 		reloadFromArguments(this.getArguments());
 	}
@@ -522,16 +523,18 @@ public class WLListFragment extends SherlockListFragment {
 				for (int i = 0; i < numselected; ++i) {
 					int pos = sel.keyAt(i);
 					c.moveToPosition(pos);
-					urls.add(c
-							.getString(c
-									.getColumnIndex(WLEntryContract.EntryColumns.KEY_URL)));
+					urls.add(c.getString(c
+							.getColumnIndex(WLEntryContract.EntryColumns.KEY_URL)));
 				}
 
-				final Intent intent = new Intent(
-						WLListFragment.this.getSherlockActivity(),
-						AddTagsActivity.class);
-				intent.putStringArrayListExtra(AddTagsFragment.KEY_URLSID, urls);
-				WLListFragment.this.getSherlockActivity().startActivity(intent);
+				// Create and show the dialog.
+				SherlockDialogFragment addFragment = new AddTagsDialogFragment();
+				Bundle args = new Bundle();
+				args.putStringArrayList(AddTagsDialogFragment.KEY_URLSID, urls);
+				addFragment.setArguments(args);
+				addFragment.show(getSherlockActivity()
+						.getSupportFragmentManager(), "dialog_add");
+
 				return true;
 			}
 			mode.finish();
@@ -591,7 +594,7 @@ public class WLListFragment extends SherlockListFragment {
 
 		@Override
 		public void onLoaderReset(Loader<Cursor> loader) {
-			//mListAdapter.swapCursor(null);
+			// mListAdapter.swapCursor(null);
 		}
 	};
 

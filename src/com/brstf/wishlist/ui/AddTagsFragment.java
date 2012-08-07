@@ -1,6 +1,8 @@
 package com.brstf.wishlist.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import android.content.Context;
@@ -17,11 +19,17 @@ import com.brstf.wishlist.R;
 import com.brstf.wishlist.provider.WLEntryContract;
 
 public class AddTagsFragment extends SherlockListFragment {
+	private final String TAG = "AddTagsFragment";
+
 	public static final String KEY_URLSID = "URLSID";
 	private ArrayList<String> mTagsCur = null;
 	private ArrayList<String> mTagsSom = null;
 	private ArrayList<String> mTagsRem = null;
 	private ArrayList<String> mTagsAll = null;
+
+	private ArrayList<String> mTagsCurActive = null;
+	private ArrayList<String> mTagsSomActive = null;
+	private ArrayList<String> mTagsRemActive = null;
 
 	private final String KEY_CURRENT = "\\,current,\\";
 	private final String KEY_INSOME = "\\,insome,\\";
@@ -46,6 +54,7 @@ public class AddTagsFragment extends SherlockListFragment {
 				row.setClickable(false);
 				row.setEnabled(false);
 				row.setLongClickable(false);
+				row.setFocusable(false);
 				((TextView) row).setTextColor(0xFF33B5E5);
 				if (getItem(position).equals(KEY_CURRENT)) {
 					displayText = "SELECTED TAGS:";
@@ -57,10 +66,28 @@ public class AddTagsFragment extends SherlockListFragment {
 			} else {
 				row = mInflater.inflate(android.R.layout.simple_list_item_1,
 						parent, false);
+				String selected = getItem(position);
+				if (mTagsCurActive.contains(selected)
+						&& !mTagsCur.contains(selected)) {
+					((TextView) row).setTextColor(0xFF00FF00);
+				} else if ((mTagsSomActive.contains(selected) && !mTagsSom
+						.contains(selected))
+						|| (mTagsRemActive.contains(selected) && !mTagsRem
+								.contains(selected))) {
+					((TextView) row).setTextColor(0xFFFF0000);
+				}
 				displayText = getItem(position);
 			}
 			((TextView) row).setText(displayText);
 			return row;
+		}
+
+		@Override
+		public boolean isEnabled(int position) {
+			String selected = getItem(position);
+			return !(selected.equals(KEY_CURRENT)
+					|| selected.equals(KEY_INSOME) || selected
+						.equals(KEY_REMAIN));
 		}
 	}
 
@@ -82,6 +109,10 @@ public class AddTagsFragment extends SherlockListFragment {
 		mTagsSom = new ArrayList<String>();
 		mTagsRem = new ArrayList<String>();
 
+		mTagsCurActive = new ArrayList<String>();
+		mTagsSomActive = new ArrayList<String>();
+		mTagsRemActive = new ArrayList<String>();
+
 		if (mTagsAll == null) {
 			fillMasterTagList();
 		}
@@ -89,6 +120,38 @@ public class AddTagsFragment extends SherlockListFragment {
 		fillTagsFromArguments(getArguments());
 	}
 
+	@Override
+	public void onListItemClick(android.widget.ListView l, View v,
+			int position, long id) {
+		String selected = mAdapter.getItem(position);
+
+		// Check which active tag list the clicked tag was in, and move it
+		// appropriately
+		if (mTagsCurActive.contains(selected)) {
+			if (mTagsSom.contains(selected)) {
+				mTagsSomActive.add(selected);
+			} else if (mTagsAll.contains(selected)) {
+				mTagsRemActive.add(selected);
+			}
+			mTagsCurActive.remove(selected);
+		} else if (mTagsSomActive.contains(selected)) {
+			mTagsCurActive.add(selected);
+			mTagsSomActive.remove(selected);
+		} else if (mTagsRemActive.contains(selected)) {
+			mTagsCurActive.add(selected);
+			mTagsRemActive.remove(selected);
+		}
+		
+		sortActiveLists();
+
+		// Notify the adapter that the dataset changed
+		notifyAdapterChange();
+	}
+
+	/**
+	 * Fills the master tag list - the list of all tags currently in the
+	 * database.
+	 */
 	private void fillMasterTagList() {
 		mTagsAll = new ArrayList<String>();
 
@@ -107,6 +170,15 @@ public class AddTagsFragment extends SherlockListFragment {
 		}
 	}
 
+	/**
+	 * Fills the adapter contents from passed in arguments. Builds list of
+	 * currently used tags in all selected entries, some selected entries, and
+	 * all other tags currently in use.
+	 * 
+	 * @param arguments
+	 *            {@link Bundle} of arguments passed in to this fragment
+	 *            containing all selected entries from the main list
+	 */
 	private void fillTagsFromArguments(Bundle arguments) {
 		ArrayList<String> urls = new ArrayList<String>();
 		urls = getArguments().getStringArrayList(KEY_URLSID);
@@ -134,6 +206,9 @@ public class AddTagsFragment extends SherlockListFragment {
 		mTagsCur.clear();
 		mTagsSom.clear();
 		mTagsRem.clear();
+		mTagsCurActive.clear();
+		mTagsSomActive.clear();
+		mTagsRemActive.clear();
 
 		// Now that we have all the tags and their counts, we construct the tag
 		// list
@@ -154,30 +229,67 @@ public class AddTagsFragment extends SherlockListFragment {
 			}
 		}
 
+		mTagsCurActive.addAll(mTagsCur);
+		mTagsSomActive.addAll(mTagsSom);
+		mTagsRemActive.addAll(mTagsRem);
+		
+		sortActiveLists();
+
 		notifyAdapterChange();
 	}
 
+	private void sortActiveLists() {
+		Collections.sort(mTagsCurActive, new TagComparator());
+		Collections.sort(mTagsSomActive, new TagComparator());
+		Collections.sort(mTagsRemActive, new TagComparator());
+	}
+
+	/**
+	 * Called when the adapter's dataset is changed, this function updates the
+	 * adapter contents.
+	 */
 	private void notifyAdapterChange() {
 		mAdapter.clear();
 
-		if (mTagsCur.size() > 0) {
+		if (mTagsCurActive.size() > 0) {
 			mAdapter.add(KEY_CURRENT);
-			mAdapter.addAll(mTagsCur);
+			mAdapter.addAll(mTagsCurActive);
 		}
 
-		if (mTagsSom.size() > 0) {
+		if (mTagsSomActive.size() > 0) {
 			mAdapter.add(KEY_INSOME);
-			mAdapter.addAll(mTagsSom);
+			mAdapter.addAll(mTagsSomActive);
 		}
 
-		if (mTagsRem.size() > 0) {
+		if (mTagsRemActive.size() > 0) {
 			mAdapter.add(KEY_REMAIN);
-			mAdapter.addAll(mTagsRem);
+			mAdapter.addAll(mTagsRemActive);
 		}
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
+	private class TagComparator implements Comparator<String> {
+		@Override
+		public int compare(String lhs, String rhs) {
+			boolean lShifted = isShifted(lhs);
+			boolean rShifted = isShifted(rhs);
+			
+			if( lShifted == rShifted ) {
+				return lhs.compareTo(rhs);
+			} else {
+				if( lShifted ) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		}
+
+		public boolean isShifted(String entry) {
+			return (mTagsCurActive.contains(entry) && !mTagsCur.contains(entry))
+					|| (mTagsSomActive.contains(entry) && !mTagsSom
+							.contains(entry))
+					|| (mTagsRemActive.contains(entry) && !mTagsRem
+							.contains(entry));
+		}
 	}
 }

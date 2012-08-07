@@ -53,10 +53,6 @@
         </activity>
         
         <activity
-            android:name=".ui.AddTagsActivity"
-            android:label="@string/label_add_tags" />
-        
-        <activity
             android:name="com.brstf.wishlist.ui.WLListActivity"
             android:label="@string/actionbar_name" />
 
