@@ -36,29 +36,8 @@
         android:layout_height="1dip"
         android:layout_width="match_parent"/>
     
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        
-        <EditText android:id="@+id/dialog_edit_text"
-            android:hint="@string/hint_add_tag"
-            android:maxLines="1" 
-            android:layout_height="50dip"
-            android:layout_width="0dip"
-            android:layout_weight="1"/>
-        
-        <ImageButton android:id="@+id/btn_submit"
-            android:src="@android:drawable/ic_menu_add"
-            android:layout_height="50dip"
-            android:layout_width="50dip"
-            android:background="@drawable/transparent_button"
-            android:contentDescription="@string/description_btn_submit"/>
-            
-    </LinearLayout>
-    
     <ListView android:id="@+id/dialog_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-    
 
 </LinearLayout>

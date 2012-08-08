@@ -105,6 +105,16 @@ public class WLListActivity extends BaseActivity implements
 		mFrag.onStop();
 	}
 
+	/**
+	 * Called by both the add dialog and remove dialog, finishes the action mode
+	 * when appropriate.
+	 */
+	public void onDialogFinish(int numTags) {
+		getSupportLoaderManager()
+				.restartLoader(mLoader, null, mLoaderCallbacks);
+		mFrag.onDialogFinish(numTags);
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		// If the app is exiting and we have to save state, save the current
@@ -167,6 +177,5 @@ public class WLListActivity extends BaseActivity implements
 			mAdapter.swapCursor(null);
 		}
 	};
-	
-	
+
 }

@@ -100,7 +100,7 @@ public class HomeFragment extends SherlockListFragment {
 				.getApplicationContext());
 		setListAdapter(mAdapter);
 
-		getLoaderManager().restartLoader(mLoader, null, mLoaderCallbacks);
+		reloadTags();
 	}
 
 	@Override
@@ -160,6 +160,13 @@ public class HomeFragment extends SherlockListFragment {
 			}
 		}
 	};
+	
+	/**
+	 * Reloads the tag list.
+	 */
+	public void reloadTags() {
+		getLoaderManager().restartLoader(mLoader, null, mLoaderCallbacks);
+	}
 
 	private final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
 

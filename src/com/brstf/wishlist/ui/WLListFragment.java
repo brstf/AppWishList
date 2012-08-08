@@ -465,6 +465,12 @@ public class WLListFragment extends SherlockListFragment {
 		public boolean onActionItemClicked(
 				com.actionbarsherlock.view.ActionMode mode,
 				com.actionbarsherlock.view.MenuItem item) {
+			// Get the selected items
+			final SparseBooleanArray sel = WLListFragment.this.mListAdapter
+					.getSelected();
+			int numselected = sel.size();
+			ArrayList<String> urls = new ArrayList<String>();
+
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
 				final SparseBooleanArray sba = WLListFragment.this.mListAdapter
@@ -515,25 +521,41 @@ public class WLListFragment extends SherlockListFragment {
 					loader.forceLoad();
 				}
 			case R.id.menu_tag:
-				final SparseBooleanArray sel = WLListFragment.this.mListAdapter
-						.getSelected();
-				int numselected = sel.size();
-				ArrayList<String> urls = new ArrayList<String>();
-				Cursor c = mListAdapter.getCursor();
+				Cursor addc = mListAdapter.getCursor();
 				for (int i = 0; i < numselected; ++i) {
 					int pos = sel.keyAt(i);
-					c.moveToPosition(pos);
-					urls.add(c.getString(c
+					addc.moveToPosition(pos);
+					urls.add(addc.getString(addc
 							.getColumnIndex(WLEntryContract.EntryColumns.KEY_URL)));
 				}
 
 				// Create and show the dialog.
 				SherlockDialogFragment addFragment = new AddTagsDialogFragment();
-				Bundle args = new Bundle();
-				args.putStringArrayList(AddTagsDialogFragment.KEY_URLSID, urls);
-				addFragment.setArguments(args);
+				Bundle addArgs = new Bundle();
+				addArgs.putStringArrayList(AddTagsDialogFragment.KEY_URLSID,
+						urls);
+				addFragment.setArguments(addArgs);
 				addFragment.show(getSherlockActivity()
 						.getSupportFragmentManager(), "dialog_add");
+
+				return true;
+			case R.id.menu_remove_tag:
+				Cursor remc = mListAdapter.getCursor();
+				for (int i = 0; i < numselected; ++i) {
+					int pos = sel.keyAt(i);
+					remc.moveToPosition(pos);
+					urls.add(remc.getString(remc
+							.getColumnIndex(WLEntryContract.EntryColumns.KEY_URL)));
+				}
+
+				// Create and show the dialog.
+				SherlockDialogFragment remFragment = new RemTagsDialogFragment();
+				Bundle remArgs = new Bundle();
+				remArgs.putStringArrayList(AddTagsDialogFragment.KEY_URLSID,
+						urls);
+				remFragment.setArguments(remArgs);
+				remFragment.show(getSherlockActivity()
+						.getSupportFragmentManager(), "dialog_rem");
 
 				return true;
 			}
@@ -565,6 +587,16 @@ public class WLListFragment extends SherlockListFragment {
 			return false;
 		}
 	};
+
+	/**
+	 * Called by both the add dialog and remove dialog, finishes the action mode
+	 * when appropriate.
+	 */
+	public void onDialogFinish(int numTags) {
+		if (lamode != null) {
+			lamode.finish();
+		}
+	}
 
 	// //////////////////////////////
 	// Loader callbacks

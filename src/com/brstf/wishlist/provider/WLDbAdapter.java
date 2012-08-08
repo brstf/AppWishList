@@ -298,7 +298,9 @@ public class WLDbAdapter {
 	 * Adds a tag to the entry with the given URL.
 	 * 
 	 * @param url
+	 *            URL of the entry to add the tag to
 	 * @param tag
+	 *            Tag to add to the given entry
 	 */
 	public void addTag(String url, String tag) {
 		Cursor c = mDb.query(Tables.ENTRIES_TAGS,
@@ -332,42 +334,113 @@ public class WLDbAdapter {
 		mDb.update(Tables.ENTRIES, values, EntryColumns.KEY_URL + " = ?",
 				new String[] { url });
 
+		modifyTagCount(url, tag,
+				c.getString(c.getColumnIndex(EntryColumns.KEY_TYPE)), 1);
+	}
+
+	/**
+	 * Removes a tag from the entry with the given URL.
+	 * 
+	 * @param url
+	 *            URL of the entry to remove the tag from
+	 * @param tag
+	 *            Tag to remove from the given entry
+	 */
+	public void remTag(String url, String tag) {
+		// Get the entry
+		Cursor c = mDb.query(true, Tables.ENTRIES, new String[] {
+				EntryColumns.KEY_TYPE, EntryColumns.KEY_TAGS },
+				EntryColumns.KEY_URL + " = ?", new String[] { url }, null,
+				null, null, null);
+		c.moveToFirst();
+
+		String type = c.getString(c.getColumnIndex(EntryColumns.KEY_TYPE));
+		if (type.toLowerCase().equals(tag)) {
+			// Do not remove typed tags
+			return;
+		}
+		String tags = c.getString(c.getColumnIndex(EntryColumns.KEY_TAGS));
+
+		// Check if the tag is present
+		if (!tags.contains(tag)) {
+			// If not, return, there's nothing to remove
+			return;
+		}
+
+		// If so, construct a new tags list without the given tag
+		String[] taglist = tags.split(",");
+		tags = "";
+		for (int i = 0; i < taglist.length; ++i) {
+			// If this is the tag we're removing, don't add it
+			if (taglist[i].equals(tag)) {
+				continue;
+			}
+
+			// Otherwise, add it
+			if (tags.equals("")) {
+				tags = taglist[i];
+			} else {
+				tags += "," + taglist[i];
+			}
+		}
+		tags = tags.equals("") ? null : tags;
+
+		// Update the entry with the new tags list
+		ContentValues values = new ContentValues();
+		values.put(EntryColumns.KEY_TAGS, tags);
+		mDb.update(Tables.ENTRIES, values, EntryColumns.KEY_URL + " = ?",
+				new String[] { url });
+
+		// Update the count
+		modifyTagCount(url, tag, type, -1);
+	}
+
+	private void modifyTagCount(String url, String tag, String type, int delta) {
+		// Update the count
 		Cursor tagc = mDb.query(true, Tables.ENTRIES_TAGS, TagQuery.columns,
 				TagColumns.KEY_TAG + " = ?", new String[] { tag }, null, null,
 				null, null);
 		tagc.moveToFirst();
 		int count = tagc.getInt(tagc.getColumnIndex(BaseColumns._COUNT));
-		values.clear();
-		values.put(BaseColumns._COUNT, count + 1);
 
-		// Increment the appropriate type count as well
-		switch (EntryType.getTypeFromString(c.getString(c
-				.getColumnIndex(EntryColumns.KEY_TYPE)))) {
+		// If modifying the count would result in a tag with no entries,
+		// delete the tag
+		if (count + delta == 0) {
+			mDb.delete(Tables.ENTRIES_TAGS, TagColumns.KEY_TAG + " = ?",
+					new String[] { tag });
+			return;
+		}
+
+		ContentValues values = new ContentValues();
+		values.put(BaseColumns._COUNT, count + delta);
+
+		// Decrement the appropriate type count as well
+		switch (EntryType.getTypeFromString(type)) {
 		case APP:
 			int appcount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_APP_COUNT));
-			values.put(TagColumns.KEY_APP_COUNT, appcount + 1);
+			values.put(TagColumns.KEY_APP_COUNT, appcount + delta);
 			break;
 		case MUSIC_ALBUM:
 		case MUSIC_ARTIST:
 			int musiccount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_MUSIC_COUNT));
-			values.put(TagColumns.KEY_MUSIC_COUNT, musiccount + 1);
+			values.put(TagColumns.KEY_MUSIC_COUNT, musiccount + delta);
 			break;
 		case MOVIE:
 			int moviecount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_MOVIE_COUNT));
-			values.put(TagColumns.KEY_MOVIE_COUNT, moviecount + 1);
+			values.put(TagColumns.KEY_MOVIE_COUNT, moviecount + delta);
 			break;
 		case BOOK:
 			int bookcount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_BOOK_COUNT));
-			values.put(TagColumns.KEY_BOOK_COUNT, bookcount + 1);
+			values.put(TagColumns.KEY_BOOK_COUNT, bookcount + delta);
 			break;
 		case MAGAZINE:
 			int magcount = tagc.getInt(tagc
 					.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT));
-			values.put(TagColumns.KEY_MAGAZINE_COUNT, magcount + 1);
+			values.put(TagColumns.KEY_MAGAZINE_COUNT, magcount + delta);
 			break;
 		}
 

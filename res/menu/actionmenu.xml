@@ -11,5 +11,10 @@
         android:icon="@android:drawable/ic_menu_edit"
         android:showAsAction="always"
         android:title="@string/menu_tag"/>
+    <item
+        android:id="@+id/menu_remove_tag"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel" 
+        android:showAsAction="always"
+        android:title="@string/menu_tag_rem"/>
 
 </menu>

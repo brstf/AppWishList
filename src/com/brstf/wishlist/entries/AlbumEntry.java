@@ -32,9 +32,9 @@ public class AlbumEntry extends SinglePricedEntry {
 		Pattern p_length = Pattern
 				.compile("Total Length<.*?class=\"meta-details-value\">(.*?)<");
 		Pattern p_tracks = Pattern
-				.compile("Tracks</td.*?class=\"meta-details-value\">(.*?)<");
+				.compile("Tracks.*?</td.*?class=\"meta-details-value\".*?>(.*?)<");
 		Pattern p_release = Pattern
-				.compile("Released<.*?class=\"meta-details-value\">(.*?)<");
+				.compile("Released.*?<.*?class=\"meta-details-value\".*?>(.*?)<");
 
 		Matcher m_artist = p_artist.matcher(text);
 		Matcher m_length = p_length.matcher(text);
@@ -69,7 +69,7 @@ public class AlbumEntry extends SinglePricedEntry {
 
 	@Override
 	protected String getTitlePattern() {
-		return "class=\"doc-header-title\">(.*?)<";
+		return "class=\"doc-header-title\".*?>(.*?)<";
 	}
 
 	@Override

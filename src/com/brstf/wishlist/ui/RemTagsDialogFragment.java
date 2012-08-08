@@ -26,7 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class AddTagsDialogFragment extends SherlockDialogFragment {
+public class RemTagsDialogFragment extends SherlockDialogFragment {
 	public static final String KEY_URLSID = "URLSID";
 
 	private final String KEY_CURRENT = "\\,current,\\";
@@ -39,14 +39,14 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 	private ArrayList<String> mTagsSom = null;
 	private ArrayList<String> mTagsRem = null;
 
-	private ArrayList<String> mTagsToAdd = null;
+	private ArrayList<String> mTagsCurActive = null;
 	private ArrayList<String> mTagsSomActive = null;
-	private ArrayList<String> mTagsRemActive = null;
+	private ArrayList<String> mTagsToRem = null;
 
 	private ListView mList;
 	private ArrayAdapter<String> mAdapter;
 
-	public AddTagsDialogFragment() {
+	public RemTagsDialogFragment() {
 		// Empty Constructor
 	}
 
@@ -58,9 +58,9 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 		mTagsCur = new ArrayList<String>();
 		mTagsSom = new ArrayList<String>();
 		mTagsRem = new ArrayList<String>();
-		mTagsToAdd = new ArrayList<String>();
+		mTagsCurActive = new ArrayList<String>();
 		mTagsSomActive = new ArrayList<String>();
-		mTagsRemActive = new ArrayList<String>();
+		mTagsToRem = new ArrayList<String>();
 
 		// If we did not construct all tags yet, do so
 		if (mTagsAll == null) {
@@ -134,9 +134,9 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 		mTagsCur.clear();
 		mTagsSom.clear();
 		mTagsRem.clear();
-		mTagsToAdd.clear();
+		mTagsCurActive.clear();
 		mTagsSomActive.clear();
-		mTagsRemActive.clear();
+		mTagsToRem.clear();
 
 		// Now that we have all the tags and their counts, we construct the tag
 		// list
@@ -157,8 +157,8 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 			}
 		}
 
+		mTagsCurActive.addAll(mTagsCur);
 		mTagsSomActive.addAll(mTagsSom);
-		mTagsRemActive.addAll(mTagsRem);
 
 		sortActiveLists();
 
@@ -171,9 +171,9 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 	private void sortActiveLists() {
 		TagComparator tc = new TagComparator();
 		Collections.sort(mTagsCur, tc);
-		Collections.sort(mTagsToAdd, tc);
+		Collections.sort(mTagsCurActive, tc);
 		Collections.sort(mTagsSomActive, tc);
-		Collections.sort(mTagsRemActive, tc);
+		Collections.sort(mTagsToRem, tc);
 	}
 
 	/**
@@ -194,23 +194,23 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 		mAdapter.clear();
 
 		mAdapter.add(KEY_CURRENT);
-		for (String s : mTagsCur) {
+		for (String s : mTagsCurActive) {
 			mAdapter.add(s);
-		}
-
-		for (String s : mTagsToAdd) {
-			mAdapter.add(s);
-		}
-
-		if (mTagsSomActive.size() > 0 || mTagsRemActive.size() > 0) {
-			mAdapter.add(KEY_REMAIN);
 		}
 
 		for (String s : mTagsSomActive) {
 			mAdapter.add(s);
 		}
 
-		for (String s : mTagsRemActive) {
+		if (mTagsSomActive.size() > 0 || mTagsCurActive.size() > 0) {
+			mAdapter.add(KEY_REMAIN);
+		}
+
+		for (String s : mTagsToRem) {
+			mAdapter.add(s);
+		}
+
+		for (String s : mTagsRem) {
 			mAdapter.add(s);
 		}
 	}
@@ -221,7 +221,7 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.dialog_add_tag, container);
+		final View view = inflater.inflate(R.layout.dialog_rem_tag, container);
 		mList = (ListView) view.findViewById(R.id.dialog_list);
 
 		mList.setAdapter(mAdapter);
@@ -231,19 +231,19 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 			public void onItemClick(AdapterView<?> adapter, View v,
 					int position, long id) {
 				String selected = mAdapter.getItem(position);
-				if (mTagsToAdd.contains(selected)) {
+				if (mTagsToRem.contains(selected)) {
 					if (mTagsSom.contains(selected)) {
 						mTagsSomActive.add(selected);
-					} else if (mTagsRem.contains(selected)) {
-						mTagsRemActive.add(selected);
+					} else if (mTagsCur.contains(selected)) {
+						mTagsCurActive.add(selected);
 					}
-					mTagsToAdd.remove(selected);
+					mTagsToRem.remove(selected);
 				} else if (mTagsSomActive.contains(selected)) {
-					mTagsToAdd.add(selected);
+					mTagsToRem.add(selected);
 					mTagsSomActive.remove(selected);
-				} else if (mTagsRemActive.contains(selected)) {
-					mTagsToAdd.add(selected);
-					mTagsRemActive.remove(selected);
+				} else if (mTagsCurActive.contains(selected)) {
+					mTagsToRem.add(selected);
+					mTagsCurActive.remove(selected);
 				}
 
 				sortActiveLists();
@@ -261,7 +261,7 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 		revertButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AddTagsDialogFragment.this.dismiss();
+				RemTagsDialogFragment.this.dismiss();
 			}
 		});
 
@@ -272,68 +272,26 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 			@Override
 			public void onClick(View v) {
 				WLDbAdapter dbhelper = new WLDbAdapter(
-						AddTagsDialogFragment.this.getActivity()
+						RemTagsDialogFragment.this.getActivity()
 								.getBaseContext());
 				dbhelper.open();
 
 				// Loop through each entry and add each tag
 				for (String url : urls) {
-					for (String tag : mTagsToAdd) {
-						dbhelper.addTag(url, tag);
+					for (String tag : mTagsToRem) {
+						dbhelper.remTag(url, tag);
 					}
 				}
 
 				dbhelper.close();
 
 				// Dismiss the dialog
-				AddTagsDialogFragment.this.dismiss();
-				((WLListActivity) getActivity()).onDialogFinish(mTagsToAdd.size());
-			}
-		});
-
-		// Get the submit button and add its functionality
-		ImageButton submitButton = (ImageButton) view
-				.findViewById(R.id.btn_submit);
-		submitButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AddTagsDialogFragment.this.onTagSubmit();
+				RemTagsDialogFragment.this.dismiss();
+				((WLListActivity) getActivity()).onDialogFinish(mTagsToRem.size());
 			}
 		});
 
 		return view;
-	}
-
-	/**
-	 * Called when the submit button is pressed. Retrieves the text of the new
-	 * tag edit box, and adds that tag to the list.
-	 */
-	protected void onTagSubmit() {
-		// Obtain the text from the dialog box
-		EditText tagTextView = (EditText) this.getView().findViewById(
-				R.id.dialog_edit_text);
-		String tagText = tagTextView.getText().toString();
-		Log.d("AddDialog", tagText);
-
-		// Split for multiple tags
-		String[] tags = tagText.split(",");
-
-		// Loop through each tag:
-		for (String tag : tags) {
-			// trim the tag
-			tag = tag.trim().toLowerCase();
-
-			// Check to make sure tag names are valid (non-empty)
-			if (tag.length() == 0) {
-				continue;
-			}
-
-			// Add this tag to the new tags list
-			mTagsToAdd.add(tag);
-		}
-		// Clear the text
-		tagTextView.getText().clear();
-		notifyAdapterChange();
 	}
 
 	/**
@@ -342,17 +300,17 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 	 * 
 	 * @return {@link AddListAdapter} for the {@link ListView}
 	 */
-	private AddListAdapter initAddAdapter() {
-		return new AddListAdapter(this.getActivity().getApplicationContext());
+	private RemListAdapter initAddAdapter() {
+		return new RemListAdapter(this.getActivity().getApplicationContext());
 	}
 
 	/**
 	 * ArrayAdapter for the Add style of the {@link AddTagsDialogFragment}.
 	 */
-	public class AddListAdapter extends ArrayAdapter<String> {
+	public class RemListAdapter extends ArrayAdapter<String> {
 		LayoutInflater mInflater;
 
-		public AddListAdapter(Context context) {
+		public RemListAdapter(Context context) {
 			super(context, android.R.layout.simple_list_item_1);
 			mInflater = LayoutInflater.from(context);
 		}
@@ -390,15 +348,15 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 
 				// If this is tag is currently applied to all entries, don't
 				// allow clicking (we cannot remove tags in the add tags dialog)
-				if (mTagsCur.contains(selected)) {
+				if (mTagsRem.contains(selected)) {
 					row.setClickable(false);
 					row.setLongClickable(false);
 					row.setFocusable(false);
 				}
 
 				// If a new tag has been added, set its text color to green
-				if (mTagsToAdd.contains(selected)) {
-					((TextView) row).setTextColor(0xFF00FF00);
+				if (mTagsToRem.contains(selected)) {
+					((TextView) row).setTextColor(0xFFFF0000);
 				}
 				displayText = selected;
 			}
@@ -416,7 +374,7 @@ public class AddTagsDialogFragment extends SherlockDialogFragment {
 			String selected = getItem(position);
 			if (selected.equals(KEY_CURRENT) || selected.equals(KEY_REMAIN)) {
 				return false;
-			} else if (mTagsCur.contains(selected)) {
+			} else if (mTagsRem.contains(selected)) {
 				return false;
 			} else {
 				return true;

@@ -38,7 +38,7 @@ public class MovieEntry extends MultiPricedEntry {
 		Pattern p_dir = Pattern
 				.compile("itemprop=\"director\".*?itemprop=\"name\">(.*?)<");
 		Pattern p_length = Pattern
-				.compile("<dt>Movie Length:</dt><dd>(.*?) minutes");
+				.compile(">Movie Length<.*?><div class=\"meta-details-value\".*?>(.*?) minutes");
 
 		Matcher m_cr = p_cr.matcher(text);
 		Matcher m_dir = p_dir.matcher(text);
@@ -95,7 +95,7 @@ public class MovieEntry extends MultiPricedEntry {
 
 	@Override
 	protected String getTitlePattern() {
-		return "<h1.*?class=\"doc-banner-title\">(.*?)<";
+		return "<h1.*?class=\"doc-header-title\".*?>(.*?)<";
 	}
 
 	@Override

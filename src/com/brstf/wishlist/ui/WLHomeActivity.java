@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 public class WLHomeActivity extends BaseActivity implements
 		HomeFragment.OnTileSelectedListener {
+	private HomeFragment mFrag = null;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -24,15 +26,15 @@ public class WLHomeActivity extends BaseActivity implements
 			}
 
 			// Create an instance of ExampleFragment
-			HomeFragment firstFragment = new HomeFragment();
+			mFrag = new HomeFragment();
 
 			// In case this activity was started with special instructions from
 			// an Intent, pass the Intent's extras to the fragment as arguments
-			firstFragment.setArguments(getIntent().getExtras());
+			mFrag.setArguments(getIntent().getExtras());
 
 			// Add the fragment to the 'fragment_container' FrameLayout
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, firstFragment).commit();
+					.add(R.id.fragment_container, mFrag).commit();
 		}
 	}
 
@@ -46,6 +48,9 @@ public class WLHomeActivity extends BaseActivity implements
 	public void onStart() {
 		super.onStart();
 
+		// Reload tags
+		mFrag.reloadTags();
+		
 		// Every time the activity starts, check for updates!
 		// new WLPriceChecker().priceCheck();
 	}

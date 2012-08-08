@@ -86,7 +86,7 @@ public class ArtistEntry extends Entry {
 	}
 
 	protected String getTitlePattern() {
-		return "class=\"doc-header-title\">(.*?)<";
+		return "class=\"doc-header-title\".*?>(.*?)<";
 	}
 
 	protected String getIconPattern() {
