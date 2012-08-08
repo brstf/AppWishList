@@ -1,6 +1,7 @@
 package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.brstf.wishlist.R;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLProvider;
 import com.brstf.wishlist.provider.WLEntryContract.TagColumns;
@@ -50,11 +51,16 @@ public class HomeFragment extends SherlockListFragment {
 		public void bindView(View view, Context context, Cursor cursor) {
 			String tag = cursor.getString(cursor
 					.getColumnIndex(TagColumns.KEY_TAG));
+			int tag_total = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(BaseColumns._COUNT)));
 			view.setTag(tag);
-			((TextView) view).setText(tag
+			
+			TextView tagtext = (TextView) view.findViewById(R.id.tag_text);
+			tagtext.setText(tag.substring(0, 1).toUpperCase() + tag.substring(1));
+			TextView tagcount = (TextView) view.findViewById(R.id.tag_count);
+			tagcount.setText(String.valueOf(tag_total));
+			/*((TextView) view).setText(tag
 					+ " (T:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(BaseColumns._COUNT)))
 					+ " A:"
 					+ Integer.valueOf(cursor.getInt(cursor
 							.getColumnIndex(TagColumns.KEY_APP_COUNT)))
@@ -70,12 +76,12 @@ public class HomeFragment extends SherlockListFragment {
 					+ " Ma:"
 					+ Integer.valueOf(cursor.getInt(cursor
 							.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT)))
-					+ ")");
+					+ ")");*/
 		}
 
 		@Override
 		public View newView(Context c, Cursor cursor, ViewGroup parent) {
-			View row = mInflater.inflate(android.R.layout.simple_list_item_1,
+			View row = mInflater.inflate(R.layout.row_home,
 					parent, false);
 
 			return row;

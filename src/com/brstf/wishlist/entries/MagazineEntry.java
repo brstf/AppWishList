@@ -82,7 +82,7 @@ public class MagazineEntry extends MultiPricedEntry {
 
 	@Override
 	protected String getTitlePattern() {
-		return "<h1.*?class=\"doc-header-title\"><a href=\".*?\">(.*?)<";
+		return "<h1.*?class=\"doc-header-title\".*?><a href=\".*?\">(.*?)<";
 	}
 
 	@Override
