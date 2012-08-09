@@ -6,6 +6,7 @@
     <string name="description_cancel_tag_transaction">Cancel Transaction</string>
     <string name="description_commit_tag_transaction">Save Changes</string>
     <string name="description_btn_submit">Add Tag</string>
+    <string name="description_edit_entries">Edit Entries</string>
     
     <string name="dialog_add_title">Add Tags</string>
     

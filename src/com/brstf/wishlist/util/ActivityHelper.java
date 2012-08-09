@@ -32,7 +32,7 @@ public class ActivityHelper {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		mActivity.getSupportMenuInflater().inflate(R.menu.default_menu_items,
+		mActivity.getSupportMenuInflater().inflate(R.menu.home_menu_items,
 				menu);
 		return true;
 	}

@@ -364,8 +364,7 @@ public class WLListFragment extends SherlockListFragment {
 					public boolean onItemLongClick(AdapterView<?> parent,
 							View view, int position, long id) {
 						Log.d(TAG, "Long click");
-						lamode = WLListFragment.this.getSherlockActivity()
-								.startActionMode(new ListActionMode());
+						startActionMode();
 						return false;
 					}
 				});
@@ -641,4 +640,8 @@ public class WLListFragment extends SherlockListFragment {
 		}
 	}
 
+	public void startActionMode() {
+		lamode = WLListFragment.this.getSherlockActivity().startActionMode(
+				new ListActionMode());
+	}
 }

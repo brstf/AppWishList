@@ -2,6 +2,8 @@ package com.brstf.wishlist.ui;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLProvider;
@@ -122,6 +124,22 @@ public class WLListActivity extends BaseActivity implements
 		outState.putInt(KEY_TAGID, mTagId);
 
 		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_edit_entries:
+			mFrag.startActionMode();
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getSupportMenuInflater().inflate(R.menu.list_menu_items, menu);
+		return true;
 	}
 
 	private class TagAdapter extends CursorAdapter {

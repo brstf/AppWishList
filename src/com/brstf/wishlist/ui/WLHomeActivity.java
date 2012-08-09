@@ -49,7 +49,9 @@ public class WLHomeActivity extends BaseActivity implements
 		super.onStart();
 
 		// Reload tags
-		mFrag.reloadTags();
+		if( mFrag != null ) {
+			mFrag.reloadTags();
+		}
 		
 		// Every time the activity starts, check for updates!
 		// new WLPriceChecker().priceCheck();

@@ -1,7 +1,10 @@
 package com.brstf.wishlist.ui;
 
+import java.util.ArrayList;
+
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.drawables.HomeIndicator;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLProvider;
 import com.brstf.wishlist.provider.WLEntryContract.TagColumns;
@@ -10,6 +13,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
+import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
@@ -20,6 +32,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -54,35 +67,51 @@ public class HomeFragment extends SherlockListFragment {
 			int tag_total = Integer.valueOf(cursor.getInt(cursor
 					.getColumnIndex(BaseColumns._COUNT)));
 			view.setTag(tag);
-			
+
 			TextView tagtext = (TextView) view.findViewById(R.id.tag_text);
-			tagtext.setText(tag.substring(0, 1).toUpperCase() + tag.substring(1));
+			tagtext.setText(tag.substring(0, 1).toUpperCase()
+					+ tag.substring(1));
 			TextView tagcount = (TextView) view.findViewById(R.id.tag_count);
 			tagcount.setText(String.valueOf(tag_total));
-			/*((TextView) view).setText(tag
-					+ " (T:"
-					+ " A:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_APP_COUNT)))
-					+ " Mu:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_MUSIC_COUNT)))
-					+ " Mo:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_MOVIE_COUNT)))
-					+ " B:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_BOOK_COUNT)))
-					+ " Ma:"
-					+ Integer.valueOf(cursor.getInt(cursor
-							.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT)))
-					+ ")");*/
+
+			LinearLayout indicator = (LinearLayout) view
+					.findViewById(R.id.typeindicator);
+
+			// Get the count of each type of entry
+			int appCount = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(TagColumns.KEY_APP_COUNT)));
+			int musCount = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(TagColumns.KEY_MUSIC_COUNT)));
+			int movCount = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(TagColumns.KEY_MOVIE_COUNT)));
+			int booCount = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(TagColumns.KEY_BOOK_COUNT)));
+			int magCount = Integer.valueOf(cursor.getInt(cursor
+					.getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT)));
+
+			HomeIndicator hi = new HomeIndicator(appCount, musCount, movCount,
+					booCount, magCount);
+
+			indicator.setBackgroundDrawable(hi);
+
+			/*
+			 * ((TextView) view).setText(tag + " (T:" + " A:" +
+			 * Integer.valueOf(cursor.getInt(cursor
+			 * .getColumnIndex(TagColumns.KEY_APP_COUNT))) + " Mu:" +
+			 * Integer.valueOf(cursor.getInt(cursor
+			 * .getColumnIndex(TagColumns.KEY_MUSIC_COUNT))) + " Mo:" +
+			 * Integer.valueOf(cursor.getInt(cursor
+			 * .getColumnIndex(TagColumns.KEY_MOVIE_COUNT))) + " B:" +
+			 * Integer.valueOf(cursor.getInt(cursor
+			 * .getColumnIndex(TagColumns.KEY_BOOK_COUNT))) + " Ma:" +
+			 * Integer.valueOf(cursor.getInt(cursor
+			 * .getColumnIndex(TagColumns.KEY_MAGAZINE_COUNT))) + ")");
+			 */
 		}
 
 		@Override
 		public View newView(Context c, Cursor cursor, ViewGroup parent) {
-			View row = mInflater.inflate(R.layout.row_home,
-					parent, false);
+			View row = mInflater.inflate(R.layout.row_home, parent, false);
 
 			return row;
 		}
@@ -166,7 +195,7 @@ public class HomeFragment extends SherlockListFragment {
 			}
 		}
 	};
-	
+
 	/**
 	 * Reloads the tag list.
 	 */
