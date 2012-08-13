@@ -519,6 +519,7 @@ public class WLListFragment extends SherlockListFragment {
 				if (loader != null) {
 					loader.forceLoad();
 				}
+				break;
 			case R.id.menu_tag:
 				Cursor addc = mListAdapter.getCursor();
 				for (int i = 0; i < numselected; ++i) {

@@ -1,5 +1,8 @@
 package com.brstf.wishlist.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +11,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.brstf.wishlist.service.PendingService;
+import com.brstf.wishlist.service.PriceCheckService;
 import com.brstf.wishlist.util.ActivityHelper;
 
 public class BaseActivity extends SherlockFragmentActivity {
@@ -20,6 +24,14 @@ public class BaseActivity extends SherlockFragmentActivity {
 		// Startup the pending intent service when the app is opened
 		final Intent pendingIntent = new Intent(this, PendingService.class);
 		startService(pendingIntent);
+
+		PendingIntent pintent = PendingIntent.getService(
+				getBaseContext(), 0, new Intent(this, PriceCheckService.class),
+				PendingIntent.FLAG_ONE_SHOT);
+		((AlarmManager) this.getSystemService(Context.ALARM_SERVICE))
+				.setInexactRepeating(AlarmManager.RTC,
+						System.currentTimeMillis() + 1,
+						AlarmManager.INTERVAL_HALF_DAY, pintent);
 	}
 
 	@Override
@@ -40,38 +52,38 @@ public class BaseActivity extends SherlockFragmentActivity {
 	protected ActivityHelper getActivityHelper() {
 		return mActivityHelper;
 	}
-	
+
 	public static Bundle intentToFragmentArguments(Intent intent) {
 		Bundle arguments = new Bundle();
-		if( intent == null ) {
+		if (intent == null) {
 			return arguments;
 		}
-		
+
 		final Uri uri = intent.getData();
-		if( uri != null ) {
+		if (uri != null) {
 			arguments.putParcelable("_uri", uri);
 		}
-		
+
 		final Bundle extras = intent.getExtras();
-		if( extras != null ) {
+		if (extras != null) {
 			arguments.putAll(extras);
 		}
-		
+
 		return arguments;
 	}
-	
+
 	public static Intent fragmentArgumentsToIntent(Bundle arguments) {
 		final Intent intent = new Intent();
-		
-		if( arguments == null ) {
+
+		if (arguments == null) {
 			return intent;
 		}
-		
+
 		final Uri uri = arguments.getParcelable("_uri");
-		if( uri != null ) {
+		if (uri != null) {
 			intent.setData(uri);
 		}
-		
+
 		intent.putExtras(arguments);
 		intent.removeExtra("_uri");
 		return intent;

@@ -133,7 +133,7 @@ public class WLListActivity extends BaseActivity implements
 			mFrag.startActionMode();
 			return true;
 		}
-		return false;
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

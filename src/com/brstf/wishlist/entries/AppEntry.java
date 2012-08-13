@@ -43,7 +43,7 @@ public class AppEntry extends SinglePricedEntry {
 	}
 	
 	@Override
-	protected String getPricePattern() {
+	public String getPricePattern() {
 		return "data-docPrice=\"(.*?)\"";
 	}
 

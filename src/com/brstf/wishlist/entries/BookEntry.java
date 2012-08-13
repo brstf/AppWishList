@@ -56,7 +56,7 @@ public class BookEntry extends SinglePricedEntry {
 	}
 	
 	@Override
-	protected String getPricePattern() {
+	public String getPricePattern() {
 		// TODO Auto-generated method stub
 		return "data-docPrice=\"(.*?)\"";
 	}

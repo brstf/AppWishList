@@ -132,7 +132,11 @@ public class WLEntryContract {
 				EntryColumns.KEY_REG_PRICE_1, EntryColumns.KEY_REG_PRICE_2,
 				EntryColumns.KEY_REG_PRICE_3, EntryColumns.KEY_REG_PRICE_4,
 				EntryColumns.KEY_ICONPATH, EntryColumns.KEY_ICONURL,
-				EntryColumns.KEY_URL };
+				EntryColumns.KEY_URL, EntryColumns.KEY_RATING,
+				EntryColumns.KEY_CRATING, EntryColumns.KEY_MOVLENGTH,
+				EntryColumns.KEY_ALBLENGTH, EntryColumns.KEY_NUMTRACKS,
+				EntryColumns.KEY_DATE, EntryColumns.KEY_PCOUNT,
+				EntryColumns.KEY_TAGS };
 	}
 
 	public interface SearchQuery {

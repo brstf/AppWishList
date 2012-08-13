@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -56,16 +57,37 @@
             android:name="com.brstf.wishlist.ui.WLListActivity"
             android:label="@string/actionbar_name" />
 
-        <service android:name=".service.IconService" />
-        <service android:name=".service.AddEntryService" />
-        <service android:name=".service.PendingService" />
+        <!-- Services -->
+        <service android:name=".service.IconService" 
+            android:exported="false"/>
+        
+        <service android:name=".service.AddEntryService"
+			android:exported="false"/>
+        
+        <service android:name=".service.PendingService"
+            android:exported="false" />
+        
+        <service android:name=".service.PriceCheckService"
+            android:exported="false" />
+        
+        <service android:name=".service.BootService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED" /> "
+            </intent-filter>
+        </service>
 
+        <!-- ContentProvider -->
         <provider
             android:name="com.brstf.wishlist.provider.WLProvider"
+            android:exported="false"
             android:authorities="com.brstf.wishlist" />
 
+        <!-- Search activity and meta-data -->
         <activity
             android:name=".ui.SearchActivity"
+            android:exported="false"
             android:label="@string/label_searchactivity"
             android:launchMode="singleTop" >
             <intent-filter>

@@ -114,4 +114,34 @@ public enum EntryType {
 			return NONE;
 		}
 	}
+
+	public static boolean isSinglePricedEntryString(String type) {
+		return isSinglePricedEntry(getTypeFromString(type));
+	}
+
+	public static boolean isSinglePricedEntry(EntryType type) {
+		switch (type) {
+		case MOVIE:
+		case MAGAZINE:
+		case MUSIC_ARTIST:
+		case NONE:
+			return false;
+		default:
+			return true;
+		}
+	}
+	
+	public static boolean isMultiPricedEntryString(String type) {
+		return isSinglePricedEntry(getTypeFromString(type));
+	}
+
+	public static boolean isMultiPricedEntry(EntryType type) {
+		switch (type) {
+		case MOVIE:
+		case MAGAZINE:
+			return true;
+		default:
+			return false;
+		}
+	}
 }

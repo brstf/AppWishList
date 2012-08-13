@@ -63,7 +63,7 @@ public class AlbumEntry extends SinglePricedEntry {
 	}
 
 	@Override
-	protected String getPricePattern() {
+	public String getPricePattern() {
 		return "<span itemprop=\"price\" content=\"(.*?)\"";
 	}
 

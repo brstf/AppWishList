@@ -177,16 +177,18 @@ public class WLDbAdapter {
 			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_UPDATE_APP
 					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
 					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
-					+ " == 'APP' BEGIN UPDATE " + Tables.ENTRIES_TAGS + " SET "
-					+ TagColumns.KEY_APP_COUNT + " = "
+					+ " == 'APP' AND old." + EntryColumns.KEY_TYPE
+					+ " == 'PENDING' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " SET " + TagColumns.KEY_APP_COUNT + " = "
 					+ TagColumns.KEY_APP_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");
 
 			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_UPDATE_MUSIC
 					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
-					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
+					+ Tables.ENTRIES + " WHEN ( new." + EntryColumns.KEY_TYPE
 					+ " == 'ARTIST' OR new." + EntryColumns.KEY_TYPE
-					+ " == 'ALBUM' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " == 'ALBUM' ) AND old." + EntryColumns.KEY_TYPE
+					+ " == 'PENDING' BEGIN UPDATE " + Tables.ENTRIES_TAGS
 					+ " SET " + TagColumns.KEY_MUSIC_COUNT + " = "
 					+ TagColumns.KEY_MUSIC_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");
@@ -194,7 +196,8 @@ public class WLDbAdapter {
 			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_UPDATE_MOVIE
 					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
 					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
-					+ " == 'MOVIE' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " == 'MOVIE' AND old." + EntryColumns.KEY_TYPE
+					+ " == 'PENDING' BEGIN UPDATE " + Tables.ENTRIES_TAGS
 					+ " SET " + TagColumns.KEY_MOVIE_COUNT + " = "
 					+ TagColumns.KEY_MOVIE_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");
@@ -202,7 +205,8 @@ public class WLDbAdapter {
 			db.execSQL("CREATE TRIGGER " + Triggers.ENTRIES_TAGS_UPDATE_BOOK
 					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
 					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
-					+ " == 'BOOK' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " == 'BOOK' AND old." + EntryColumns.KEY_TYPE
+					+ " == 'PENDING' BEGIN UPDATE " + Tables.ENTRIES_TAGS
 					+ " SET " + TagColumns.KEY_BOOK_COUNT + " = "
 					+ TagColumns.KEY_BOOK_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");
@@ -211,7 +215,8 @@ public class WLDbAdapter {
 					+ Triggers.ENTRIES_TAGS_UPDATE_MAGAZINE
 					+ " AFTER UPDATE OF " + EntryColumns.KEY_TYPE + " ON "
 					+ Tables.ENTRIES + " WHEN new." + EntryColumns.KEY_TYPE
-					+ " == 'MAGAZINE' BEGIN UPDATE " + Tables.ENTRIES_TAGS
+					+ " == 'MAGAZINE' AND old." + EntryColumns.KEY_TYPE
+					+ " == 'PENDING' BEGIN UPDATE " + Tables.ENTRIES_TAGS
 					+ " SET " + TagColumns.KEY_MAGAZINE_COUNT + " = "
 					+ TagColumns.KEY_MAGAZINE_COUNT + " + 1 WHERE "
 					+ TagColumns.KEY_TAG + " == 'all'; END;");

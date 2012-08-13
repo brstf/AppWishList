@@ -33,7 +33,7 @@ public abstract class SinglePricedEntry extends RatedEntry {
 		}
 	}
 
-	protected abstract String getPricePattern();
+	public abstract String getPricePattern();
 
 	@Override
 	public void setFromDb(Cursor c) {
