@@ -332,6 +332,10 @@ public class WLDbAdapter {
 				null, null, null);
 		c.moveToFirst();
 		String tags = c.getString(c.getColumnIndex(EntryColumns.KEY_TAGS));
+		// If this entry already contains the tag, don't add it
+		if( tags.contains(tag)) {
+			return;
+		}
 		tags = (tags == null || tags.equals("")) ? tag : tags + "," + tag;
 
 		ContentValues values = new ContentValues();

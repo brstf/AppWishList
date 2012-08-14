@@ -3,23 +3,15 @@ package com.brstf.wishlist.service;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.brstf.wishlist.entries.Entry;
 import com.brstf.wishlist.entries.EntryType;
-import com.brstf.wishlist.entries.SinglePricedEntry;
-import com.brstf.wishlist.provider.WLDbAdapter;
 import com.brstf.wishlist.provider.WLEntryContract;
-import com.brstf.wishlist.provider.WLProvider;
+import com.brstf.wishlist.provider.WLEntryContract.EntriesQuery;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.util.NetworkUtils;
-import com.brstf.wishlist.util.ProviderUtils;
-
-import android.app.AlarmManager;
 import android.app.IntentService;
-import android.app.PendingIntent;
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.provider.BaseColumns;
 import android.util.Log;
 
 public class PriceCheckService extends IntentService {
@@ -44,44 +36,37 @@ public class PriceCheckService extends IntentService {
 
 		// Loop through each entry
 		while (!c.isAfterLast()) {
-			// Get the entry from the cursor
-			Entry ent = EntryType.getTypeEntry(EntryType.getTypeFromString(c
-					.getString(c.getColumnIndex(EntryColumns.KEY_TYPE))), c
-					.getInt(c.getColumnIndex(BaseColumns._ID)));
-			ent.setFromDb(c);
-
+			EntryType type = EntryType.getTypeFromString(c
+					.getString(EntriesQuery.COLUMN_TYPE));
 			// If this is a priced entry, do price checking
-			if (EntryType.isSinglePricedEntry(ent.getType())) {
-				SinglePricedEntry spent = (SinglePricedEntry) ent;
-
-				String text = NetworkUtils.downloadURL(spent.getURL());
+			if (EntryType.isSinglePricedEntry(type)) {
+				String url = c.getString(EntriesQuery.COLUMN_URL);
+				String text = NetworkUtils.downloadURL(url);
 
 				// Retrieve current price of entry
-				Pattern p_price = Pattern.compile(spent.getPricePattern());
+				Pattern p_price = Pattern.compile(EntryType
+						.getPricePattern(type));
 				Matcher m_price = p_price.matcher(text);
 				m_price.find();
 
+				float curPrice = 0.0f;
 				// Set current price of entry and update "Sale" status
-				if (m_price.group(1).equals("Free")) {
-					spent.setCurrentPrice(0.0f);
-				} else {
-					spent.setCurrentPrice(Float.valueOf(m_price.group(1)
-							.substring(1)));
-				}
-				if (spent.isOnSale()) {
-					spent.addTag("sale");
-				} else {
-					spent.removeTag("sale");
+				if (!m_price.group(1).equals("Free")) {
+					curPrice = Float.valueOf(m_price.group(1).substring(1));
 				}
 
-				ProviderUtils.update(getContentResolver(), spent);
-				Log.d(TAG, spent.getTitle());
-			} else if (EntryType.isMultiPricedEntry(ent.getType())) {
+				// Update the database
+				ContentValues values = new ContentValues();
+				values.put(EntryColumns.KEY_CUR_PRICE_1, curPrice);
+				getContentResolver().update(
+						WLEntryContract.Entries.buildEntryUri(url), values,
+						null, null);
+				Log.d(TAG, c.getString(EntriesQuery.COLUMN_NAME));
+			} else if (EntryType.isMultiPricedEntry(type)) {
 
 			}
-			
+
 			c.moveToNext();
 		}
 	}
-
 }

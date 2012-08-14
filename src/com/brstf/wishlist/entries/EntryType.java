@@ -130,7 +130,7 @@ public enum EntryType {
 			return true;
 		}
 	}
-	
+
 	public static boolean isMultiPricedEntryString(String type) {
 		return isSinglePricedEntry(getTypeFromString(type));
 	}
@@ -143,5 +143,40 @@ public enum EntryType {
 		default:
 			return false;
 		}
+	}
+
+	public static String getPricePattern(EntryType type) {
+		switch (type) {
+		case APP:
+			return "data-docPrice=\"(.*?)\"";
+		case MUSIC_ALBUM:
+			return "<span itemprop=\"price\" content=\"(.*?)\"";
+		case BOOK:
+			return "data-docPrice=\"(.*?)\"";
+		case MAGAZINE:
+			// Issue Price
+			return getMagazineBasePatternPrice()
+					+ "Current issue\".*?<div class=\"clear\"";
+		case MOVIE:
+			// RENT SD
+			return getMovieBasePricePattern()
+					+ "Rent SD\".*?<div class=\"clear\"";
+		default:
+			return null;
+		}
+	}
+
+	private static String getMagazineBasePatternPrice() {
+		return "data-docPrice=\"(.{1,10})\" data-docPriceMicros=\".{1,14}\""
+				+ " data-isFree=\".{0,10}\" data-isPurchased=\".{0,10}\" "
+				+ "data-offerType=\".{0,10}\" data-rentalGrantPeriodDays=\"."
+				+ "{0,10}\" data-rentalactivePeriodHours=\".{0,10}\" "
+				+ "data-offerTitle=\"";
+	}
+
+	private static String getMovieBasePricePattern() {
+		return "data-docPrice=\"(.{1,10})\" data-docPriceMicros=\".{1,14}\" data-isFree=\".{0,10}\" "
+				+ "data-isPurchased=\".{0,10}\" data-offerType=\".{0,10}\" data-rentalGrantPeriodDays=\".{0,10}\" "
+				+ "data-rentalactivePeriodHours=\".{0,10}\" data-offerTitle=\"";
 	}
 }

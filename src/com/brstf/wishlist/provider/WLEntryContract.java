@@ -137,6 +137,29 @@ public class WLEntryContract {
 				EntryColumns.KEY_ALBLENGTH, EntryColumns.KEY_NUMTRACKS,
 				EntryColumns.KEY_DATE, EntryColumns.KEY_PCOUNT,
 				EntryColumns.KEY_TAGS };
+		int COLUMN_ID = 0;
+		int COLUMN_TYPE = 1;
+		int COLUMN_NAME = 2;
+		int COLUMN_CREATOR = 3;
+		int COLUMN_CUR_PRICE_1 = 4;
+		int COLUMN_CUR_PRICE_2 = 5;
+		int COLUMN_CUR_PRICE_3 = 6;
+		int COLUMN_CUR_PRICE_4 = 7;
+		int COLUMN_REG_PRICE_1 = 8;
+		int COLUMN_REG_PRICE_2 = 9;
+		int COLUMN_REG_PRICE_3 = 10;
+		int COLUMN_REG_PRICE_4 = 11;
+		int COLUMN_ICONPATH = 12;
+		int COLUMN_ICONURL = 13;
+		int COLUMN_URL = 14;
+		int COLUMN_RATING = 15;
+		int COLUMN_CRATING = 16;
+		int COLUMN_MOVLENGTH = 17;
+		int COLUMN_ALBLENGTH = 18;
+		int COLUMN_NUMTRACKS = 19;
+		int COLUMN_DATE = 20;
+		int COLUMN_PCOUNT = 21;
+		int COLUMN_TAGS = 22;
 	}
 
 	public interface SearchQuery {
