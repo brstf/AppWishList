@@ -1,7 +1,6 @@
 package com.brstf.wishlist.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;

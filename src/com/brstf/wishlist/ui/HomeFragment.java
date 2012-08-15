@@ -1,7 +1,5 @@
 package com.brstf.wishlist.ui;
 
-import java.util.ArrayList;
-
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.drawables.HomeIndicator;
@@ -13,15 +11,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
-import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;

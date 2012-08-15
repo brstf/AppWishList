@@ -14,9 +14,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class ShareActivity extends SherlockActivity {
+	private static final String TAG = "ShareActivity";
+	private static final String URL_PATTERN = "https://play.google.com/store/(apps|movies|magazines|books|music/artist|music/album)/.*$";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -32,8 +35,18 @@ public class ShareActivity extends SherlockActivity {
 			url = intent.getExtras().getString("android.intent.extra.TEXT");
 		}
 
-		// Before attempting to add this to the wishlist, see if it's already
-		// there
+		// Before attempting to add this to the wishlist, verify the url
+		if (!url.matches(URL_PATTERN)) {
+			Log.d(TAG, "Bad URL: " + url);
+			Toast.makeText(getBaseContext(),
+					"Not a valid Google Play Store url", Toast.LENGTH_SHORT)
+					.show();
+			finish();
+			return;
+		}
+
+		// If the url is valid, check to make sure it's not already in the
+		// wishlist
 		String rc = addPending(url);
 		if (rc != null) {
 			if (rc == EntryType.getTypeString(EntryType.PENDING)) {
