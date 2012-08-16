@@ -9,9 +9,14 @@ import com.brstf.wishlist.provider.WLEntryContract.EntriesQuery;
 import com.brstf.wishlist.provider.WLEntryContract.EntryColumns;
 import com.brstf.wishlist.util.NetworkUtils;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 public class PriceCheckService extends IntentService {
@@ -33,7 +38,8 @@ public class PriceCheckService extends IntentService {
 				WLEntryContract.Entries.CONTENT_URI,
 				WLEntryContract.EntriesQuery.columns, null, null, null);
 		c.moveToFirst();
-
+		int numNotifications = 0;
+		
 		// Loop through each entry
 		while (!c.isAfterLast()) {
 			EntryType type = EntryType.getTypeFromString(c
@@ -61,6 +67,36 @@ public class PriceCheckService extends IntentService {
 				getContentResolver().update(
 						WLEntryContract.Entries.buildEntryUri(url), values,
 						null, null);
+
+				// Notify the user of a price drop
+				float oldPrice = c.getFloat(EntriesQuery.COLUMN_REG_PRICE_1);
+				if (oldPrice != curPrice) {
+					Log.d(TAG, "Sale! " + c.getString(EntriesQuery.COLUMN_NAME));
+					NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+					// Construct the notification to send
+					Notification notification = new Notification(
+							android.R.drawable.alert_dark_frame,
+							c.getString(EntriesQuery.COLUMN_NAME)
+									+ " is on sale!",
+							System.currentTimeMillis());
+					CharSequence nTitle = c.getString(EntriesQuery.COLUMN_NAME)
+							+ " is on sale!";
+					CharSequence nText = c.getString(EntriesQuery.COLUMN_NAME)
+							+ " is now $" + String.format("%.2f", curPrice)
+							+ " (was $" + String.format("%.2f", oldPrice) + ")";
+
+					// Setup the intent
+					Intent nIntent = new Intent(Intent.ACTION_VIEW,
+							Uri.parse(url));
+					PendingIntent contentIntent = PendingIntent.getActivity(
+							this, 0, nIntent, 0);
+					notification.setLatestEventInfo(getApplicationContext(),
+							nTitle, nText, contentIntent);
+
+					// Send the notification
+					nm.notify(numNotifications++, notification);
+				}
 				Log.d(TAG, c.getString(EntriesQuery.COLUMN_NAME));
 			} else if (EntryType.isMultiPricedEntry(type)) {
 

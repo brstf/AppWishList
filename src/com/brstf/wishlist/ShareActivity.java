@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 public class ShareActivity extends SherlockActivity {
 	private static final String TAG = "ShareActivity";
-	private static final String URL_PATTERN = "https://play.google.com/store/(apps|movies|magazines|books|music/artist|music/album)/.*$";
+	private static final String URL_PATTERN = "https://play.google.com/store/(apps/|movies/|magazines/|books/|music/artist|music/album).*$";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 public class WLListActivity extends BaseActivity implements
 		OnNavigationListener {
-	private static final String KEY = "WLListActivity";
+	private static final String TAG = "WLListActivity";
 	private TagAdapter mAdapter = null;
 	private WLListFragment mFrag = null;
 	public static final String KEY_TAGID = "TAGID";
@@ -39,7 +39,6 @@ public class WLListActivity extends BaseActivity implements
 
 		if (findViewById(R.id.fragment_container) != null) {
 			mTagId = getIntent().getIntExtra(KEY_TAGID, 0);
-			Log.d(KEY, "Get extra: " + String.valueOf(mTagId));
 
 			// If we have a saved state, restore the previous filter tag
 			if (savedInstanceState != null) {

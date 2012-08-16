@@ -27,7 +27,7 @@ public class BaseActivity extends SherlockFragmentActivity {
 
 		PendingIntent pintent = PendingIntent.getService(
 				getBaseContext(), 0, new Intent(this, PriceCheckService.class),
-				PendingIntent.FLAG_ONE_SHOT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		((AlarmManager) this.getSystemService(Context.ALARM_SERVICE))
 				.setInexactRepeating(AlarmManager.RTC,
 						System.currentTimeMillis() + 1,

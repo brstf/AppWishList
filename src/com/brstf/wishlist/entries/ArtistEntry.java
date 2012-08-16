@@ -81,8 +81,6 @@ public class ArtistEntry extends Entry {
 		while (m_genre.find()) {
 			addGenre(m_genre.group(1));
 		}
-
-		addTag("Music");
 	}
 
 	protected String getTitlePattern() {

@@ -58,8 +58,6 @@ public class AlbumEntry extends SinglePricedEntry {
 		setTrackCount(Integer.valueOf(m_tracks.group(1)));
 		setReleaseDate(android.text.Html.fromHtml(m_release.group(1))
 				.toString());
-
-		addTag("Music");
 	}
 
 	@Override
