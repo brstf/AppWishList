@@ -56,6 +56,10 @@
         <activity
             android:name="com.brstf.wishlist.ui.WLListActivity"
             android:label="@string/actionbar_name" />
+        
+        <activity
+            android:name="com.brstf.wishlist.ui.SettingsActivity"
+            android:label="@string/actionbar_name_settings" />
 
         <!-- Services -->
         <service android:name=".service.IconService" 

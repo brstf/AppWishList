@@ -8,4 +8,8 @@
     <item android:id="@+id/menu_edit_entries"
         android:title="@string/description_edit_entries"
         android:showAsAction="never" />
+    
+    <item android:id="@+id/menu_settings"
+        android:title="@string/settings"
+        android:showAsAction="never"/>
 </menu>

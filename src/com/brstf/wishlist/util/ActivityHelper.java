@@ -1,6 +1,9 @@
 package com.brstf.wishlist.util;
 
+import android.content.Intent;
+
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.ui.SettingsActivity;
 import com.brstf.wishlist.ui.WLHomeActivity;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -32,8 +35,8 @@ public class ActivityHelper {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		mActivity.getSupportMenuInflater().inflate(R.menu.home_menu_items,
-				menu);
+		mActivity.getSupportMenuInflater()
+				.inflate(R.menu.home_menu_items, menu);
 		return true;
 	}
 
@@ -44,6 +47,11 @@ public class ActivityHelper {
 			return true;
 		case R.id.menu_search:
 			mActivity.onSearchRequested();
+			return true;
+		case R.id.menu_settings:
+			// Start Settings Activity
+			Intent settingsIntent = new Intent(mActivity, SettingsActivity.class);
+			mActivity.startActivity(settingsIntent);
 			return true;
 		}
 		return false;

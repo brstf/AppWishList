@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!-- Parent LinearLayout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <!-- General Settings Title Separator -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="20dip"
+            android:text="@string/settings_title_general"
+            android:textColor="#FF33B5E5"
+            android:textSize="12dip" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/solid_holo_blue" />
+
+        <!-- Price Check on Wi-Fi Only -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:paddingLeft="5dip"
+                android:text="@string/settings_sync_wifi"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <ToggleButton
+                android:id="@+id/btn_wifi_sync"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+
+        <!-- Price Check Time Interval -->
+
+        <LinearLayout
+            android:id="@+id/btn_sync_inteval"
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:background="@drawable/transparent_button"
+            android:clickable="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dip"
+                android:paddingTop="7dip"
+                android:text="@string/settings_sync_interval"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <TextView
+                android:id="@+id/text_current_interval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dip"
+                android:paddingTop="2dip"
+                android:text="@string/settings_sync_sample_interval"
+                android:textColor="#FF888888"
+                android:textSize="13dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+
+        <!-- Confirm Before Deletion -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:paddingLeft="5dip"
+                android:text="@string/settings_confirm_deletion"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <ToggleButton
+                android:id="@+id/btn_confirm_deletion"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+
+        <!-- Add Tags Upon Wishlist Addition -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:paddingLeft="5dip"
+                android:text="@string/settings_add_upon_addition"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <ToggleButton
+                android:id="@+id/btn_add_upon_addition"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+
+        <!-- Display Settings Title Separator -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="20dip"
+            android:text="@string/settings_title_display"
+            android:textColor="#FF33B5E5"
+            android:textSize="12dip" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/solid_holo_blue" />
+
+        <!-- Movie Display Option -->
+
+        <LinearLayout
+            android:id="@+id/btn_display_price_movie"
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:background="@drawable/transparent_button"
+            android:clickable="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dip"
+                android:paddingTop="7dip"
+                android:text="@string/settings_display_price_movie"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <TextView
+                android:id="@+id/text_display_price_movie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dip"
+                android:paddingTop="2dip"
+                android:text="@string/settings_display_price_movie_sample"
+                android:textColor="#FF888888"
+                android:textSize="13dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+        
+        <!-- Magazine Display Option -->
+
+        <LinearLayout
+            android:id="@+id/btn_display_price_magazine"
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:background="@drawable/transparent_button"
+            android:clickable="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dip"
+                android:paddingTop="7dip"
+                android:text="@string/settings_display_price_magazine"
+                android:textColor="#FFFFFFFF"
+                android:textSize="18dip" />
+
+            <TextView
+                android:id="@+id/text_display_price_magazine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dip"
+                android:paddingTop="2dip"
+                android:text="@string/settings_display_price_magazine_sample"
+                android:textColor="#FF888888"
+                android:textSize="13dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/separator" />
+    </LinearLayout>
+
+</ScrollView>

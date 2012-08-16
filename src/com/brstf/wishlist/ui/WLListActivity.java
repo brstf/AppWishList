@@ -52,7 +52,7 @@ public class WLListActivity extends BaseActivity implements
 					.replace(R.id.fragment_container, mFrag).commit();
 		}
 
-		// Adapter is initialiezd here so that it is guaranteed that we have
+		// Adapter is initialized here so that it is guaranteed that we have
 		// obtained mTagId before the Loader finishes loading
 		mAdapter = new TagAdapter(getApplicationContext());
 		loaderFinished = false;

@@ -4,4 +4,8 @@
         android:icon="@android:drawable/ic_menu_search"
         android:title="@string/description_search"
         android:showAsAction="always|collapseActionView"/>
+    
+    <item android:id="@+id/menu_settings"
+        android:title="@string/settings"
+        android:showAsAction="never"/>
 </menu>
