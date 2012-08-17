@@ -1,6 +1,8 @@
 package com.brstf.wishlist.util;
 
+import android.app.AlarmManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.brstf.wishlist.R;
 import com.brstf.wishlist.ui.SettingsActivity;
@@ -50,7 +52,8 @@ public class ActivityHelper {
 			return true;
 		case R.id.menu_settings:
 			// Start Settings Activity
-			Intent settingsIntent = new Intent(mActivity, SettingsActivity.class);
+			Intent settingsIntent = new Intent(mActivity,
+					SettingsActivity.class);
 			mActivity.startActivity(settingsIntent);
 			return true;
 		}
@@ -82,5 +85,36 @@ public class ActivityHelper {
 		// activity, though this may be necessary to change later
 		// TODO: Does any sub-activity need this changed??
 		mActivity.finish();
+	}
+
+	/**
+	 * Fills the given {@link SharedPreferences} with default values.
+	 * 
+	 * @param prefs
+	 *            {@link SharedPreferences} to fill with default values
+	 */
+	public void fillDefaultPreferences(SharedPreferences prefs) {
+		SharedPreferences.Editor editor = prefs.edit();
+
+		// Mark the preferences as created
+		editor.putBoolean("CREATED", true);
+
+		// General Preferences:
+		editor.putBoolean(mActivity.getString(R.string.prefs_sync_wifi), true);
+		editor.putLong(mActivity.getString(R.string.prefs_sync_interval),
+				AlarmManager.INTERVAL_HALF_DAY);
+		editor.putBoolean(mActivity.getString(R.string.prefs_confirm_deletion),
+				false);
+		editor.putBoolean(
+				mActivity.getString(R.string.prefs_add_upon_addition), false);
+
+		// Display Preferences:
+		editor.putInt(mActivity.getString(R.string.prefs_display_price_movie),
+				0);
+		editor.putInt(
+				mActivity.getString(R.string.prefs_display_price_magazine), 0);
+
+		// Finally, commit the changes
+		editor.commit();
 	}
 }

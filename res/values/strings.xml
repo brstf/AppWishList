@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Description Strings -->
     <string name="description_search">Search</string>
     <string name="description_add_tag">Add New Tag</string>
     <string name="description_cancel_tag_transaction">Cancel Transaction</string>
     <string name="description_commit_tag_transaction">Save Changes</string>
     <string name="description_btn_submit">Add Tag</string>
     <string name="description_edit_entries">Edit Entries</string>
-    
+
+    <!-- Preference Strings -->
+    <string name="PREFS_NAME">WishlistPreferences</string>
+    <string name="prefs_sync_wifi">sync_wifi</string>
+    <string name="prefs_sync_interval">sync_interval</string>
+    <string name="prefs_confirm_deletion">confirm_deletion</string>
+    <string name="prefs_add_upon_addition">add_upon_deletion</string>
+    <string name="prefs_display_price_movie">display_price_movie</string>
+    <string name="prefs_display_price_magazine">display_price_magazine</string>
+
+    <!-- Settings Strings -->
     <string name="settings">Settings</string>
     <string name="settings_title_general">GENERAL</string>
     <string name="settings_sync_wifi">Price Check on Wi-Fi Only</string>
-    <string name="settings_sync_interval">Set Price Check Interval&#8230;</string>
+    <string name="settings_sync_interval">Set Price Check Interval…</string>
     <string name="settings_sync_sample_interval">Twice A Day</string>
     <string name="settings_confirm_deletion">Confirm Before Deletion</string>
     <string name="settings_add_upon_addition">Add Tags Upon Wishlist Addition</string>
@@ -20,20 +31,36 @@
     <string name="settings_display_price_movie_sample">Rent: Standard Definition</string>
     <string name="settings_display_price_magazine">Default Magazine Price Display:</string>
     <string name="settings_display_price_magazine_sample">Single Issue</string>
-    
+    <string name="settings_interval_title">CHOOSE INTERVAL:</string>
+    <string name="settings_interval_15min">15 Minutes</string>
+    <string name="settings_interval_halfhour">Every Half-hour</string>
+    <string name="settings_interval_1hour">Every Hour</string>
+    <string name="settings_interval_halfday">Twice a Day</string>
+    <string name="settings_interval_day">Once a Day</string>
+    <string name="settings_movprice_rentsd">Rental Standard Definition</string>
+    <string name="settings_movprice_renthd">Rental High Definition</string>
+    <string name="settings_movprice_buysd">Purchase Standard Definition</string>
+    <string name="settings_movprice_buyhd">Purchase High Definition</string>
+    <string name="settings_magprice_issue">Issue Price</string>
+    <string name="settings_magprice_monthly">Monthly Subscription</string>
+    <string name="settings_magprice_annual">Annual Subscription</string>
+
+    <!-- Dialog Strings -->
     <string name="dialog_add_title">Add Tags</string>
-    
+
+    <!-- Hint Strings -->
     <string name="hint_search">Search Wishlist</string>
-    <string name="hint_add_tag">Enter new tag&#8230;</string>
-    
+    <string name="hint_add_tag">Enter new tag…</string>
+
+    <!-- Menu Strings -->
     <string name="menu_delete">Delete</string>
     <string name="menu_tag">Tag</string>
     <string name="menu_tag_rem">Remove Tags</string>
-    
+
+    <!-- Label Strings -->
     <string name="label_add_tags">Modify Tags</string>
     <string name="label_searchactivity">Search</string>
     <string name="label_search">Search</string>
-    
     <string name="app_name">Wishlist</string>
     <string name="add_name">Add to Wishlist</string>
     <string name="actionbar_name">Wishlist</string>

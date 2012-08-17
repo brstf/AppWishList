@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/interval_group"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="20dip"
+            android:text="@string/settings_interval_title"
+            android:textColor="#FF33B5E5"
+            android:textSize="12dip" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:src="@drawable/solid_holo_blue" />
+        
+    <!-- Interval 15 Minutes -->
+
+    <RadioButton
+        android:id="@+id/interval_15min"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_interval_15min" />
+    
+    <!-- Interval 30 Minutes -->
+
+    <RadioButton
+        android:id="@+id/interval_halfhour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_interval_halfhour" />
+    
+    <!-- Interval 1 Hour -->
+
+    <RadioButton
+        android:id="@+id/interval_1hour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_interval_1hour" />
+    
+    <!-- Interval Twice a day -->
+
+    <RadioButton
+        android:id="@+id/interval_halfday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_interval_halfday" />
+    
+    <!-- Interval Once a day -->
+
+    <RadioButton
+        android:id="@+id/interval_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_interval_day" />
+
+</RadioGroup>
