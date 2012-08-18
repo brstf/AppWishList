@@ -15,7 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends BaseActivity implements
+		ChooseIntervalDialog.OnDialogDismissListener {
 	private ToggleButton mWifiSync;
 	private LinearLayout mSyncInterval;
 	private ToggleButton mConfirmDeletion;
@@ -30,6 +31,11 @@ public class SettingsActivity extends BaseActivity {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 
 		View cView = getWindow().getDecorView().findViewById(
 				android.R.id.content);
@@ -74,7 +80,7 @@ public class SettingsActivity extends BaseActivity {
 		mSyncInterval.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SherlockDialogFragment intervalFragment = new ChooseIntervalDialog();
+				SherlockDialogFragment intervalFragment = new ChooseIntervalDialog(SettingsActivity.this);
 				intervalFragment.show(getSupportFragmentManager(),
 						"dialog_interval");
 			}
@@ -107,6 +113,15 @@ public class SettingsActivity extends BaseActivity {
 						editor.commit();
 					}
 				});
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		setIntervalSubString();
+		setMoviePriceSubString();
+		setMagazinePriceSubString();
 	}
 
 	@Override
@@ -179,5 +194,12 @@ public class SettingsActivity extends BaseActivity {
 			textMovie.setText(getString(R.string.settings_movprice_buyhd));
 			break;
 		}
+	}
+
+	@Override
+	public void onDialogDismissal() {
+		setIntervalSubString();
+		setMoviePriceSubString();
+		setMagazinePriceSubString();
 	}
 }

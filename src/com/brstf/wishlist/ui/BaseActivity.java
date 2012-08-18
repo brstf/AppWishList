@@ -21,14 +21,19 @@ public class BaseActivity extends SherlockFragmentActivity {
 	protected static SharedPreferences mPrefs = null;
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
 		mPrefs = getSharedPreferences(getString(R.string.PREFS_NAME), 0);
 		if (!mPrefs.contains("CREATED")) {
 			// Create the initial preferences
 			mActivityHelper.fillDefaultPreferences(mPrefs);
 		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 
 		// Startup the pending intent service when the app is opened
 		final Intent pendingIntent = new Intent(this, PendingService.class);

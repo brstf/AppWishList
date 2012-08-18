@@ -1,11 +1,15 @@
 package com.brstf.wishlist.ui;
 
+import java.util.HashMap;
+
 import android.app.AlarmManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
@@ -18,7 +22,17 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 	private RadioButton mHalfday = null;
 	private RadioButton mDay = null;
 	private SharedPreferences mPrefs = null;
+	private final HashMap<RadioButton, Long> intervalMap = new HashMap<RadioButton, Long>();
+	private OnDialogDismissListener mListener;
 
+	public interface OnDialogDismissListener {
+		public void onDialogDismissal();
+	}
+	
+	ChooseIntervalDialog( OnDialogDismissListener list ) {
+		mListener = list;
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,23 +55,57 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 		mHalfday = (RadioButton) view.findViewById(R.id.interval_halfday);
 		mDay = (RadioButton) view.findViewById(R.id.interval_day);
 
+		intervalMap.put(m15min, AlarmManager.INTERVAL_FIFTEEN_MINUTES);
+		intervalMap.put(m30min, AlarmManager.INTERVAL_HALF_HOUR);
+		intervalMap.put(m1hour, AlarmManager.INTERVAL_HOUR);
+		intervalMap.put(mHalfday, AlarmManager.INTERVAL_HALF_DAY);
+		intervalMap.put(mDay, AlarmManager.INTERVAL_DAY);
+
 		mPrefs = getActivity().getSharedPreferences(
 				getString(R.string.PREFS_NAME), 0);
 		;
 		long interval = mPrefs.getLong(getString(R.string.prefs_sync_interval),
 				0);
-		if (interval == AlarmManager.INTERVAL_FIFTEEN_MINUTES) {
+		if (interval == intervalMap.get(m15min)) {
 			m15min.setChecked(true);
-		} else if (interval == AlarmManager.INTERVAL_HALF_HOUR) {
+		} else if (interval == intervalMap.get(m30min)) {
 			m30min.setChecked(true);
-		} else if (interval == AlarmManager.INTERVAL_HOUR) {
+		} else if (interval == intervalMap.get(m1hour)) {
 			m1hour.setChecked(true);
-		} else if (interval == AlarmManager.INTERVAL_HALF_DAY) {
+		} else if (interval == intervalMap.get(mHalfday)) {
 			mHalfday.setChecked(true);
-		} else if (interval == AlarmManager.INTERVAL_DAY) {
+		} else if (interval == intervalMap.get(mDay)) {
 			mDay.setChecked(true);
 		}
 
 		return view;
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		// Add check listeners to all radio buttons
+		OnCheckedChangeListener rButtonListener = new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				if( isChecked ) {
+					SharedPreferences.Editor editor = mPrefs.edit();
+					editor.putLong(getString(R.string.prefs_sync_interval),
+							intervalMap.get((RadioButton) buttonView));
+					editor.commit();
+					
+					mListener.onDialogDismissal();
+					dismiss();
+				}
+			}
+		};
+
+		m15min.setOnCheckedChangeListener(rButtonListener);
+		m30min.setOnCheckedChangeListener(rButtonListener);
+		m1hour.setOnCheckedChangeListener(rButtonListener);
+		mHalfday.setOnCheckedChangeListener(rButtonListener);
+		mDay.setOnCheckedChangeListener(rButtonListener);
 	}
 }
