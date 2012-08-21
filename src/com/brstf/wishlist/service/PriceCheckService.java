@@ -1,8 +1,10 @@
 package com.brstf.wishlist.service;
 
+import java.sql.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.brstf.wishlist.R;
 import com.brstf.wishlist.entries.EntryType;
 import com.brstf.wishlist.provider.WLEntryContract;
 import com.brstf.wishlist.provider.WLEntryContract.EntriesQuery;
@@ -15,31 +17,61 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.format.Time;
 import android.util.Log;
 
 public class PriceCheckService extends IntentService {
 	private static final String TAG = "PriceCheckService";
+	private SharedPreferences mPrefs;
+	private final long RECHECK_INTERVAL = 300000; // 5 min.
 
 	public PriceCheckService() {
 		super(TAG);
 	}
 
 	@Override
+	public void onCreate() {
+		super.onCreate();
+		
+		mPrefs = getSharedPreferences(getString(R.string.PREFS_NAME), 0);
+		Log.d(TAG, "PriceCheckServiceCreated");
+	}
+
+	@Override
 	protected void onHandleIntent(Intent intent) {
-		// Receive intent
+		// Check preferences to see if sync should be done (are we on Wi-Fi?)
+		boolean wifiOnly = mPrefs.getBoolean(
+				getString(R.string.prefs_sync_wifi), true);
+		if ((wifiOnly && !NetworkUtils.isWifiAvailable(getBaseContext()))
+				|| !NetworkUtils.isNetworkAvailable(getBaseContext())) {
+			// Schedule a recheck
+			long lastTime = mPrefs.getLong(
+					getString(R.string.prefs_last_check_time), 0);
+			long interval = mPrefs.getLong(
+					getString(R.string.prefs_sync_interval), 0);
+
+			NetworkUtils.schedulePriceCheck(getBaseContext(), lastTime
+					+ RECHECK_INTERVAL, interval, mPrefs,
+					getString(R.string.prefs_last_check_time));
+
+			Time t = new Time();
+			t.set(lastTime + RECHECK_INTERVAL);
+			Log.d(TAG, "Reschedule for " + t.toString());
+			return;
+		}
 
 		Log.d(TAG, "PriceCheckServiceStarted");
-		// If intent contains a RESCHEDULE flag, reschedule the service
-
+		
 		// Query for all entries
 		Cursor c = getContentResolver().query(
 				WLEntryContract.Entries.CONTENT_URI,
 				WLEntryContract.EntriesQuery.columns, null, null, null);
 		c.moveToFirst();
 		int numNotifications = 0;
-		
+
 		// Loop through each entry
 		while (!c.isAfterLast()) {
 			EntryType type = EntryType.getTypeFromString(c
@@ -104,5 +136,11 @@ public class PriceCheckService extends IntentService {
 
 			c.moveToNext();
 		}
+
+		// Update the last checked time
+		SharedPreferences.Editor editor = mPrefs.edit();
+		editor.putLong(getString(R.string.prefs_last_check_time),
+				System.currentTimeMillis());
+		editor.commit();
 	}
 }

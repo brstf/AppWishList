@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/interval_group"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="5dip"
+    android:paddingLeft="10dip"
+    android:paddingRight="10dip"
+    android:paddingTop="5dip" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="20dip"
+        android:text="@string/settings_movprice_title"
+        android:textColor="#FF33B5E5"
+        android:textSize="12dip" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:paddingLeft="0dip"
+        android:paddingRight="0dip"
+        android:src="@drawable/solid_holo_blue" />
+
+    <!-- Rental Standard Definition -->
+
+    <RadioButton
+        android:id="@+id/movprice_rsd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip"
+        android:text="@string/settings_movprice_rentsd"
+        android:textSize="25dip" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:src="@drawable/separator" />
+
+    <!-- Rental High Definition -->
+
+    <RadioButton
+        android:id="@+id/movprice_rhd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip"
+        android:text="@string/settings_movprice_renthd"
+        android:textSize="25dip" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:src="@drawable/separator" />
+
+    <!-- Buy Standard Definition -->
+
+    <RadioButton
+        android:id="@+id/movprice_bsd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip"
+        android:text="@string/settings_movprice_buysd"
+        android:textSize="25dip" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:src="@drawable/separator" />
+
+    <!-- Buy High Definition -->
+
+    <RadioButton
+        android:id="@+id/movprice_bhd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip"
+        android:text="@string/settings_movprice_buyhd"
+        android:textSize="25dip" />
+    
+</RadioGroup>

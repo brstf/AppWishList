@@ -17,6 +17,7 @@
     <string name="prefs_add_upon_addition">add_upon_deletion</string>
     <string name="prefs_display_price_movie">display_price_movie</string>
     <string name="prefs_display_price_magazine">display_price_magazine</string>
+    <string name="prefs_last_check_time">last_check_time</string>
 
     <!-- Settings Strings -->
     <string name="settings">Settings</string>
@@ -37,10 +38,12 @@
     <string name="settings_interval_1hour">Every Hour</string>
     <string name="settings_interval_halfday">Twice a Day</string>
     <string name="settings_interval_day">Once a Day</string>
+    <string name="settings_movprice_title">CHOOSE DISPLAYED MOVIE PRICE:</string>
     <string name="settings_movprice_rentsd">Rental Standard Definition</string>
     <string name="settings_movprice_renthd">Rental High Definition</string>
     <string name="settings_movprice_buysd">Purchase Standard Definition</string>
     <string name="settings_movprice_buyhd">Purchase High Definition</string>
+    <string name="settings_magprice_title">CHOOSE DISPLAYED MAGAZINE PRICE:</string>
     <string name="settings_magprice_issue">Issue Price</string>
     <string name="settings_magprice_monthly">Monthly Subscription</string>
     <string name="settings_magprice_annual">Annual Subscription</string>

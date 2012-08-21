@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.entries.MovieDisplayPrice;
 import com.brstf.wishlist.ui.SettingsActivity;
 import com.brstf.wishlist.ui.WLHomeActivity;
 
@@ -110,9 +111,10 @@ public class ActivityHelper {
 
 		// Display Preferences:
 		editor.putInt(mActivity.getString(R.string.prefs_display_price_movie),
-				0);
+				MovieDisplayPrice.RENTAL_STANDARD_DEFINITION);
 		editor.putInt(
-				mActivity.getString(R.string.prefs_display_price_magazine), 0);
+				mActivity.getString(R.string.prefs_display_price_magazine),
+				MovieDisplayPrice.RENTAL_STANDARD_DEFINITION);
 
 		// Finally, commit the changes
 		editor.commit();

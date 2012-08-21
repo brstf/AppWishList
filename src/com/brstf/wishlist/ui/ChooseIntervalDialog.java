@@ -14,6 +14,8 @@ import android.widget.RadioButton;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.interfaces.OnDialogDismissListener;
+import com.brstf.wishlist.util.NetworkUtils;
 
 public class ChooseIntervalDialog extends SherlockDialogFragment {
 	private RadioButton m15min = null;
@@ -25,14 +27,10 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 	private final HashMap<RadioButton, Long> intervalMap = new HashMap<RadioButton, Long>();
 	private OnDialogDismissListener mListener;
 
-	public interface OnDialogDismissListener {
-		public void onDialogDismissal();
-	}
-	
-	ChooseIntervalDialog( OnDialogDismissListener list ) {
+	ChooseIntervalDialog(OnDialogDismissListener list) {
 		mListener = list;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,7 +61,7 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 
 		mPrefs = getActivity().getSharedPreferences(
 				getString(R.string.PREFS_NAME), 0);
-		;
+
 		long interval = mPrefs.getLong(getString(R.string.prefs_sync_interval),
 				0);
 		if (interval == intervalMap.get(m15min)) {
@@ -81,6 +79,9 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 		return view;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -90,15 +91,22 @@ public class ChooseIntervalDialog extends SherlockDialogFragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				if( isChecked ) {
-					SharedPreferences.Editor editor = mPrefs.edit();
-					editor.putLong(getString(R.string.prefs_sync_interval),
-							intervalMap.get((RadioButton) buttonView));
-					editor.commit();
-					
-					mListener.onDialogDismissal();
-					dismiss();
-				}
+				if (!isChecked)
+					return;
+
+				long interval = intervalMap.get((RadioButton) buttonView);
+				SharedPreferences.Editor editor = mPrefs.edit();
+				editor.putLong(getString(R.string.prefs_sync_interval),
+						interval);
+				editor.commit();
+
+				String lastTimeString = getString(R.string.prefs_last_check_time);
+				long lastTime = mPrefs.getLong(lastTimeString, 0);
+				NetworkUtils.schedulePriceCheck(getActivity().getBaseContext(),
+						lastTime + interval, interval, mPrefs, lastTimeString);
+
+				mListener.onDialogDismissal();
+				dismiss();
 			}
 		};
 

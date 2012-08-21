@@ -3,6 +3,9 @@ package com.brstf.wishlist.ui;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.view.Menu;
 import com.brstf.wishlist.R;
+import com.brstf.wishlist.entries.MagazineDisplayPrice;
+import com.brstf.wishlist.entries.MovieDisplayPrice;
+import com.brstf.wishlist.interfaces.OnDialogDismissListener;
 
 import android.app.AlarmManager;
 import android.content.SharedPreferences;
@@ -16,7 +19,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class SettingsActivity extends BaseActivity implements
-		ChooseIntervalDialog.OnDialogDismissListener {
+		OnDialogDismissListener {
 	private ToggleButton mWifiSync;
 	private LinearLayout mSyncInterval;
 	private ToggleButton mConfirmDeletion;
@@ -80,7 +83,8 @@ public class SettingsActivity extends BaseActivity implements
 		mSyncInterval.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SherlockDialogFragment intervalFragment = new ChooseIntervalDialog(SettingsActivity.this);
+				SherlockDialogFragment intervalFragment = new ChooseIntervalDialog(
+						SettingsActivity.this);
 				intervalFragment.show(getSupportFragmentManager(),
 						"dialog_interval");
 			}
@@ -113,6 +117,26 @@ public class SettingsActivity extends BaseActivity implements
 						editor.commit();
 					}
 				});
+
+		mDisplayPriceMovie.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SherlockDialogFragment intervalFragment = new ChooseMoviePriceDialog(
+						SettingsActivity.this);
+				intervalFragment.show(getSupportFragmentManager(),
+						"dialog_movprice");
+			}
+		});
+
+		mDisplayPriceMagazine.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SherlockDialogFragment intervalFragment = new ChooseMagazinePriceDialog(
+						SettingsActivity.this);
+				intervalFragment.show(getSupportFragmentManager(),
+						"dialog_magprice");
+			}
+		});
 	}
 
 	@Override
@@ -160,13 +184,13 @@ public class SettingsActivity extends BaseActivity implements
 		TextView textMagazine = (TextView) mDisplayPriceMagazine
 				.findViewById(R.id.text_display_price_magazine);
 		switch (whichPrice) {
-		case 0:
+		case MagazineDisplayPrice.CURRENT_ISSUE:
 			textMagazine.setText(getString(R.string.settings_magprice_issue));
 			break;
-		case 1:
+		case MagazineDisplayPrice.SUBSCRIPTION_MONTHLY:
 			textMagazine.setText(getString(R.string.settings_magprice_monthly));
 			break;
-		case 2:
+		case MagazineDisplayPrice.SUBSCRIPTION_ANNUAL:
 			textMagazine.setText(getString(R.string.settings_magprice_annual));
 			break;
 		}
@@ -181,16 +205,16 @@ public class SettingsActivity extends BaseActivity implements
 		TextView textMovie = (TextView) mDisplayPriceMovie
 				.findViewById(R.id.text_display_price_movie);
 		switch (whichPrice) {
-		case 0:
+		case MovieDisplayPrice.RENTAL_STANDARD_DEFINITION:
 			textMovie.setText(getString(R.string.settings_movprice_rentsd));
 			break;
-		case 1:
+		case MovieDisplayPrice.RENTAL_HIGH_DEFINITION:
 			textMovie.setText(getString(R.string.settings_movprice_renthd));
 			break;
-		case 2:
+		case MovieDisplayPrice.BUY_STANDARD_DEFINITION:
 			textMovie.setText(getString(R.string.settings_movprice_buysd));
 			break;
-		case 3:
+		case MovieDisplayPrice.BUY_HIGH_DEFINITION:
 			textMovie.setText(getString(R.string.settings_movprice_buyhd));
 			break;
 		}
